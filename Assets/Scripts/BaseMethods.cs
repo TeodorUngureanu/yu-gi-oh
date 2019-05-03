@@ -2,9 +2,5 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NonMonster {
-
-    enum Type { Spell, Trap };
-
-    private Type type;
+public class BaseMethods {
 }

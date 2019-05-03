@@ -2,8 +2,26 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Card : MonoBehaviour {
+public class Card {
     private string cardName;
     private string description;
     private string effectKey;
+    private int turnPlayed;
+
+    public Card(string vCardName, string vDescription, string vEffectKey)
+    {
+        cardName = vCardName;
+        description = vDescription;
+        effectKey = vEffectKey;
+    }
+
+    public int getTurnPlayed()
+    {
+        return turnPlayed;
+    }
+
+    public void setTurnPlayed(int crtTurn)
+    {
+        turnPlayed = crtTurn;
+    }
 }
