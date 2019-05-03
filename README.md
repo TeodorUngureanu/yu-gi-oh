@@ -1,1 +1,1 @@
-# YuGiHoHoHo
+# YuGiOh project
