@@ -15,6 +15,21 @@ public class Card {
         effectKey = vEffectKey;
     }
 
+    public string getCardName()
+    {
+        return cardName;
+    }
+    
+    public string getDescription()
+    {
+        return description;
+    }
+
+    public string getEffectKey()
+    {
+        return effectKey;
+    }
+
     public int getTurnPlayed()
     {
         return turnPlayed;
