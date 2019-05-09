@@ -5,15 +5,17 @@ using UnityEngine;
 public class Player : MonoBehaviour {
 
     private Deck deckScript;
-    private List<Card> hand;
+    private HandScript handScript;
+    private List<Card> cardsInHand;
     private int cardsLeftInDeck;
     private Turn turn = new Turn();
 
     private long lifePoints;
 
-    public GameObject disk;
-    public GameObject deck;
+    public GameObject disk, deck, card, hand;
     private bool isReadyForDuel, hasDrawnHand;
+    private bool isFirst = true; //only set for testing
+    private bool playedMonsterThisTurn = false;
 
     void Awake()
     {
@@ -21,6 +23,8 @@ public class Player : MonoBehaviour {
         isReadyForDuel = false;
         hasDrawnHand = false;
         deckScript = deck.GetComponent<Deck>();
+        handScript = hand.GetComponent<HandScript>();
+        cardsInHand = new List<Card>();
     }
 
     // Use this for initialization
@@ -30,48 +34,48 @@ public class Player : MonoBehaviour {
         deckScript.LoadDeck("Yugi");
         deckScript.ShuffleCards();
         deck.SetActive(false);
+        handScript.SetDefaultCard(card);
     }
 
     // Update is called once per frame
     void Update()
     {
+        
+
+        if (Input.GetKeyDown(KeyCode.Space) && isReadyForDuel && !hasDrawnHand)
+        {
+            Debug.Log("Drawing first hand");
+            //to change this to 6; currently in testing
+            if (cardsInHand.Count == 0)
+            {
+                for (int index = 0; index < 2; index++)
+                {
+                    DrawCard();
+                }
+                Invoke("SetHandDrawn", 3.0f);
+            }
+        }
         //used only at the beginning, maybe it can be moved
-        if(Input.GetKeyDown(KeyCode.Space) && !isReadyForDuel)
+        if (Input.GetKeyDown(KeyCode.Space) && !isReadyForDuel)
         {
             isReadyForDuel = true;
             disk.GetComponent<Animation>()["Take 001"].speed = 2.0f;
             disk.GetComponent<Animation>().Play();
 
-            Invoke("ShowDeck", 3.0f);
-        }
-        if(Input.GetKeyDown(KeyCode.Space) && !hasDrawnHand)
-        {
-            //Draw first hand
-                    }
-        //implement OnHover on cards, OnGraveyard
-        
-        //temporarily skipping enemy's turn - TO BE REMOVED
-        if(turn.getCurrentPhase() == Turn.Phase.Hold && hasDrawnHand)
-        {
-            if(Input.GetKeyDown(KeyCode.Space))
-            {
-                OnPhaseTrigger();
-            }
+            Invoke("ShowDeck", 1.0f);
         }
 
-        if (turn.getCurrentPhase() == Turn.Phase.Draw)
+        //implement OnHover on cards, OnGraveyard
+
+        //temporarily skipping enemy's turn - TO BE REMOVED
+        if (turn.getCurrentPhase() == Turn.Phase.Hold && hasDrawnHand)
         {
-            cardsLeftInDeck = deckScript.CardsLeft();
-            if (cardsLeftInDeck > 0)
-            {
-                //add card in hand (TODO: animation)
-                Card nextCard = deckScript.DrawCard();
-            }
-            else
+            if (Input.GetKeyDown(KeyCode.Space))
             {
                 OnPhaseTrigger();
             }
         }
+        
         if(turn.isMainPhase())
         {
             //player is able to play cards
@@ -84,7 +88,17 @@ public class Player : MonoBehaviour {
         {
             //player is only able to attack
         }
-
+        if(turn.getCurrentPhase() == Turn.Phase.End)
+        {
+            if(cardsInHand.Count > 6)
+            {
+                //discard cards
+            }
+            else
+            {
+                OnPhaseTrigger();
+            }
+        }
     }
 
     private void ShowDeck()
@@ -109,15 +123,45 @@ public class Player : MonoBehaviour {
         {
             deckScript.setIsDrawPhase(true);
         }
+
+        Debug.Log(turn.getCurrentPhase() + " phase");
     }
 
     private List<Card> CanBePlayed()
     {
-        List<Card> canBePlayed = hand;
-        foreach(Card card in hand)
+        List<Card> canBePlayed = cardsInHand;
+        for (int index = 0; index < cardsInHand.Count; index ++)
         {
+            Card crtCard = cardsInHand[index];
             //if cannot be played, remove it
+
+            //else
+            handScript.HighlightCard(index);
         }
         return canBePlayed;
+    }
+
+    //to be called after connection is made with another player (randomly or host first)
+    public void SetIsFirst(bool vIsFirst)
+    {
+        isFirst = vIsFirst;
+    }
+
+    public void DrawCard()
+    {
+        Card nextCard = deckScript.DrawCard();
+        cardsInHand.Add(nextCard);
+        //animation
+        handScript.AddCard(cardsInHand.Count - 1);
+
+        if(turn.getCurrentPhase() == Turn.Phase.Draw)
+        {
+            OnPhaseTrigger();
+        }
+    }
+
+    private void SetHandDrawn()
+    {
+        hasDrawnHand = true;
     }
 }

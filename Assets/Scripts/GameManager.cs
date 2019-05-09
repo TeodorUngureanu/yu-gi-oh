@@ -2,14 +2,30 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
-{
-    private static GameManager Instance;
-    
+public class GameManager : MonoBehaviour {
+
+    private static GameManager instance;
     public GameObject player;
-    private Player enemy; //?
+    private Player enemy; //is this needed?
     private Graveyard playerGraveyard, enemyGraveyard;
     private Field field;
+
+    public static GameManager Get()
+    {
+        return instance;
+    }
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     public Graveyard getGraveyard(string key)
     {
@@ -25,28 +41,9 @@ public class GameManager : MonoBehaviour
         return field.GetEffectValueForType(monsterType);
     }
 
-    public static GameManager Get()
+    public void DrawCard()
     {
-        return Instance;
+        player.GetComponent<Player>().DrawCard();
     }
 
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(this);
-            Init();
-        }
-        else
-        {
-            Destroy(gameObject);
-            Debug.Log("GameManager Instance: " + (Instance == this));
-        }
-    }
-
-    private void Init()
-    {
-        GameData.Load();
-    }
 }
