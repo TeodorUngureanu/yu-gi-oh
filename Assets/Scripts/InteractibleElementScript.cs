@@ -20,7 +20,7 @@ public abstract class InteractibleElementScript : MonoBehaviour {
 
     protected Renderer objRenderer;
 
-    void Awake()
+    protected virtual void Awake()
     {
         // Instantiate outline materials
         outlineMaskMaterial = Instantiate(Resources.Load<Material>(@"Materials/OutlineMask"));
@@ -29,6 +29,8 @@ public abstract class InteractibleElementScript : MonoBehaviour {
         outlineMaskMaterial.name = "OutlineMask (Instance)";
         outlineFillMaterial.name = "OutlineFill (Instance)";
 
+        Debug.Log(outlineMaskMaterial);
+        Debug.Log(outlineFillMaterial);
         // Apply material properties immediately
         needsUpdate = true;
     }

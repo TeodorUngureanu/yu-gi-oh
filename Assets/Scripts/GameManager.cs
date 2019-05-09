@@ -4,10 +4,28 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour {
 
+    private static GameManager instance;
     public GameObject player;
-    private Player enemy; //?
+    private Player enemy; //is this needed?
     private Graveyard playerGraveyard, enemyGraveyard;
     private Field field;
+
+    public static GameManager Get()
+    {
+        return instance;
+    }
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     public Graveyard getGraveyard(string key)
     {
@@ -21,6 +39,11 @@ public class GameManager : MonoBehaviour {
     public int GetFieldEffectValue(string monsterType)
     {
         return field.GetEffectValueForType(monsterType);
+    }
+
+    public void DrawCard()
+    {
+        player.GetComponent<Player>().DrawCard();
     }
 
 }
