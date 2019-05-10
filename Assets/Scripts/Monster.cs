@@ -21,9 +21,9 @@ public class Monster : Card {
     private bool isForbidden;
     private bool isFusion;
 
-    public Monster(string vCardName, string vDescription, string vEffectKey, Attribute vAttribute, MonsterType vType, int vAttackPoints,
-            int vDefensePoints, int vRarity, bool vHasEffect, bool vIsForbidden, bool vIsFusion)
-        : base(vCardName, vDescription, vEffectKey)
+    public Monster(string vCardName, string vDescription, string vEffectKey, bool vMonster, Attribute vAttribute, MonsterType vType,
+        int vAttackPoints, int vDefensePoints, int vRarity, bool vHasEffect, bool vIsForbidden, bool vIsFusion)
+        : base(vCardName, vDescription, vEffectKey, vMonster)
     {
         attribute = vAttribute;
         type = vType;

@@ -7,12 +7,14 @@ public class Card {
     private string description;
     private string effectKey;
     private int turnPlayed;
+    private bool monster;
 
-    public Card(string vCardName, string vDescription, string vEffectKey)
+    public Card(string vCardName, string vDescription, string vEffectKey, bool vMonster)
     {
         cardName = vCardName;
         description = vDescription;
         effectKey = vEffectKey;
+        monster = vMonster;
     }
 
     public string getCardName()
@@ -38,5 +40,15 @@ public class Card {
     public void setTurnPlayed(int crtTurn)
     {
         turnPlayed = crtTurn;
+    }
+
+    public bool isMonster()
+    {
+        return monster;
+    }
+
+    public void setMonster(bool vMonster)
+    {
+        monster = vMonster;
     }
 }

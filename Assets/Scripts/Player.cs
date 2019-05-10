@@ -6,11 +6,17 @@ public class Player : MonoBehaviour {
 
     private Deck deckScript;
     private HandScript handScript;
-    private List<Card> cardsInHand;
+    private DiskScript diskScript;
+    private List<Card> cardsInHand, monstersOnDisk, spellsOnDisk;
+    private List<Card> monstersOnField, spellsOnField;
     private int cardsLeftInDeck;
     private Turn turn = new Turn();
 
     private long lifePoints;
+    private int turnCount = 0;
+
+    //to change this to 5; currently in testing
+    public int initialHandSize = 3;
 
     public GameObject disk, deck, card, hand;
     private bool isReadyForDuel, hasDrawnHand;
@@ -24,7 +30,12 @@ public class Player : MonoBehaviour {
         hasDrawnHand = false;
         deckScript = deck.GetComponent<Deck>();
         handScript = hand.GetComponent<HandScript>();
+        diskScript = disk.GetComponent<DiskScript>();
         cardsInHand = new List<Card>();
+        monstersOnDisk = new List<Card> { null, null, null, null, null };
+        spellsOnDisk = new List<Card> { null, null, null, null, null };
+        monstersOnField = new List<Card> { null, null, null, null, null };
+        spellsOnField = new List<Card> { null, null, null, null, null };
     }
 
     // Use this for initialization
@@ -32,27 +43,26 @@ public class Player : MonoBehaviour {
     {
         //init deck
         deckScript.LoadDeck("Yugi");
-        deckScript.ShuffleCards();
+        //deckScript.ShuffleCards();
         deck.SetActive(false);
+        card.SetActive(false);
         handScript.SetDefaultCard(card);
     }
 
     // Update is called once per frame
     void Update()
     {
-        
-
         if (Input.GetKeyDown(KeyCode.Space) && isReadyForDuel && !hasDrawnHand)
         {
             Debug.Log("Drawing first hand");
-            //to change this to 6; currently in testing
+            
             if (cardsInHand.Count == 0)
             {
-                for (int index = 0; index < 2; index++)
+                for (int index = 0; index < initialHandSize; index++)
                 {
                     DrawCard();
                 }
-                Invoke("SetHandDrawn", 3.0f);
+                hasDrawnHand = true;
             }
         }
         //used only at the beginning, maybe it can be moved
@@ -78,11 +88,11 @@ public class Player : MonoBehaviour {
         
         if(turn.isMainPhase())
         {
-            //player is able to play cards
-
-            //highlight these cards
-            List<Card> canBePlayed = CanBePlayed();
-            
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                ProcessUsableHandCards(false);
+                OnPhaseTrigger();
+            }
         }
         if(turn.getCurrentPhase() == Turn.Phase.Battle)
         {
@@ -105,6 +115,7 @@ public class Player : MonoBehaviour {
     {
         Debug.Log("Showing deck...");
         deck.SetActive(true);
+        card.SetActive(true);
         //temporarily, while not using headset
         Cursor.visible = true;
     }
@@ -122,29 +133,71 @@ public class Player : MonoBehaviour {
         if(turn.getCurrentPhase() == Turn.Phase.Draw)
         {
             deckScript.setIsDrawPhase(true);
+            playedMonsterThisTurn = false;
+            turnCount++;
+        }
+
+        if(turn.isMainPhase())
+        {
+            //highlight playable cards
+            ProcessUsableHandCards(true);
+        }
+
+        if(turn.getCurrentPhase() == Turn.Phase.Battle)
+        {
+
         }
 
         Debug.Log(turn.getCurrentPhase() + " phase");
     }
 
-    private List<Card> CanBePlayed()
+    private void ProcessUsableHandCards(bool highlight)
     {
-        List<Card> canBePlayed = cardsInHand;
         for (int index = 0; index < cardsInHand.Count; index ++)
         {
             Card crtCard = cardsInHand[index];
-            //if cannot be played, remove it
-
-            //else
-            handScript.HighlightCard(index);
+            if (highlight)
+            {
+                //if can be played, add it
+                if((crtCard.isMonster() && monstersOnDisk.IndexOf(null) != -1 && !playedMonsterThisTurn) ||
+                    (!crtCard.isMonster() && spellsOnDisk.IndexOf(null) != -1))
+                {
+                    handScript.HighlightCard(index);
+                }
+            } else
+            {
+                //the other way
+                handScript.UnhighlightCard(index);
+            }
         }
-        return canBePlayed;
+    }
+
+    private void ProcessBattleReadyMonsters(bool highlight)
+    {
+        for (int index = 0; index < monstersOnDisk.Count; index++)
+        {
+            Card crtCard = monstersOnDisk[index];
+            if (highlight)
+            {
+                //if can be played, add it
+                if (crtCard.getTurnPlayed() != turnCount)
+                {
+                    handScript.HighlightCard(index);
+                }
+            }
+            else
+            {
+                //the other way
+                handScript.UnhighlightCard(index);
+            }
+        }
     }
 
     //to be called after connection is made with another player (randomly or host first)
     public void SetIsFirst(bool vIsFirst)
     {
         isFirst = vIsFirst;
+
     }
 
     public void DrawCard()
@@ -152,7 +205,7 @@ public class Player : MonoBehaviour {
         Card nextCard = deckScript.DrawCard();
         cardsInHand.Add(nextCard);
         //animation
-        handScript.AddCard(cardsInHand.Count - 1);
+        handScript.AddCard(cardsInHand.Count - 1, nextCard.isMonster());
 
         if(turn.getCurrentPhase() == Turn.Phase.Draw)
         {
@@ -160,8 +213,28 @@ public class Player : MonoBehaviour {
         }
     }
 
-    private void SetHandDrawn()
+    public void SetMonsterOnDisk(int index)
     {
-        hasDrawnHand = true;
+        int diskIndex = monstersOnDisk.IndexOf(null);
+        Card card = cardsInHand[index];
+        card.setTurnPlayed(turnCount);
+        monstersOnDisk[diskIndex] = card;
+        monstersOnField[diskIndex] = card;
+        cardsInHand.RemoveAt(index);
+        handScript.RecalculateIndex(index, true);
+        diskScript.SetMonster(diskIndex);
+        GameManager.Get().PlaceMonsterOnField(diskIndex);
+        playedMonsterThisTurn = true;
+    }
+
+    public void SetSpellOnDisk(int index)
+    {
+        int diskIndex = spellsOnDisk.IndexOf(null);
+        spellsOnDisk[diskIndex] = cardsInHand[index];
+        spellsOnField[diskIndex] = cardsInHand[index];
+        cardsInHand.RemoveAt(index);
+        handScript.RecalculateIndex(index, false);
+        diskScript.SetSpell(diskIndex);
+        GameManager.Get().PlaceSpellOnField(diskIndex);
     }
 }

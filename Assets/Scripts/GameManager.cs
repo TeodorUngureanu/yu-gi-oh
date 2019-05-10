@@ -5,10 +5,11 @@ using UnityEngine;
 public class GameManager : MonoBehaviour {
 
     private static GameManager instance;
-    public GameObject player;
-    private Player enemy; //is this needed?
+    public GameObject player, field;
+    private Player enemy, playerScript; //is this needed?
     private Graveyard playerGraveyard, enemyGraveyard;
-    private Field field;
+
+    private FieldScript fieldScript;
 
     public static GameManager Get()
     {
@@ -20,6 +21,11 @@ public class GameManager : MonoBehaviour {
         if (instance == null)
         {
             instance = this;
+            if(player != null)
+            {
+                playerScript = player.GetComponent<Player>();
+            }
+            fieldScript = field.GetComponent<FieldScript>();
         }
         else
         {
@@ -38,12 +44,31 @@ public class GameManager : MonoBehaviour {
 
     public int GetFieldEffectValue(string monsterType)
     {
-        return field.GetEffectValueForType(monsterType);
+        return field.GetComponent<FieldScript>().GetEffectValueForType(monsterType);
     }
 
     public void DrawCard()
     {
-        player.GetComponent<Player>().DrawCard();
+        playerScript.DrawCard();
     }
 
+    public void PlaceMonsterOnDisk(int index)
+    {
+        playerScript.SetMonsterOnDisk(index);
+    }
+
+    public void PlaceSpellOnDisk(int index)
+    {
+        playerScript.SetSpellOnDisk(index);
+    }
+
+    public void PlaceMonsterOnField(int index)
+    {
+        fieldScript.SetMonster(index);
+    }
+
+    public void PlaceSpellOnField(int index)
+    {
+        fieldScript.SetSpell(index);
+    }
 }

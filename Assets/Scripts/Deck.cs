@@ -20,10 +20,10 @@ public class Deck : InteractibleElementScript {
         //To implement
 
         //temporarily adding some cards - TO BE REMOVED
-        Monster card = new Monster("Card1", "blah blah card1", "NO_EFFECT", Monster.Attribute.Dark, Monster.MonsterType.Beast, 2000, 500, 5, false, false, false);
-        NonMonster card2 = new NonMonster("Card2", "blah blah card2", "NO_EFFECT", NonMonster.NonMonsterType.Spell);
-        Monster card3 = new Monster("Card3", "blah blah card3", "NO_EFFECT", Monster.Attribute.Light, Monster.MonsterType.Beast, 200, 500, 1, false, false, false);
-        NonMonster card4 = new NonMonster("Card4", "blah blah card4", "EFFECT_9", NonMonster.NonMonsterType.Trap);
+        Monster card = new Monster("Card1", "blah blah card1", "NO_EFFECT", true, Monster.Attribute.Dark, Monster.MonsterType.Beast, 2000, 500, 5, false, false, false);
+        NonMonster card2 = new NonMonster("Card2", "blah blah card2", "NO_EFFECT", false, NonMonster.NonMonsterType.Spell);
+        Monster card3 = new Monster("Card3", "blah blah card3", "NO_EFFECT", true, Monster.Attribute.Light, Monster.MonsterType.Beast, 200, 500, 1, false, false, false);
+        NonMonster card4 = new NonMonster("Card4", "blah blah card4", "EFFECT_9", false, NonMonster.NonMonsterType.Trap);
         mainDeck.Add(card);
         mainDeck.Add(card2);
         mainDeck.Add(card3);
@@ -51,15 +51,14 @@ public class Deck : InteractibleElementScript {
 
     public Card DrawCard()
     {
-        Debug.Log("Cards in deck: " + mainDeck.Count);
         Card firstCard = mainDeck[0];
         mainDeck.RemoveAt(0);
+        Debug.Log("Cards remaining in deck: " + mainDeck.Count);
         return firstCard;
     }
 
     public void setIsDrawPhase(bool drawPhase)
     {
-        Debug.Log("Draw Phase: " + drawPhase);
         isDrawPhase = drawPhase;
     }
 
@@ -90,5 +89,6 @@ public class Deck : InteractibleElementScript {
     public override void interactWithElement()
     {
         GameManager.Get().DrawCard();
+        unhighlightObject();
     }
 }

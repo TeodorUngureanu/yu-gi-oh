@@ -5,11 +5,12 @@ using UnityEngine;
 
 public class CardScript : InteractibleElementScript {
 
-    public enum Location { HAND, FIELD, DECK, GRAVEYARD };
+    public enum Location { HAND, FIELD, DISK, GRAVEYARD };
 
     private Location location;
     private int cardIndex;
-    private bool highlight = false;
+    private bool highlight = false, isMonster;
+    public int turnPlayed;
 
     protected override void Awake()
     {
@@ -22,9 +23,11 @@ public class CardScript : InteractibleElementScript {
         return location;
     }
 
-    public void SetLocation(Location vLocation)
+    public void SetData(Location vLocation, int vCardIndex, bool vIsMonster)
     {
         location = vLocation;
+        cardIndex = vCardIndex;
+        isMonster = vIsMonster;
     }
 
     public int GetCardIndex()
@@ -40,6 +43,25 @@ public class CardScript : InteractibleElementScript {
     public void SetHighlight(bool vHighlight)
     {
         highlight = vHighlight;
+        if(!highlight)
+        {
+            unhighlightObject();
+        }
+    }
+    
+    public bool IsMonster()
+    {
+        return isMonster;
+    }
+
+    public int GetTurnPlayed()
+    {
+        return turnPlayed;
+    }
+
+    public void SetTurnPlayed(int vTurnPlayed)
+    {
+        turnPlayed = vTurnPlayed;
     }
 
     void OnMouseEnter()
@@ -58,8 +80,32 @@ public class CardScript : InteractibleElementScript {
         }
     }
 
+    void OnMouseDown()
+    {
+        if (highlight)
+        {
+            interactWithElement();
+        }
+    }
+
     public override void interactWithElement()
     {
-        
+        if(location.Equals(Location.HAND))
+        {
+            //place it on the disk
+            if(isMonster)
+            {
+                GameManager.Get().PlaceMonsterOnDisk(cardIndex);
+            }
+            else
+            {
+                GameManager.Get().PlaceSpellOnDisk(cardIndex);
+            }
+        }
+        if(location.Equals(Location.DISK))
+        {
+            //prepare attack, give tribute, select for spell/effect usage
+            setAttackMode(true);
+        }
     }
 }
