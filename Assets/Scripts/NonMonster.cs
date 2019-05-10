@@ -8,8 +8,8 @@ public class NonMonster : Card {
 
     private NonMonsterType type;
 
-    public NonMonster(string vCardName, string vDescription, string vEffectKey, NonMonsterType vType)
-        : base(vCardName, vDescription, vEffectKey)
+    public NonMonster(string vCardName, string vDescription, string vEffectKey, bool vMonster, NonMonsterType vType)
+        : base(vCardName, vDescription, vEffectKey, vMonster)
     {
         type = vType;
     }

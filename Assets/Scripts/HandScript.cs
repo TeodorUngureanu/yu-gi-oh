@@ -13,23 +13,13 @@ public class HandScript : MonoBehaviour {
     
     private Vector3 rotationVector = new Vector3(0, -90, 90);
     private Vector3 scalingVector = new Vector3(100, 0.2401343f, 69);
-
-    // Use this for initialization
-    void Start () {
-		
-	}
 	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
     public void SetDefaultCard(GameObject card)
     {
         defaultCard = card;
     }
 
-    public void AddCard(int index)
+    public void AddCard(int index, bool isMonster)
     {
         float crtX = x + cardsInHand.Count * xInterval;
         GameObject crtCard = Instantiate<GameObject>(
@@ -39,8 +29,27 @@ public class HandScript : MonoBehaviour {
             gameObject.transform);
 
         crtCard.transform.localScale = scalingVector;
-        crtCard.GetComponent<CardScript>().SetCardIndex(index);
+        crtCard.GetComponent<CardScript>().SetData(CardScript.Location.HAND, index, isMonster);
         cardsInHand.Add(crtCard);
+    }
+
+    public void RecalculateIndex(int lowestIndex, bool isMonster)
+    {
+        Destroy(cardsInHand[lowestIndex]);
+        cardsInHand.RemoveAt(lowestIndex);
+        for(int index = 0; index < cardsInHand.Count; index ++)
+        {
+            GameObject crtCard = cardsInHand[index];
+            if (isMonster && crtCard.GetComponent<CardScript>().IsMonster())
+            {
+                UnhighlightCard(index);
+            }
+            if (index >= lowestIndex)
+            {
+                crtCard.GetComponent<CardScript>().SetCardIndex(index);
+                crtCard.transform.position = new Vector3(crtCard.transform.position.x - xInterval, crtCard.transform.position.y, crtCard.transform.position.z);
+            }
+        }
     }
 
     public void HighlightCard(int index)

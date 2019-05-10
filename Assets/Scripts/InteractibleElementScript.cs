@@ -10,13 +10,13 @@ public abstract class InteractibleElementScript : MonoBehaviour {
         public List<Vector3> data;
     }
     protected static HashSet<Mesh> registeredMeshes = new HashSet<Mesh>();
-    protected Color outlineColor = Color.yellow;
+    protected Color outlineColor = Color.yellow, outlineSecondColor = Color.red;
     protected float outlineWidth = 7f;
     protected Material outlineMaskMaterial;
     protected Material outlineFillMaterial;
     protected List<Mesh> bakeKeys = new List<Mesh>();
     protected List<ListVector3> bakeValues = new List<ListVector3>();
-    protected bool needsUpdate;
+    protected bool needsUpdate, attackMode = false;
 
     protected Renderer objRenderer;
 
@@ -28,9 +28,7 @@ public abstract class InteractibleElementScript : MonoBehaviour {
 
         outlineMaskMaterial.name = "OutlineMask (Instance)";
         outlineFillMaterial.name = "OutlineFill (Instance)";
-
-        Debug.Log(outlineMaskMaterial);
-        Debug.Log(outlineFillMaterial);
+        
         // Apply material properties immediately
         needsUpdate = true;
     }
@@ -131,7 +129,13 @@ public abstract class InteractibleElementScript : MonoBehaviour {
     void UpdateMaterialProperties()
     {
         // Apply properties according to mode
-        outlineFillMaterial.SetColor("_OutlineColor", outlineColor);
+        if(attackMode)
+        {
+            outlineFillMaterial.SetColor("_OutlineColor", outlineSecondColor);
+        } else
+        {
+            outlineFillMaterial.SetColor("_OutlineColor", outlineColor);
+        }
 
         outlineMaskMaterial.SetFloat("_ZTest", (float)UnityEngine.Rendering.CompareFunction.Always);
         outlineFillMaterial.SetFloat("_ZTest", (float)UnityEngine.Rendering.CompareFunction.LessEqual);
@@ -154,6 +158,11 @@ public abstract class InteractibleElementScript : MonoBehaviour {
         materials.Remove(outlineFillMaterial);
 
         objRenderer.materials = materials.ToArray();
+    }
+
+    public void setAttackMode(bool vAttack)
+    {
+        attackMode = vAttack;
     }
 
     public abstract void interactWithElement();
