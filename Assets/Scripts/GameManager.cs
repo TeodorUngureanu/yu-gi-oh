@@ -46,4 +46,14 @@ public class GameManager : MonoBehaviour {
         player.GetComponent<Player>().DrawCard();
     }
 
+    public void SetFirst(bool value)
+    {
+        player.GetComponent<Player>().SetIsFirst(value);
+    }
+
+    public void InitDuel()
+    {
+        player.GetComponent<Player>().SetIsReadyForDuel(true);
+        player.GetComponent<Player>().InitDuel();
+    }
 }

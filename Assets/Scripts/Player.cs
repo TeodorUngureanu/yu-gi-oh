@@ -55,14 +55,11 @@ public class Player : MonoBehaviour {
                 Invoke("SetHandDrawn", 3.0f);
             }
         }
+
         //used only at the beginning, maybe it can be moved
         if (Input.GetKeyDown(KeyCode.Space) && !isReadyForDuel)
         {
-            isReadyForDuel = true;
-            disk.GetComponent<Animation>()["Take 001"].speed = 2.0f;
-            disk.GetComponent<Animation>().Play();
-
-            Invoke("ShowDeck", 1.0f);
+            InitDuel();
         }
 
         //implement OnHover on cards, OnGraveyard
@@ -146,6 +143,11 @@ public class Player : MonoBehaviour {
     {
         isFirst = vIsFirst;
     }
+    
+    public void SetIsReadyForDuel(bool vIsReadyForDuel)
+    {
+        isReadyForDuel = vIsReadyForDuel;
+    }
 
     public void DrawCard()
     {
@@ -163,5 +165,14 @@ public class Player : MonoBehaviour {
     private void SetHandDrawn()
     {
         hasDrawnHand = true;
+    }
+
+    public void InitDuel()
+    {
+        isReadyForDuel = true;
+        disk.GetComponent<Animation>()["Take 001"].speed = 2.0f;
+        disk.GetComponent<Animation>().Play();
+
+        Invoke("ShowDeck", 3.0f);
     }
 }
