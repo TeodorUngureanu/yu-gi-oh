@@ -26,17 +26,17 @@ public class FieldScript : MonoBehaviour {
         return value;
     }
 
-    public void SetMonster(int index)
+    public void SetMonster(int index, string cardName)
     {
         Debug.Log("Setting monster on field on position " + index);
-        monsterField[index].GetComponent<CardScript>().SetData(CardScript.Location.FIELD, index, true);
+        monsterField[index].GetComponent<CardScript>().SetData(CardScript.Location.FIELD, index, true, cardName);
         monsterField[index].SetActive(true);
     }
 
-    public void SetSpell(int index)
+    public void SetSpell(int index, string cardName)
     {
         Debug.Log("Setting spell on field on position " + index);
-        spellField[index].GetComponent<CardScript>().SetData(CardScript.Location.FIELD, index, false);
+        spellField[index].GetComponent<CardScript>().SetData(CardScript.Location.FIELD, index, false, cardName);
         spellField[index].SetActive(true);
     }
 }

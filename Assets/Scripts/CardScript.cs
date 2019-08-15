@@ -11,6 +11,8 @@ public class CardScript : InteractibleElementScript {
     private int cardIndex;
     private bool highlight = false, isMonster;
     public int turnPlayed;
+    public GameObject frontImagePlane;
+    private string position = "DEF";
 
     protected override void Awake()
     {
@@ -23,11 +25,19 @@ public class CardScript : InteractibleElementScript {
         return location;
     }
 
-    public void SetData(Location vLocation, int vCardIndex, bool vIsMonster)
+    public void SetData(Location vLocation, int vCardIndex, bool vIsMonster, string cardName)
     {
         location = vLocation;
         cardIndex = vCardIndex;
         isMonster = vIsMonster;
+
+        if(objRenderer == null)
+        {
+            objRenderer = GetComponent<Renderer>();
+        }
+
+        Texture2D texture = Resources.Load<Texture2D>("Images/Card Images/" + cardName);
+        frontImagePlane.GetComponent<Renderer>().material.mainTexture = texture;
     }
 
     public int GetCardIndex()
@@ -92,20 +102,30 @@ public class CardScript : InteractibleElementScript {
     {
         if(location.Equals(Location.HAND))
         {
-            //place it on the disk
-            if(isMonster)
+            if (GameManager.Get().IsPlayerDiscarding())
             {
-                GameManager.Get().PlaceMonsterOnDisk(cardIndex);
+                //send card to Graveyard
             }
             else
             {
-                GameManager.Get().PlaceSpellOnDisk(cardIndex);
+                //place it on the disk
+                if (isMonster)
+                {
+                    GameManager.Get().PlaceMonsterOnDisk(cardIndex);
+                }
+                else
+                {
+                    GameManager.Get().PlaceSpellOnDisk(cardIndex);
+                }
             }
         }
         if(location.Equals(Location.DISK))
         {
             //prepare attack, give tribute, select for spell/effect usage
             setAttackMode(true);
+
+            //testing position switch
+            GameManager.Get().SwitchMonsterPosition(cardIndex, (position == "DEF") ? "ATK" : "DEF");
         }
     }
 }

@@ -1,13 +1,20 @@
-﻿using System.Collections;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Card {
+public abstract class Card {
+    [JsonProperty("name")]
     private string cardName;
+    [JsonProperty("description")]
     private string description;
+    [JsonProperty("effectKey")]
     private string effectKey;
-    private int turnPlayed;
+    [JsonProperty("isMonster")]
     private bool monster;
+    [JsonIgnore]
+    private int turnPlayed;
 
     public Card(string vCardName, string vDescription, string vEffectKey, bool vMonster)
     {

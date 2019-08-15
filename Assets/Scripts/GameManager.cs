@@ -11,6 +11,8 @@ public class GameManager : MonoBehaviour {
 
     private FieldScript fieldScript;
 
+    private bool playerDiscarding = false;
+
     public static GameManager Get()
     {
         return instance;
@@ -47,6 +49,16 @@ public class GameManager : MonoBehaviour {
         return field.GetComponent<FieldScript>().GetEffectValueForType(monsterType);
     }
 
+    public bool IsPlayerDiscarding()
+    {
+        return playerDiscarding;
+    }
+
+    public void SetPlayerDiscarding(bool value)
+    {
+        playerDiscarding = value;
+    }
+
     public void DrawCard()
     {
         playerScript.DrawCard();
@@ -62,14 +74,19 @@ public class GameManager : MonoBehaviour {
         playerScript.SetSpellOnDisk(index);
     }
 
-    public void PlaceMonsterOnField(int index)
+    public void PlaceMonsterOnField(int index, string cardName)
     {
-        fieldScript.SetMonster(index);
+        fieldScript.SetMonster(index, cardName);
     }
 
-    public void PlaceSpellOnField(int index)
+    public void SwitchMonsterPosition(int index, string position)
     {
-        fieldScript.SetSpell(index);
+        playerScript.SwitchMonsterPosition(index, position);
+    }
+
+    public void PlaceSpellOnField(int index, string cardName)
+    {
+        fieldScript.SetSpell(index, cardName);
     }
 
     public void SetFirst(bool value)

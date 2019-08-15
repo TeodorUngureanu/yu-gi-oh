@@ -11,7 +11,7 @@ public class HandScript : MonoBehaviour {
     private float y = 2.46f, z = -5.0f;
     private float xInterval = 0.88f;
     
-    private Vector3 rotationVector = new Vector3(0, -90, 90);
+    private Vector3 rotationVector = new Vector3(0, -90, -90);
     private Vector3 scalingVector = new Vector3(100, 0.2401343f, 69);
 	
     public void SetDefaultCard(GameObject card)
@@ -19,7 +19,7 @@ public class HandScript : MonoBehaviour {
         defaultCard = card;
     }
 
-    public void AddCard(int index, bool isMonster)
+    public void AddCard(int index, bool isMonster, string cardName)
     {
         float crtX = x + cardsInHand.Count * xInterval;
         GameObject crtCard = Instantiate<GameObject>(
@@ -29,7 +29,8 @@ public class HandScript : MonoBehaviour {
             gameObject.transform);
 
         crtCard.transform.localScale = scalingVector;
-        crtCard.GetComponent<CardScript>().SetData(CardScript.Location.HAND, index, isMonster);
+        crtCard.GetComponent<CardScript>().SetData(CardScript.Location.HAND, index, isMonster, cardName);
+        
         cardsInHand.Add(crtCard);
     }
 

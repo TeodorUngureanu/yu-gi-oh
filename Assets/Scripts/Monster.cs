@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Newtonsoft.Json;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
@@ -6,24 +7,32 @@ using UnityEngine;
 public class Monster : Card {
 
     public enum Attribute { Dark, Divine, Earth, Fire, Light, Water, Wind };
-    //TODO: change this
+    //TODO: change this (or not)
     public enum MonsterType { Aqua, Beast, [Description("Beast-Warrior")] BW, Cyberse, Dinosaur,
                 [Description("Divine-Beast")] DB, Dragon, Fairy, Fiend, Fish, Insect,
                 Machine, Plant, Psychic, Pyro, Reptile, Rock, [Description("Sea Serpent")] SS,
                 Spellcaster, Thunder, Warrior, [Description("Winged Beast")] WB, Wyrm, Zombie };
 
+    [JsonProperty("attribute")]
     private Attribute attribute;
+    [JsonProperty("type")]
     private MonsterType type;
+    [JsonProperty("attack")]
     private int attackPoints;
+    [JsonProperty("defense")]
     private int defensePoints;
+    [JsonProperty("rarity")]
     private int rarity; //number of stars
+    [JsonProperty("hasEffect")]
     private bool hasEffect;
-    private bool isForbidden;
+    [JsonProperty("isFusion")]
     private bool isFusion;
+    [JsonIgnore]
+    private string position;
 
-    public Monster(string vCardName, string vDescription, string vEffectKey, bool vMonster, Attribute vAttribute, MonsterType vType,
-        int vAttackPoints, int vDefensePoints, int vRarity, bool vHasEffect, bool vIsForbidden, bool vIsFusion)
-        : base(vCardName, vDescription, vEffectKey, vMonster)
+    public Monster(string vCardName, string vDescription, string vEffectKey, Attribute vAttribute, MonsterType vType,
+        int vAttackPoints, int vDefensePoints, int vRarity, bool vHasEffect, bool vIsFusion)
+        : base(vCardName, vDescription, vEffectKey, true)
     {
         attribute = vAttribute;
         type = vType;
@@ -31,7 +40,6 @@ public class Monster : Card {
         defensePoints = vDefensePoints;
         rarity = vRarity;
         hasEffect = vHasEffect;
-        isForbidden = vIsForbidden;
         isFusion = vIsFusion;
     }
 
@@ -65,13 +73,13 @@ public class Monster : Card {
         return hasEffect;
     }
 
-    public bool isForbiddenCard()
-    {
-        return isForbidden;
-    }
-
     public bool isFusionCard()
     {
         return isFusion;
+    }
+
+    public void setPosition(string pos)
+    {
+        position = pos;
     }
 }
