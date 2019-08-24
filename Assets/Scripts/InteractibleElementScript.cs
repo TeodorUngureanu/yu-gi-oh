@@ -143,6 +143,8 @@ public abstract class InteractibleElementScript : MonoBehaviour {
     }
 
     public void highlightObject() {
+        if (objRenderer == null)
+            return;
         var materials = objRenderer.sharedMaterials.ToList();
 
         materials.Add(outlineMaskMaterial);
@@ -152,6 +154,8 @@ public abstract class InteractibleElementScript : MonoBehaviour {
     }
 
     public void unhighlightObject() {
+        if (objRenderer == null)
+            return;
         var materials = objRenderer.sharedMaterials.ToList();
 
         materials.Remove(outlineMaskMaterial);
@@ -160,9 +164,9 @@ public abstract class InteractibleElementScript : MonoBehaviour {
         objRenderer.materials = materials.ToArray();
     }
 
-    public void setAttackMode(bool vAttack)
+    public void SwitchAttackMode()
     {
-        attackMode = vAttack;
+        attackMode = !attackMode;
     }
 
     public abstract void interactWithElement();
