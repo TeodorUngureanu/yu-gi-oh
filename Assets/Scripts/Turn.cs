@@ -27,7 +27,7 @@ public class Turn {
 
     public void goToNextPhase()
     {
-        currentPhase = (currentPhase == turnPhases.Count) ? 0 : currentPhase + 1;
+        currentPhase = (currentPhase == turnPhases.Count - 1) ? 0 : currentPhase + 1;
     }
 
 }

@@ -19,7 +19,7 @@ public class HandScript : MonoBehaviour {
         defaultCard = card;
     }
 
-    public void AddCard(int index, bool isMonster, string cardName)
+    public void AddCard(int index, string cardType, string cardName)
     {
         float crtX = x + cardsInHand.Count * xInterval;
         GameObject crtCard = Instantiate<GameObject>(
@@ -29,7 +29,7 @@ public class HandScript : MonoBehaviour {
             gameObject.transform);
 
         crtCard.transform.localScale = scalingVector;
-        crtCard.GetComponent<CardScript>().SetData(CardScript.Location.HAND, index, isMonster, cardName);
+        crtCard.GetComponent<CardScript>().SetData(CardScript.Location.HAND, index, cardType, cardName);
         
         cardsInHand.Add(crtCard);
     }
@@ -61,5 +61,10 @@ public class HandScript : MonoBehaviour {
     public void UnhighlightCard(int index)
     {
         cardsInHand[index].GetComponent<CardScript>().SetHighlight(false);
+    }
+
+    public CardScript GetCardScriptForIndex(int index)
+    {
+        return cardsInHand[index].GetComponent<CardScript>();
     }
 }

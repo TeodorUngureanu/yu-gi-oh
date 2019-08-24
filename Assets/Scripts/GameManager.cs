@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour {
 
     private static GameManager instance;
     public GameObject player, field;
-    private Player enemy, playerScript; //is this needed?
+    private Player playerScript;
     private Graveyard playerGraveyard, enemyGraveyard;
 
     private FieldScript fieldScript;
@@ -64,14 +64,14 @@ public class GameManager : MonoBehaviour {
         playerScript.DrawCard();
     }
 
-    public void PlaceMonsterOnDisk(int index)
+    public void PlaceMonsterOnDisk(int index, string face)
     {
-        playerScript.SetMonsterOnDisk(index);
+        playerScript.SetMonsterOnDisk(index, face);
     }
 
-    public void PlaceSpellOnDisk(int index)
+    public void PlaceSpellOnDisk(int index, string face)
     {
-        playerScript.SetSpellOnDisk(index);
+        playerScript.SetSpellOnDisk(index, face);
     }
 
     public void PlaceMonsterOnField(int index, string cardName)
@@ -94,9 +94,21 @@ public class GameManager : MonoBehaviour {
         player.GetComponent<Player>().SetIsFirst(value);
     }
 
+    public Turn.Phase GetTurnPhase()
+    {
+        return player.GetComponent<Player>().GetCurrentPhase();
+    }
+
     public void InitDuel()
     {
         player.GetComponent<Player>().SetIsReadyForDuel(true);
         player.GetComponent<Player>().InitDuel();
+    }
+
+    public void DiscardCard(int index)
+    {
+        player.GetComponent<Player>().RemoveCardFromHand(index, false);
+
+        //send card to Graveyard
     }
 }
