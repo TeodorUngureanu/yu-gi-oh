@@ -64,12 +64,12 @@ public class GameManager : MonoBehaviour {
         playerScript.DrawCard();
     }
 
-    public void PlaceMonsterOnDisk(int index, string face)
+    public void PlaceMonsterOnDisk(int index, Enums.CardFace face)
     {
         playerScript.SetMonsterOnDisk(index, face);
     }
 
-    public void PlaceSpellOnDisk(int index, string face)
+    public void PlaceSpellOnDisk(int index, Enums.CardFace face)
     {
         playerScript.SetSpellOnDisk(index, face);
     }

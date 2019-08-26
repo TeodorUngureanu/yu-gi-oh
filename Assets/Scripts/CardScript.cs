@@ -4,19 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CardScript : InteractibleElementScript {
-
-    public enum Location { HAND, DISK, GRAVEYARD };
-
-    private Location location;
-    private int cardIndex;
-    private bool highlight = false;
-    private string cardType;
+public class CardScript : InteractibleAbstractCard {
+    
     public int turnPlayed;
     public GameObject frontImagePlane;
     public Canvas frontCanvas, backCanvas;
-    private string face = "UP";
-    private string position = "ATK";
+    private Enums.CardFace face = Enums.CardFace.Up;
+    public string position;
     private bool hasChangedPositionThisTurn = true;
 
     protected override void Awake()
@@ -25,9 +19,8 @@ public class CardScript : InteractibleElementScript {
         objRenderer = GetComponent<Renderer>();
     }
 
-    public void SetData(Location vLocation, int vCardIndex, string vCardType, string cardName)
+    public void SetData(int vCardIndex, Enums.CardType vCardType, string cardName)
     {
-        location = vLocation;
         cardIndex = vCardIndex;
         cardType = vCardType;
 
@@ -45,112 +38,45 @@ public class CardScript : InteractibleElementScript {
             backCanvas.enabled = false;
         }
 
-        if(location == Location.HAND)
-        {
-            if(cardType == "Spell")
-            {
-                face = "DOWN";
-            }
-            ChangeText();
-        }
-
         Texture2D texture = Resources.Load<Texture2D>("Images/Card Images/" + cardName);
         frontImagePlane.GetComponent<Renderer>().material.mainTexture = texture;
     }
 
-    public void SetFace(string newFace)
+    public void SetFace(Enums.CardFace newFace)
     {
         face = newFace;
         ChangeText();
     }
 
-    public void ChangeText()
+    public override void ChangeText()
     {
-        if(GameManager.Get().IsPlayerDiscarding())
+        if (IsMonster())
         {
-            frontCanvas.GetComponentInChildren<Text>().text = "Discard";
-            return;
-        }
-        if(location == Location.HAND)
-        {
-            if(IsMonster())
+            if (GameManager.Get().GetTurnPhase() == Turn.Phase.Battle)
             {
-                frontCanvas.GetComponentInChildren<Text>().text = (face == "UP") ? "Summon" : "Set";
+                frontCanvas.GetComponentInChildren<Text>().text = "Attack";
             }
             else
             {
-                frontCanvas.GetComponentInChildren<Text>().text = (cardType == "Spell" && face == "UP") ? "Activate" : "Set";
+                if (face == Enums.CardFace.Down)
+                {
+                    backCanvas.GetComponentInChildren<Text>().text = "Flip";
+                }
+                else
+                {
+                    frontCanvas.GetComponentInChildren<Text>().text = (position == "DEF") ? "Atk position" : "Def position";
+                }
             }
         }
         else
         {
-            if (IsMonster())
+            if(face == Enums.CardFace.Down)
             {
-                if (GameManager.Get().GetTurnPhase() == Turn.Phase.Battle)
-                {
-                    frontCanvas.GetComponentInChildren<Text>().text = "Attack";
-                }
-                else
-                {
-                    if (face == "DOWN")
-                    {
-                        backCanvas.GetComponentInChildren<Text>().text = "Flip";
-                    }
-                    else
-                    {
-                        frontCanvas.GetComponentInChildren<Text>().text = (position == "DEF") ? "Atk position" : "Def position";
-                    }
-                }
-            }
-            else
-            {
-                if(face == "DOWN")
-                {
-                    backCanvas.GetComponentInChildren<Text>().text = "Activate";
-                }
+                backCanvas.GetComponentInChildren<Text>().text = "Activate";
             }
         }
     }
-
-    public Location GetLocation()
-    {
-        return location;
-    }
-
-    public int GetCardIndex()
-    {
-        return cardIndex;
-    }
-
-    public void SetCardIndex(int vCardIndex)
-    {
-        cardIndex = vCardIndex;
-    }
-
-    public string GetCardType()
-    {
-        return cardType;
-    }
-
-    public bool IsHighlight()
-    {
-        return highlight;
-    }
-
-    public void SetHighlight(bool vHighlight)
-    {
-        highlight = vHighlight;
-        if(!highlight)
-        {
-            unhighlightObject();
-        }
-    }
-
-    public bool IsMonster()
-    {
-        return Equals(cardType, "Monster");
-    }
-
+    
     public int GetTurnPlayed()
     {
         return turnPlayed;
@@ -163,121 +89,80 @@ public class CardScript : InteractibleElementScript {
 
     void OnMouseEnter()
     {
-        if (highlight)
+        if (highlightable)
         {
-            highlightObject();
-            if (location == Location.HAND)
+            HighlightObject();
+            if(face == Enums.CardFace.Up)
             {
                 frontCanvas.enabled = true;
-            }
-            if(location == Location.DISK)
+            } else
             {
-                if(face == "UP")
-                {
-                    frontCanvas.enabled = true;
-                } else
-                {
-                    backCanvas.enabled = true;
-                }
+                backCanvas.enabled = true;
             }
         }
     }
 
     void OnMouseExit()
     {
-        if (highlight)
+        if (highlightable)
         {
-            unhighlightObject();
-            if (location == Location.HAND)
+            UnhighlightObject();
+            if (face == Enums.CardFace.Up)
             {
                 frontCanvas.enabled = false;
-                if(IsMonster())
-                {
-                    SetFace("UP");
-                }
-                else
-                {
-                    SetFace("DOWN");
-                }
             }
-            if (location == Location.DISK)
+            else
             {
-                if (face == "UP")
-                {
-                    frontCanvas.enabled = false;
-                }
-                else
-                {
-                    backCanvas.enabled = false;
-                }
+                backCanvas.enabled = false;
             }
         }
     }
 
     void OnMouseOver()
     {
-        if (highlight)
+        if (highlightable)
         {
             if (Input.GetMouseButtonDown(0))
             {
-                interactWithElement();
-            }
-
-            if(Input.GetMouseButtonDown(1) && location == Location.HAND && !GameManager.Get().IsPlayerDiscarding())
-            {
-                SwitchFace();
+                backCanvas.enabled = false;
+                frontCanvas.enabled = false;
+                InteractWithElement();
             }
         }
     }
 
     private void SwitchFace()
     {
-        if(face == "UP")
+        if(face == Enums.CardFace.Up)
         {
-            SetFace("DOWN");
+            SetFace(Enums.CardFace.Down);
         }
         else
         {
-            if(cardType != "Trap")
+            if(cardType != Enums.CardType.Trap)
             {
-                SetFace("UP");
+                SetFace(Enums.CardFace.Up);
             }
         }
     }
 
     private void ChangePosition()
     {
-        if(position == "DEF" && face == "DOWN")
+        if (position == "DEF" && face == Enums.CardFace.Down)
         {
             backCanvas.enabled = false;
             frontCanvas.enabled = true;
+            SetFace(Enums.CardFace.Up);
+            
+            Vector3 crtRotation = this.gameObject.transform.localEulerAngles;
+            crtRotation.x = 180;
+            this.gameObject.transform.localEulerAngles = crtRotation;
         }
-        position = (position == "ATK") ? "DEF" : "ATK";
     }
 
-    public override void interactWithElement()
+    public override void InteractWithElement()
     {
-        if(location.Equals(Location.HAND))
-        {
-            if (GameManager.Get().IsPlayerDiscarding())
-            {
-                GameManager.Get().DiscardCard(cardIndex);
-            }
-            else
-            {
-                //place it on the disk
-                if (IsMonster())
-                {
-                    GameManager.Get().PlaceMonsterOnDisk(cardIndex, face);
-                }
-                else
-                {
-                    GameManager.Get().PlaceSpellOnDisk(cardIndex, face);
-                }
-            }
-        }
-
-        if(location.Equals(Location.DISK) && IsMonster())
+        if(IsMonster())
         {
             Turn.Phase currentPhase = GameManager.Get().GetTurnPhase();
 
@@ -294,8 +179,9 @@ public class CardScript : InteractibleElementScript {
             if ((currentPhase == Turn.Phase.Main1 || currentPhase == Turn.Phase.Main2) && !hasChangedPositionThisTurn)
             {
                 ChangePosition();
+                string newPosition = (position == "ATK") ? "DEF" : "ATK";
+                GameManager.Get().SwitchMonsterPosition(cardIndex, newPosition);
                 hasChangedPositionThisTurn = true;
-                GameManager.Get().SwitchMonsterPosition(cardIndex, (face.Equals("DOWN")) ? "UP" : "DOWN");
             }
         }
     }

@@ -31,7 +31,7 @@ public class Deck : InteractibleElementScript {
 
         //keep this part
         String deckJson = File.ReadAllText("pack.json");
-        List<Card> deserialized = JsonConvert.DeserializeObject<List<Card>>(deckJson, settings);
+        mainDeck = JsonConvert.DeserializeObject<List<Card>>(deckJson, settings);
 
         Debug.Log("Deck loaded. No. cards: " + mainDeck.Count);
     }
@@ -121,7 +121,7 @@ public class Deck : InteractibleElementScript {
     {
         if (isDrawPhase)
         {
-            highlightObject();
+            HighlightObject();
         }
     }
 
@@ -129,7 +129,7 @@ public class Deck : InteractibleElementScript {
     {
         if (isDrawPhase)
         {
-            unhighlightObject();
+            UnhighlightObject();
         }
     }
 
@@ -137,13 +137,13 @@ public class Deck : InteractibleElementScript {
     {
         if(isDrawPhase)
         {
-            interactWithElement();
+            InteractWithElement();
         }
     }
 
-    public override void interactWithElement()
+    public override void InteractWithElement()
     {
         GameManager.Get().DrawCard();
-        unhighlightObject();
+        UnhighlightObject();
     }
 }

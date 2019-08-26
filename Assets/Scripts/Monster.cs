@@ -7,7 +7,6 @@ using UnityEngine;
 public class Monster : Card {
 
     public enum Attribute { Dark, Divine, Earth, Fire, Light, Water, Wind };
-    //TODO: change this (or not)
     public enum MonsterType { Aqua, Beast, [Description("Beast-Warrior")] BW, Cyberse, Dinosaur,
                 [Description("Divine-Beast")] DB, Dragon, Fairy, Fiend, Fish, Insect,
                 Machine, Plant, Psychic, Pyro, Reptile, Rock, [Description("Sea Serpent")] SS,

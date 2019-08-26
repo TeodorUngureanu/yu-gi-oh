@@ -4,22 +4,21 @@ using UnityEngine;
 
 public class HandScript : MonoBehaviour {
 
-    private GameObject defaultCard;
-    public List<GameObject> cardsInHand;
+    public GameObject defaultCard;
+    private List<GameObject> cardsInHand;
 
-    private float x = -0.44f;
-    private float y = 2.46f, z = -5.0f;
-    private float xInterval = 0.88f;
+    private readonly float x = -0.44f, y = 2.46f, z = -5.0f;
+    private readonly float xInterval = 0.88f;
     
     private Vector3 rotationVector = new Vector3(0, -90, -90);
     private Vector3 scalingVector = new Vector3(100, 0.2401343f, 69);
-	
-    public void SetDefaultCard(GameObject card)
+
+    void Awake()
     {
-        defaultCard = card;
+        cardsInHand = new List<GameObject>();
     }
 
-    public void AddCard(int index, string cardType, string cardName)
+    public void AddCard(int index, Enums.CardType cardType, string cardName)
     {
         float crtX = x + cardsInHand.Count * xInterval;
         GameObject crtCard = Instantiate<GameObject>(
@@ -29,8 +28,10 @@ public class HandScript : MonoBehaviour {
             gameObject.transform);
 
         crtCard.transform.localScale = scalingVector;
-        crtCard.GetComponent<CardScript>().SetData(CardScript.Location.HAND, index, cardType, cardName);
-        
+        crtCard.GetComponent<HandCardScript>().SetData(index, cardType, cardName);
+        //string defaultFaceOnDisk = (cardType == "Monster") ? "UP" : "DOWN";
+        //crtCard.GetComponent<CardScript>().SetFace(defaultFaceOnDisk);
+
         cardsInHand.Add(crtCard);
     }
 
@@ -41,30 +42,30 @@ public class HandScript : MonoBehaviour {
         for(int index = 0; index < cardsInHand.Count; index ++)
         {
             GameObject crtCard = cardsInHand[index];
-            if (isMonster && crtCard.GetComponent<CardScript>().IsMonster())
+            if (isMonster && crtCard.GetComponent<HandCardScript>().IsMonster())
             {
-                UnhighlightCard(index);
+                SetCardUnhighlightable(index);
             }
             if (index >= lowestIndex)
             {
-                crtCard.GetComponent<CardScript>().SetCardIndex(index);
+                crtCard.GetComponent<HandCardScript>().SetCardIndex(index);
                 crtCard.transform.position = new Vector3(crtCard.transform.position.x - xInterval, crtCard.transform.position.y, crtCard.transform.position.z);
             }
         }
     }
 
-    public void HighlightCard(int index)
+    public void SetCardHighlightable(int index)
     {
-        cardsInHand[index].GetComponent<CardScript>().SetHighlight(true);
+        cardsInHand[index].GetComponent<HandCardScript>().SetHighlightable(true);
     }
 
-    public void UnhighlightCard(int index)
+    public void SetCardUnhighlightable(int index)
     {
-        cardsInHand[index].GetComponent<CardScript>().SetHighlight(false);
+        cardsInHand[index].GetComponent<HandCardScript>().SetHighlightable(false);
     }
 
-    public CardScript GetCardScriptForIndex(int index)
+    public HandCardScript GetCardScriptForIndex(int index)
     {
-        return cardsInHand[index].GetComponent<CardScript>();
+        return cardsInHand[index].GetComponent<HandCardScript>();
     }
 }

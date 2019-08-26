@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -44,7 +45,6 @@ public class Player : MonoBehaviour {
         deckScript.ShuffleCards();
         deck.SetActive(false);
         card.SetActive(false);
-        handScript.SetDefaultCard(card);
     }
 
     // Update is called once per frame
@@ -166,7 +166,7 @@ public class Player : MonoBehaviour {
 
     private void UnhighlightEverything()
     {
-        ProcessBattleReadyMonsters(false);
+        //ProcessBattleReadyMonsters(false);
         ProcessPosChangeableDiskMonsters(false);
         ProcessUsableHandCards(false);
         ProcessUsableDiskSpells(false);
@@ -194,12 +194,12 @@ public class Player : MonoBehaviour {
                 if ((crtCard.isMonster() && monstersOnDisk.IndexOf(null) != -1 && !playedMonsterThisTurn) ||
                     (!crtCard.isMonster() && spellsOnDisk.IndexOf(null) != -1))
                 {
-                    handScript.HighlightCard(index);
+                    handScript.SetCardHighlightable(index);
                 }
             } else
             {
                 //the other way
-                handScript.UnhighlightCard(index);
+                handScript.SetCardUnhighlightable(index);
             }
         }
     }
@@ -210,12 +210,12 @@ public class Player : MonoBehaviour {
         {
             if (highlight)
             {
-                handScript.HighlightCard(index);
+                handScript.SetCardHighlightable(index);
                 handScript.GetCardScriptForIndex(index).ChangeText();
             }
             else
             {
-                handScript.UnhighlightCard(index);
+                handScript.SetCardUnhighlightable(index);
                 handScript.GetCardScriptForIndex(index).ChangeText();
             }
         }
@@ -229,7 +229,7 @@ public class Player : MonoBehaviour {
             if (highlight)
             {
                 //if can be played, highlight it
-                if (crtCard != null && diskScript.GetTypeForIndex(index) == "Spell")
+                if (crtCard != null && diskScript.GetTypeForIndex(index) == Enums.CardType.Spell)
                 {
                     diskScript.HighlightSpell(index);
                 }
@@ -266,6 +266,7 @@ public class Player : MonoBehaviour {
         for (int index = 0; index < monstersOnDisk.Count; index++)
         {
             Card crtCard = monstersOnDisk[index];
+            diskScript.SwitchAttackModeForIndex(index);
             if (highlight)
             {
                 //if can attack, highlight it
@@ -279,7 +280,6 @@ public class Player : MonoBehaviour {
                 //the other way
                 diskScript.UnhighlightMonster(index);
             }
-            diskScript.SwitchAttackModeForIndex(index);
         }
     }
 
@@ -301,8 +301,8 @@ public class Player : MonoBehaviour {
         {
             Card nextCard = deckScript.DrawCard();
             cardsInHand.Add(nextCard);
-            //animation
-            string cardType = nextCard.isMonster() ? "Monster" : ((NonMonster)nextCard).getType().ToString();
+            //add animation
+            Enums.CardType cardType = nextCard.isMonster() ? Enums.CardType.Monster : (Enums.CardType) Enum.Parse(typeof(Enums.CardType), ((NonMonster)nextCard).getType().ToString());
             handScript.AddCard(cardsInHand.Count - 1, cardType, nextCard.getCardName());
         }
 
@@ -312,12 +312,11 @@ public class Player : MonoBehaviour {
         }
     }
 
-    public void SetMonsterOnDisk(int index, string face)
+    public void SetMonsterOnDisk(int index, Enums.CardFace face)
     {
         int diskIndex = monstersOnDisk.IndexOf(null);
         Card card = cardsInHand[index];
         card.setTurnPlayed(turnCount + 1);
-        //card.setPosition("DEF");
 
         monstersOnDisk[diskIndex] = card;
         monstersOnField[diskIndex] = card;
@@ -332,13 +331,14 @@ public class Player : MonoBehaviour {
         diskScript.ChangeMonsterPosition(index, position);
     }
 
-    public void SetSpellOnDisk(int index, string face)
+    public void SetSpellOnDisk(int index, Enums.CardFace face)
     {
-        //activate effect if face is UP
+        //activate effect if face is Up
         int diskIndex = spellsOnDisk.IndexOf(null);
         spellsOnDisk[diskIndex] = cardsInHand[index];
         spellsOnField[diskIndex] = cardsInHand[index];
-        diskScript.SetSpell(diskIndex, cardsInHand[index].getCardName(), ((NonMonster) cardsInHand[index]).getType().ToString(), face);
+        
+        diskScript.SetSpell(diskIndex, cardsInHand[index].getCardName(), (Enums.CardType) Enum.Parse(typeof(Enums.CardType), ((NonMonster) cardsInHand[index]).getType().ToString()), face);
         GameManager.Get().PlaceSpellOnField(diskIndex, cardsInHand[index].getCardName());
         RemoveCardFromHand(index, false);
     }
