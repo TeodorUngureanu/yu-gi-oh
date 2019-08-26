@@ -16,7 +16,7 @@ public abstract class InteractibleElementScript : MonoBehaviour {
     protected Material outlineFillMaterial;
     protected List<Mesh> bakeKeys = new List<Mesh>();
     protected List<ListVector3> bakeValues = new List<ListVector3>();
-    protected bool needsUpdate, attackMode = false;
+    protected bool needsUpdate, battlingMonster = false;
 
     protected Renderer objRenderer;
 
@@ -31,11 +31,6 @@ public abstract class InteractibleElementScript : MonoBehaviour {
         
         // Apply material properties immediately
         needsUpdate = true;
-    }
-
-    // Use this for initialization
-    void Start() {
-
     }
 
     // Update is called once per frame
@@ -56,7 +51,7 @@ public abstract class InteractibleElementScript : MonoBehaviour {
         Destroy(outlineFillMaterial);
     }
 
-    void LoadSmoothNormals()
+    protected void LoadSmoothNormals()
     {
 
         // Retrieve or generate smooth normals
@@ -87,7 +82,7 @@ public abstract class InteractibleElementScript : MonoBehaviour {
         }
     }
 
-    List<Vector3> SmoothNormals(Mesh mesh)
+    protected List<Vector3> SmoothNormals(Mesh mesh)
     {
 
         // Group vertices by location
@@ -126,10 +121,10 @@ public abstract class InteractibleElementScript : MonoBehaviour {
         return smoothNormals;
     }
 
-    void UpdateMaterialProperties()
+    protected void UpdateMaterialProperties()
     {
         // Apply properties according to mode
-        if(attackMode)
+        if(battlingMonster)
         {
             outlineFillMaterial.SetColor("_OutlineColor", outlineSecondColor);
         } else
@@ -142,7 +137,7 @@ public abstract class InteractibleElementScript : MonoBehaviour {
         outlineFillMaterial.SetFloat("_OutlineWidth", outlineWidth);
     }
 
-    public void highlightObject() {
+    public void HighlightObject() {
         if (objRenderer == null)
             return;
         var materials = objRenderer.sharedMaterials.ToList();
@@ -153,7 +148,7 @@ public abstract class InteractibleElementScript : MonoBehaviour {
         objRenderer.materials = materials.ToArray();
     }
 
-    public void unhighlightObject() {
+    public void UnhighlightObject() {
         if (objRenderer == null)
             return;
         var materials = objRenderer.sharedMaterials.ToList();
@@ -164,10 +159,11 @@ public abstract class InteractibleElementScript : MonoBehaviour {
         objRenderer.materials = materials.ToArray();
     }
 
-    public void SwitchAttackMode()
+    public void SetBattlingMonster()
     {
-        attackMode = !attackMode;
+        battlingMonster = !battlingMonster;
+        needsUpdate = true;
     }
 
-    public abstract void interactWithElement();
+    public abstract void InteractWithElement();
 }
