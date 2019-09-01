@@ -18,7 +18,7 @@ public class HandScript : MonoBehaviour {
         cardsInHand = new List<GameObject>();
     }
 
-    public void AddCard(int index, Enums.CardType cardType, string cardName)
+    public void AddCard(int index, Enums.CardType cardType, string cardNumber)
     {
         float crtX = x + cardsInHand.Count * xInterval;
         GameObject crtCard = Instantiate<GameObject>(
@@ -28,7 +28,7 @@ public class HandScript : MonoBehaviour {
             gameObject.transform);
 
         crtCard.transform.localScale = scalingVector;
-        crtCard.GetComponent<HandCardScript>().SetData(index, cardType, cardName);
+        crtCard.GetComponent<HandCardScript>().SetData(index, cardType, cardNumber);
         //string defaultFaceOnDisk = (cardType == "Monster") ? "UP" : "DOWN";
         //crtCard.GetComponent<CardScript>().SetFace(defaultFaceOnDisk);
 

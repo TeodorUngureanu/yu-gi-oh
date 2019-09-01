@@ -1,22 +1,18 @@
-﻿using Newtonsoft.Json;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class NonMonster : Card {
 
-    public enum NonMonsterType { Spell, Trap };
+    private int type;
 
-    [JsonProperty("type")]
-    private NonMonsterType type;
-
-    public NonMonster(string vCardName, string vDescription, string vEffectKey, NonMonsterType vType)
-        : base(vCardName, vDescription, vEffectKey, false)
+    public NonMonster(string vCardNumber, byte[] vImage, string vCardName, string vDescription, int vEffectKey, int vType)
+        : base(vCardNumber, vImage, vCardName, vDescription, vEffectKey, false)
     {
         type = vType;
     }
 
-    public NonMonsterType getType()
+    public int getType()
     {
         return type;
     }

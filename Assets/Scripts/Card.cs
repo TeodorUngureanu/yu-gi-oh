@@ -1,27 +1,37 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class Card {
-    [JsonProperty("name")]
-    private string cardName;
-    [JsonProperty("description")]
-    private string description;
-    [JsonProperty("effectKey")]
-    private string effectKey;
-    [JsonProperty("isMonster")]
-    private bool monster;
-    [JsonIgnore]
-    private int turnPlayed;
 
-    public Card(string vCardName, string vDescription, string vEffectKey, bool vMonster)
+    private string cardNumber;
+    private byte[] image;
+    private string cardName;
+    private string description;
+    private int effectKey;
+
+    private int turnPlayed;
+    private bool monster;
+
+    public Card(string vCardNumber, byte[] vImage, string vCardName, string vDescription, int vEffectKey, bool vMonster)
     {
+        cardNumber = vCardNumber;
+        image = vImage;
         cardName = vCardName;
         description = vDescription;
         effectKey = vEffectKey;
         monster = vMonster;
+    }
+
+    public string getCardNumber()
+    {
+        return cardNumber;
+    }
+
+    public byte[] getImage()
+    {
+        return image;
     }
 
     public string getCardName()
@@ -34,7 +44,7 @@ public abstract class Card {
         return description;
     }
 
-    public string getEffectKey()
+    public int getEffectKey()
     {
         return effectKey;
     }
