@@ -66,13 +66,13 @@ public class DiskScript : MonoBehaviour {
     }
 
 
-    public void SetMonster(int index, Enums.CardFace face, string cardName)
+    public void SetMonster(int index, Enums.CardFace face, string cardNumber)
     {
         Debug.Log("Setting monster on disk index " + index);
 
-        defMonstersOnDisk[index].GetComponent<CardScript>().SetData(index, Enums.CardType.Monster, cardName);
+        defMonstersOnDisk[index].GetComponent<CardScript>().SetData(index, Enums.CardType.Monster, cardNumber);
         defMonstersOnDisk[index].GetComponent<CardScript>().SetFace(face);
-        atkMonstersOnDisk[index].GetComponent<CardScript>().SetData(index, Enums.CardType.Monster, cardName);
+        atkMonstersOnDisk[index].GetComponent<CardScript>().SetData(index, Enums.CardType.Monster, cardNumber);
         atkMonstersOnDisk[index].GetComponent<CardScript>().SetFace(face);
 
         ActivateCardPosition(index, face == Enums.CardFace.Up);
@@ -106,10 +106,10 @@ public class DiskScript : MonoBehaviour {
         defMonstersOnDisk[index].SetActive(!isAttack);
     }
 
-    public void SetSpell(int index, string cardName, Enums.CardType spellType, Enums.CardFace face)
+    public void SetSpell(int index, string cardNumber, Enums.CardType spellType, Enums.CardFace face)
     {
         Debug.Log("Setting spell on position " + index);
-        spellsOnDisk[index].GetComponent<CardScript>().SetData(index, spellType, cardName);
+        spellsOnDisk[index].GetComponent<CardScript>().SetData(index, spellType, cardNumber);
         spellsOnDisk[index].GetComponent<CardScript>().SetFace(face);
         spellsOnDisk[index].SetActive(true);
 

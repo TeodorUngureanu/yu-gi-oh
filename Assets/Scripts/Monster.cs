@@ -1,53 +1,36 @@
-﻿using Newtonsoft.Json;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
 
 public class Monster : Card {
 
-    public enum Attribute { Dark, Divine, Earth, Fire, Light, Water, Wind };
-    public enum MonsterType { Aqua, Beast, [Description("Beast-Warrior")] BW, Cyberse, Dinosaur,
-                [Description("Divine-Beast")] DB, Dragon, Fairy, Fiend, Fish, Insect,
-                Machine, Plant, Psychic, Pyro, Reptile, Rock, [Description("Sea Serpent")] SS,
-                Spellcaster, Thunder, Warrior, [Description("Winged Beast")] WB, Wyrm, Zombie };
-
-    [JsonProperty("attribute")]
-    private Attribute attribute;
-    [JsonProperty("type")]
-    private MonsterType type;
-    [JsonProperty("attack")]
+    private int attribute;
+    private int type;
     private int attackPoints;
-    [JsonProperty("defense")]
     private int defensePoints;
-    [JsonProperty("rarity")]
-    private int rarity; //number of stars
-    [JsonProperty("hasEffect")]
+    private int rarity; // Number of stars
     private bool hasEffect;
-    [JsonProperty("isFusion")]
     private bool isFusion;
-    [JsonIgnore]
     private string position;
 
-    public Monster(string vCardName, string vDescription, string vEffectKey, Attribute vAttribute, MonsterType vType,
-        int vAttackPoints, int vDefensePoints, int vRarity, bool vHasEffect, bool vIsFusion)
-        : base(vCardName, vDescription, vEffectKey, true)
+    public Monster(string vCardNumber, byte[] vImage, string vCardName, string vDescription, int vEffectKey, int vAttribute, int vType, int vAttackPoints, int vDefensePoints, int vRarity, bool vIsFusion)
+        : base(vCardNumber, vImage, vCardName, vDescription, vEffectKey, true)
     {
         attribute = vAttribute;
         type = vType;
         attackPoints = vAttackPoints;
         defensePoints = vDefensePoints;
         rarity = vRarity;
-        hasEffect = vHasEffect;
         isFusion = vIsFusion;
     }
 
-    public Attribute getAttribute()
+    public int getAttribute()
     {
         return attribute;
     }
 
-    public MonsterType getType()
+    public int getType()
     {
         return type;
     }
@@ -75,6 +58,10 @@ public class Monster : Card {
     public bool isFusionCard()
     {
         return isFusion;
+    }
+    public string getPosition()
+    {
+        return position;
     }
 
     public void setPosition(string pos)

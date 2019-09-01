@@ -33,6 +33,8 @@ public class GameManager : MonoBehaviour {
         {
             Destroy(gameObject);
         }
+
+        Config.Get().Load();
     }
 
     public Graveyard getGraveyard(string key)
@@ -109,6 +111,7 @@ public class GameManager : MonoBehaviour {
     {
         player.GetComponent<Player>().RemoveCardFromHand(index, false);
 
-        //send card to Graveyard
+        // Send card to Graveyard
     }
+
 }

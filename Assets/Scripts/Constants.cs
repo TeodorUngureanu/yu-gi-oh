@@ -12,4 +12,10 @@ public static class Constants
     public const string DEF_CHANGE_TEXT = "Def position";
     public const string ATTACKING_TEXT = "Attack";
     public const string SACRIFICING_TEXT = "Tribute";
+
+    public struct CardInfo
+    {
+        public int Card_Type;
+        public int Card_Order;
+    }
 }

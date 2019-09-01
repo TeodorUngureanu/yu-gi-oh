@@ -39,9 +39,9 @@ public class Player : MonoBehaviour {
 
     // Use this for initialization
     void Start()
-    {
+    {   
         //init deck
-        deckScript.LoadDeck("Yugi");
+        deckScript.LoadDeck(1); // YUGI
         deckScript.ShuffleCards();
         deck.SetActive(false);
         card.SetActive(false);
@@ -303,7 +303,7 @@ public class Player : MonoBehaviour {
             cardsInHand.Add(nextCard);
             //add animation
             Enums.CardType cardType = nextCard.isMonster() ? Enums.CardType.Monster : (Enums.CardType) Enum.Parse(typeof(Enums.CardType), ((NonMonster)nextCard).getType().ToString());
-            handScript.AddCard(cardsInHand.Count - 1, cardType, nextCard.getCardName());
+            handScript.AddCard(cardsInHand.Count - 1, cardType, nextCard.getCardNumber());
         }
 
         if (turn.getCurrentPhase() == Turn.Phase.Draw)
@@ -320,7 +320,7 @@ public class Player : MonoBehaviour {
 
         monstersOnDisk[diskIndex] = card;
         monstersOnField[diskIndex] = card;
-        diskScript.SetMonster(diskIndex, face, card.getCardName());
+        diskScript.SetMonster(diskIndex, face, card.getCardNumber());
         GameManager.Get().PlaceMonsterOnField(diskIndex, card.getCardName());
         playedMonsterThisTurn = true;
         RemoveCardFromHand(index, true);
@@ -338,7 +338,7 @@ public class Player : MonoBehaviour {
         spellsOnDisk[diskIndex] = cardsInHand[index];
         spellsOnField[diskIndex] = cardsInHand[index];
         
-        diskScript.SetSpell(diskIndex, cardsInHand[index].getCardName(), (Enums.CardType) Enum.Parse(typeof(Enums.CardType), ((NonMonster) cardsInHand[index]).getType().ToString()), face);
+        diskScript.SetSpell(diskIndex, cardsInHand[index].getCardNumber(), (Enums.CardType) Enum.Parse(typeof(Enums.CardType), ((NonMonster) cardsInHand[index]).getType().ToString()), face);
         GameManager.Get().PlaceSpellOnField(diskIndex, cardsInHand[index].getCardName());
         RemoveCardFromHand(index, false);
     }
