@@ -15,7 +15,7 @@ public class Player : MonoBehaviour {
     private long lifePoints;
     private int turnCount = 0;
     private readonly int initialHandSize = 5, maxHandSize = 6;
-    public GameObject disk, deck, card, hand;
+    public GameObject disk, deck, hand;
     private bool isReadyForDuel, hasDrawnHand;
     private bool isFirst = true; //only set for testing
     private bool playedMonsterThisTurn = false;
@@ -44,7 +44,6 @@ public class Player : MonoBehaviour {
         deckScript.LoadDeck(1); // YUGI
         deckScript.ShuffleCards();
         deck.SetActive(false);
-        card.SetActive(false);
     }
 
     // Update is called once per frame
@@ -75,7 +74,6 @@ public class Player : MonoBehaviour {
         if (turn.getCurrentPhase() == Turn.Phase.Hold && hasDrawnHand)
         {
             //calculate whatever needs to be calculated, then proceed to draw phase
-            RefreshStuffWhenTurnStarts();
             OnPhaseTrigger();
         }
 
@@ -104,7 +102,6 @@ public class Player : MonoBehaviour {
     {
         Debug.Log("Showing deck...");
         deck.SetActive(true);
-        card.SetActive(true);
         //temporarily, while not using headset
         Cursor.visible = true;
         isReadyForDuel = true;
@@ -113,6 +110,11 @@ public class Player : MonoBehaviour {
     // To be called from controller (on draw trigger, on battle trigger, after all monsters attack/play card after battle, on end turn)
     private void OnPhaseTrigger()
     {
+        if (turn.getCurrentPhase() == Turn.Phase.Hold)
+        {
+            RefreshStuffWhenTurnStarts();
+        }
+
         if (turn.getCurrentPhase() == Turn.Phase.Draw)
         {
             deckScript.setIsDrawPhase(false);
@@ -157,8 +159,8 @@ public class Player : MonoBehaviour {
 
         if (turn.getCurrentPhase() == Turn.Phase.Battle)
         {
-            ProcessBattleReadyMonsters(true);
             ProcessPosChangeableDiskMonsters(false);
+            ProcessBattleReadyMonsters(true);
             ProcessUsableHandCards(false);
             ProcessUsableDiskSpells(false);
         }
@@ -226,17 +228,20 @@ public class Player : MonoBehaviour {
         for (int index = 0; index < spellsOnDisk.Count; index++)
         {
             Card crtCard = spellsOnDisk[index];
-            if (highlight)
+            if (crtCard != null)
             {
-                //if can be played, highlight it
-                if (crtCard != null && diskScript.GetTypeForIndex(index) == Enums.CardType.Spell)
+                if (highlight)
                 {
-                    diskScript.HighlightSpell(index);
+                    //if can be played, highlight it
+                    if (diskScript.GetTypeForIndex(index) == Enums.CardType.Spell)
+                    {
+                        diskScript.HighlightSpell(index);
+                    }
                 }
-            }
-            else
-            {
-                diskScript.UnhighlightSpell(index);
+                else
+                {
+                    diskScript.UnhighlightSpell(index);
+                }
             }
         }
     }
@@ -246,17 +251,20 @@ public class Player : MonoBehaviour {
         for (int index = 0; index < monstersOnDisk.Count; index++)
         {
             Card crtCard = monstersOnDisk[index];
-            if (highlight)
+            if (crtCard != null)
             {
-                //if the position can be changed, highlight the card
-                if (crtCard != null && !diskScript.HasPositionBeenChangedForIndex(index))
+                if (highlight)
                 {
-                    diskScript.HighlightMonster(index);
+                    //if the position can be changed, highlight the card
+                    if (diskScript.CanChangePositionForIndex(index))
+                    {
+                        diskScript.HighlightMonster(index);
+                    }
                 }
-            }
-            else
-            {
-                diskScript.UnhighlightMonster(index);
+                else
+                {
+                    diskScript.UnhighlightMonster(index);
+                }
             }
         }
     }
@@ -266,19 +274,24 @@ public class Player : MonoBehaviour {
         for (int index = 0; index < monstersOnDisk.Count; index++)
         {
             Card crtCard = monstersOnDisk[index];
-            diskScript.SwitchAttackModeForIndex(index);
-            if (highlight)
+            if (crtCard != null)
             {
-                //if can attack, highlight it
-                if (crtCard != null && crtCard.getTurnPlayed() != turnCount && diskScript.GetPositionForIndex(index) == "ATK")
+                diskScript.SwitchAttackModeForIndex(index, highlight);
+                if (highlight)
                 {
-                    diskScript.HighlightMonster(index);
+                    //if can attack, highlight it
+                    if (crtCard.getTurnPlayed() != turnCount && diskScript.GetPositionForIndex(index) == Enums.CardPosition.Atk)
+                    {
+                        diskScript.HighlightMonster(index);
+                        diskScript.ChangeTextForIndex(index, true);
+                    }
                 }
-            }
-            else
-            {
-                //the other way
-                diskScript.UnhighlightMonster(index);
+                else
+                {
+                    //the other way
+                    diskScript.UnhighlightMonster(index);
+                    diskScript.ChangeTextForIndex(index, true);
+                }
             }
         }
     }
@@ -316,7 +329,7 @@ public class Player : MonoBehaviour {
     {
         int diskIndex = monstersOnDisk.IndexOf(null);
         Card card = cardsInHand[index];
-        card.setTurnPlayed(turnCount + 1);
+        card.setTurnPlayed(turnCount);
 
         monstersOnDisk[diskIndex] = card;
         monstersOnField[diskIndex] = card;
@@ -324,11 +337,6 @@ public class Player : MonoBehaviour {
         GameManager.Get().PlaceMonsterOnField(diskIndex, card.getCardName());
         playedMonsterThisTurn = true;
         RemoveCardFromHand(index, true);
-    }
-
-    public void SwitchMonsterPosition(int index, string position)
-    {
-        diskScript.ChangeMonsterPosition(index, position);
     }
 
     public void SetSpellOnDisk(int index, Enums.CardFace face)

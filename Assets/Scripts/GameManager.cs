@@ -81,11 +81,6 @@ public class GameManager : MonoBehaviour {
         fieldScript.SetMonster(index, cardName);
     }
 
-    public void SwitchMonsterPosition(int index, string position)
-    {
-        playerScript.SwitchMonsterPosition(index, position);
-    }
-
     public void PlaceSpellOnField(int index, string cardName)
     {
         fieldScript.SetSpell(index, cardName);

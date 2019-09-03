@@ -5,14 +5,13 @@ using System.IO;
 using UnityEngine;
 
 public class Deck : InteractibleElementScript {
-    private List<Card> mainDeck;
+    private List<Card> mainDeck = new List<Card>();
     private bool isDrawPhase = false;
 
     protected override void Awake()
     {
         base.Awake();
         Debug.Log("Deck object awaken");
-        mainDeck = new List<Card>();
         objRenderer = GetComponent<Renderer>();
     }
 
