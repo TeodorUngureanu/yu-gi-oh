@@ -33,6 +33,8 @@ public class GameManager : MonoBehaviour {
         {
             Destroy(gameObject);
         }
+
+        Config.Get().Load();
     }
 
     public Graveyard getGraveyard(string key)
@@ -64,34 +66,16 @@ public class GameManager : MonoBehaviour {
         playerScript.DrawCard();
     }
 
-    public void PlaceMonsterOnDisk(int index, Enums.CardFace face)
+    public void SummonMonster(int index, Card cardInfo, Enums.CardFace face)
     {
-        playerScript.SetMonsterOnDisk(index, face);
+        playerScript.SetMonsterOnDisk(index, cardInfo, face);
+        fieldScript.SetMonster(index, cardInfo, face);
     }
 
-    public void PlaceSpellOnDisk(int index, Enums.CardFace face)
+    public void UseSpell(int index, Card cardInfo, Enums.CardFace face)
     {
-        playerScript.SetSpellOnDisk(index, face);
-    }
-
-    public void PlaceMonsterOnField(int index, string cardName)
-    {
-        fieldScript.SetMonster(index, cardName);
-    }
-
-    public void SwitchMonsterPosition(int index, string position)
-    {
-        playerScript.SwitchMonsterPosition(index, position);
-    }
-
-    public void PlaceSpellOnField(int index, string cardName)
-    {
-        fieldScript.SetSpell(index, cardName);
-    }
-
-    public void SetFirst(bool value)
-    {
-        player.GetComponent<Player>().SetIsFirst(value);
+        playerScript.SetSpellOnDisk(index, cardInfo, face);
+        fieldScript.SetSpell(index, cardInfo, face);
     }
 
     public Turn.Phase GetTurnPhase()
@@ -107,8 +91,39 @@ public class GameManager : MonoBehaviour {
 
     public void DiscardCard(int index)
     {
-        player.GetComponent<Player>().RemoveCardFromHand(index, false);
+        player.GetComponent<Player>().RemoveCardFromHand(index);
 
-        //send card to Graveyard
+        // Send card to Graveyard
+    }
+
+    public void StartMyTurn()
+    {
+        player.GetComponent<Player>().StartMyTurn();
+    }
+
+    public void SendInformation(string details)
+    {
+        string message = "";
+        message += GetTurnPhase().ToString();
+
+        //add action
+        message += ";" + details;
+    }
+
+    public void ReceiveInformation(string message)
+    {
+        string[] elements = message.Split(';');
+        switch(elements[0])
+        {
+            case "End":
+                StartMyTurn();
+                break;
+            case "Battle":
+                //calculate attack result and do further things if needed
+                break;
+            default:
+                //must be a main phase, process this further
+                break;
+        }
     }
 }

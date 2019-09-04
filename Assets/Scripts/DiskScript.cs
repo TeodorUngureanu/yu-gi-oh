@@ -4,158 +4,104 @@ using UnityEngine;
 
 public class DiskScript : MonoBehaviour {
 
-    public List<GameObject> defMonstersOnDisk;
-    public List<GameObject> atkMonstersOnDisk;
-    public List<string> activePositions = new List<string> { "DEF", "DEF", "DEF", "DEF", "DEF" };
+    public List<GameObject> monstersOnDisk;
     public List<GameObject> spellsOnDisk;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
-    private bool IsMonsterHighlighted(int index)
+    private bool IsMonsterHighlightable(int index)
     {
-        if (activePositions[index] == "DEF")
-        {
-            return defMonstersOnDisk[index].GetComponent<CardScript>().IsHighlightable();
-        }
-        else
-        {
-            return atkMonstersOnDisk[index].GetComponent<CardScript>().IsHighlightable();
-        }
+        return monstersOnDisk[index].GetComponent<DeskCardScript>().IsHighlightable();
     }
 
     public void HighlightMonster(int index)
     {
-        if (activePositions[index] == "DEF")
-        {
-            defMonstersOnDisk[index].GetComponent<CardScript>().SetHighlightable(true);
-        }
-        else
-        {
-            atkMonstersOnDisk[index].GetComponent<CardScript>().SetHighlightable(true);
-        }
+        monstersOnDisk[index].GetComponent<DeskCardScript>().SetHighlightable(true);
     }
 
     public void UnhighlightMonster(int index)
     {
-        if (activePositions[index] == "DEF")
-        {
-            defMonstersOnDisk[index].GetComponent<CardScript>().SetHighlightable(false);
-        }
-        else
-        {
-            atkMonstersOnDisk[index].GetComponent<CardScript>().SetHighlightable(false);
-        }
+        monstersOnDisk[index].GetComponent<DeskCardScript>().SetHighlightable(false);
     }
 
     public void HighlightSpell(int index)
     {
-        spellsOnDisk[index].GetComponent<CardScript>().SetHighlightable(true);
+        spellsOnDisk[index].GetComponent<DeskCardScript>().SetHighlightable(true);
     }
 
     public void UnhighlightSpell(int index)
     {
-        spellsOnDisk[index].GetComponent<CardScript>().SetHighlightable(false);
+        spellsOnDisk[index].GetComponent<DeskCardScript>().SetHighlightable(false);
     }
 
-
-    public void SetMonster(int index, Enums.CardFace face, string cardName)
+    public void SetMonster(int index, Enums.CardFace face, string cardNumber)
     {
-        Debug.Log("Setting monster on disk index " + index);
+        monstersOnDisk[index].GetComponent<DeskCardScript>().SetData(index, Enums.CardType.Monster, face, cardNumber);
+        monstersOnDisk[index].SetActive(true);
 
-        defMonstersOnDisk[index].GetComponent<CardScript>().SetData(index, Enums.CardType.Monster, cardName);
-        defMonstersOnDisk[index].GetComponent<CardScript>().SetFace(face);
-        atkMonstersOnDisk[index].GetComponent<CardScript>().SetData(index, Enums.CardType.Monster, cardName);
-        atkMonstersOnDisk[index].GetComponent<CardScript>().SetFace(face);
+        string action = (face == Enums.CardFace.Up) ? Constants.SUMMONING_TEXT : Constants.SETTING_TEXT;
 
-        ActivateCardPosition(index, face == Enums.CardFace.Up);
-        activePositions[index] = (face == Enums.CardFace.Up) ? "ATK" : "DEF";
-        
-
-        //if (face == "DOWN")
-        //{
-        //    GameObject defCard = defMonstersOnDisk[index];
-        //    Vector3 crtRotation = defCard.gameObject.transform.localEulerAngles;
-        //    crtRotation.x = 0;
-        //    defCard.gameObject.transform.localEulerAngles = crtRotation;
-        //}
+        string details = action + ";" + Constants.MONSTER + ";" + Constants.HAND + ";" + cardNumber;
+        GameManager.Get().SendInformation(details);
     }
 
-    public void ChangeMonsterPosition(int index, string newPosition)
+    public void SetSpell(int index, string cardNumber, Enums.CardType spellType, Enums.CardFace face)
     {
-        bool highlight = IsMonsterHighlighted(index);
-        if (highlight)
-        {
-            UnhighlightMonster(index);
-        }
-        
-        ActivateCardPosition(index, newPosition == "ATK");
-        activePositions[index] = newPosition;
-    }
-
-    private void ActivateCardPosition(int index, bool isAttack)
-    {
-        atkMonstersOnDisk[index].SetActive(isAttack);
-        defMonstersOnDisk[index].SetActive(!isAttack);
-    }
-
-    public void SetSpell(int index, string cardName, Enums.CardType spellType, Enums.CardFace face)
-    {
-        Debug.Log("Setting spell on position " + index);
-        spellsOnDisk[index].GetComponent<CardScript>().SetData(index, spellType, cardName);
-        spellsOnDisk[index].GetComponent<CardScript>().SetFace(face);
+        spellsOnDisk[index].GetComponent<DeskCardScript>().SetData(index, spellType, face, cardNumber);
         spellsOnDisk[index].SetActive(true);
-
-        if(face == Enums.CardFace.Down && spellType != Enums.CardType.Trap)
+        if(spellType == Enums.CardType.Spell)
         {
-            spellsOnDisk[index].GetComponent<CardScript>().SetHighlightable(true);
+            HighlightSpell(index);
         }
+
+        string action = (face == Enums.CardFace.Up) ? Constants.ACTIVATING_TEXT : Constants.SETTING_TEXT;
+
+        string details = action + ";" + Constants.SPELL + ";" + Constants.HAND + ";" + cardNumber;
+        GameManager.Get().SendInformation(details);
     }
 
-    public string GetPositionForIndex(int index)
+    public Enums.CardPosition GetPositionForIndex(int index)
     {
-        return index > 4 ? "DEF" : activePositions[index];
+        return index > 4 ? Enums.CardPosition.Def : monstersOnDisk[index].GetComponent<DeskCardScript>().GetPosition(); ;
     }
 
-    public void SwitchAttackModeForIndex(int index)
+    public void SwitchAttackModeForIndex(int index, bool isAttackMode)
     {
-        atkMonstersOnDisk[index].GetComponent<CardScript>().SetBattlingMonster();
-        atkMonstersOnDisk[index].GetComponent<CardScript>().ChangeText();
+        monstersOnDisk[index].GetComponent<DeskCardScript>().SetBattlingMonster(isAttackMode);
     }
 
     public void RefreshVariablesForIndex(int index)
     {
-        if (activePositions[index] == "DEF")
-        {
-            defMonstersOnDisk[index].GetComponent<CardScript>().RefreshTurnRestrictions();
-        }
-        else
-        {
-            atkMonstersOnDisk[index].GetComponent<CardScript>().RefreshTurnRestrictions();
-        }
+        monstersOnDisk[index].GetComponent<DeskCardScript>().RefreshTurnRestrictions();
     }
 
     public Enums.CardType GetTypeForIndex(int index)
     {
-        return spellsOnDisk[index].GetComponent<CardScript>().GetCardType();
+        return spellsOnDisk[index].GetComponent<DeskCardScript>().GetCardType();
     }
 
-    public bool HasPositionBeenChangedForIndex(int index)
+    public bool CanChangePositionForIndex(int index)
     {
-        if (activePositions[index] == "DEF")
+        return monstersOnDisk[index].GetComponent<DeskCardScript>().CanChangePositionThisTurn();
+    }
+
+    public void ChangeTextForIndex(int index, bool monster)
+    {
+        if(monster)
         {
-            return defMonstersOnDisk[index].GetComponent<CardScript>().HasPositionBeenChanged();
+            monstersOnDisk[index].GetComponent<DeskCardScript>().ChangeText();
         }
         else
         {
-            return atkMonstersOnDisk[index].GetComponent<CardScript>().HasPositionBeenChanged();
+            spellsOnDisk[index].GetComponent<DeskCardScript>().ChangeText();
         }
+    }
+
+    public int GetDiskMonstersCount()
+    {
+        return monstersOnDisk.Count;
+    }
+
+    public int GetDiskSpellsCount()
+    {
+        return spellsOnDisk.Count;
     }
 }

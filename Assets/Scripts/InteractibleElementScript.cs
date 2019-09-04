@@ -34,7 +34,7 @@ public abstract class InteractibleElementScript : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void Update()
+    protected virtual void Update()
     {
         if (needsUpdate)
         {
@@ -159,9 +159,9 @@ public abstract class InteractibleElementScript : MonoBehaviour {
         objRenderer.materials = materials.ToArray();
     }
 
-    public void SetBattlingMonster()
+    public void SetBattlingMonster(bool vBattlingMonster)
     {
-        battlingMonster = !battlingMonster;
+        battlingMonster = vBattlingMonster;
         needsUpdate = true;
     }
 
