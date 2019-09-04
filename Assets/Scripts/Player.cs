@@ -5,62 +5,72 @@ using UnityEngine;
 
 public class Player : MonoBehaviour {
 
+    public GameObject disk, deck, hand;
+
+    private long lifePoints;
+    private int turnCount;
+    private bool isReadyForDuel, hasDrawnHand;
+    private bool canPlayMonster;
+    private bool canActivateCardsDuringOpponentTurn;
+    private bool canOpponentActivateCards;
+    private bool isMyTurn = true; //only set for testing
+
     private Deck deckScript;
     private HandScript handScript;
     private DiskScript diskScript;
-    private List<Card> cardsInHand, monstersOnDisk, spellsOnDisk;
-    private List<Card> monstersOnField, spellsOnField;
+    private List<Card> monstersOnDisk, spellsOnDisk;
     private Turn turn = new Turn();
-
-    private long lifePoints;
-    private int turnCount = 0;
-    private readonly int initialHandSize = 5, maxHandSize = 6;
-    public GameObject disk, deck, hand;
-    private bool isReadyForDuel, hasDrawnHand;
-    private bool isFirst = true; //only set for testing
-    private bool playedMonsterThisTurn = false;
-    private bool canActivateCardsDuringOpponentTurn = false;
-    private bool canOpponentActivateCards = false;
 
     void Awake()
     {
-        lifePoints = 8000;
+        lifePoints = Constants.STARTING_LIFE_POINTS;
+        turnCount = 0;
         isReadyForDuel = false;
         hasDrawnHand = false;
+        canPlayMonster = true;
+        canActivateCardsDuringOpponentTurn = false;
+        canOpponentActivateCards = false;
+
         deckScript = deck.GetComponent<Deck>();
         handScript = hand.GetComponent<HandScript>();
         diskScript = disk.GetComponent<DiskScript>();
-        cardsInHand = new List<Card>();
         monstersOnDisk = new List<Card> { null, null, null, null, null };
         spellsOnDisk = new List<Card> { null, null, null, null, null };
-        monstersOnField = new List<Card> { null, null, null, null, null };
-        spellsOnField = new List<Card> { null, null, null, null, null };
     }
-
-    // Use this for initialization
+    
     void Start()
-    {   
-        //init deck
+    {
         deckScript.LoadDeck(1); // YUGI
         deckScript.ShuffleCards();
         deck.SetActive(false);
     }
 
-    // Update is called once per frame
+    public void InitDuel()
+    {
+        disk.GetComponent<Animation>()["Take 001"].speed = 2.0f;
+        disk.GetComponent<Animation>().Play();
+
+        Invoke("ShowDeck", 3.0f);
+    }
+
+    private void ShowDeck()
+    {
+        deck.SetActive(true);
+        isReadyForDuel = true;
+
+        //temporarily, while not using headset
+        Cursor.visible = true;
+    }
+
     void Update()
     {
         if (isReadyForDuel && !hasDrawnHand && Input.GetKeyDown(KeyCode.Space))
         {
-            Debug.Log("Drawing first hand");
-
-            if (cardsInHand.Count == 0)
+            for (int index = 0; index < Constants.INITIAL_HAND_SIZE; index++)
             {
-                for (int index = 0; index < initialHandSize; index++)
-                {
-                    DrawCard();
-                }
-                hasDrawnHand = true;
+                DrawCard();
             }
+            hasDrawnHand = true;
         }
 
         //used only at the beginning, maybe it can be moved
@@ -68,12 +78,13 @@ public class Player : MonoBehaviour {
         {
             InitDuel();
         }
-
-        //implement OnHover on cards, OnGraveyard
         
+        //if (turn.getCurrentPhase() == Turn.Phase.Hold && hasDrawnHand && isMyTurn)
         if (turn.getCurrentPhase() == Turn.Phase.Hold && hasDrawnHand)
         {
-            //calculate whatever needs to be calculated, then proceed to draw phase
+            //apply any needed effects or restrictions, then proceed to draw phase
+            canPlayMonster = true;
+
             OnPhaseTrigger();
         }
 
@@ -87,27 +98,19 @@ public class Player : MonoBehaviour {
 
         if (turn.getCurrentPhase() == Turn.Phase.End)
         {
-            if (cardsInHand.Count <= maxHandSize)
+            if (handScript.GetNoOfCards() <= Constants.MAX_HAND_SIZE)
             {
-                GameManager.Get().SetPlayerDiscarding(false);
-                ProcessDiscardableHandCards(false);
+                SetDiscardingProperties(false);
+                isMyTurn = false;
+
                 //after cards are discarded, send a message to the enemy to start their turn
+                GameManager.Get().SendInformation("End");
 
                 OnPhaseTrigger();
             }
         }
     }
-
-    private void ShowDeck()
-    {
-        Debug.Log("Showing deck...");
-        deck.SetActive(true);
-        //temporarily, while not using headset
-        Cursor.visible = true;
-        isReadyForDuel = true;
-    }
-
-    // To be called from controller (on draw trigger, on battle trigger, after all monsters attack/play card after battle, on end turn)
+    
     private void OnPhaseTrigger()
     {
         if (turn.getCurrentPhase() == Turn.Phase.Hold)
@@ -117,7 +120,7 @@ public class Player : MonoBehaviour {
 
         if (turn.getCurrentPhase() == Turn.Phase.Draw)
         {
-            deckScript.setIsDrawPhase(false);
+            deckScript.SetIsDrawPhase(false);
         }
 
         turn.goToNextPhase();
@@ -125,9 +128,9 @@ public class Player : MonoBehaviour {
 
         if (turn.getCurrentPhase() == Turn.Phase.Draw)
         {
-            deckScript.setIsDrawPhase(true);
-            playedMonsterThisTurn = false;
+            deckScript.SetIsDrawPhase(true);
             turnCount++;
+
             //get value for canOpponentActivateCards from the opponent (if so wait)
         }
 
@@ -137,14 +140,19 @@ public class Player : MonoBehaviour {
         {
             UnhighlightEverything();
 
-            if (cardsInHand.Count > maxHandSize)
+            if (handScript.GetNoOfCards() > Constants.MAX_HAND_SIZE)
             {
-                //discard cards
                 Debug.Log("Discarding cards..");
-                GameManager.Get().SetPlayerDiscarding(true);
-                ProcessDiscardableHandCards(true);
+                SetDiscardingProperties(true);
             }
         }
+        HighlightPlayerCards();
+    }
+
+    private void SetDiscardingProperties(bool start)
+    {
+        GameManager.Get().SetPlayerDiscarding(start);
+        ProcessDiscardableHandCards(start);
     }
 
     private void HighlightPlayerCards()
@@ -168,7 +176,6 @@ public class Player : MonoBehaviour {
 
     private void UnhighlightEverything()
     {
-        //ProcessBattleReadyMonsters(false);
         ProcessPosChangeableDiskMonsters(false);
         ProcessUsableHandCards(false);
         ProcessUsableDiskSpells(false);
@@ -187,39 +194,50 @@ public class Player : MonoBehaviour {
 
     private void ProcessUsableHandCards(bool highlight)
     {
-        for (int index = 0; index < cardsInHand.Count; index++)
+        for (int index = 0; index < handScript.GetNoOfCards(); index++)
         {
-            Card crtCard = cardsInHand[index];
+            Card crtCard = handScript.GetCardInfoForIndex(index);
             if (highlight)
             {
-                //if can be played, add it
-                if ((crtCard.isMonster() && monstersOnDisk.IndexOf(null) != -1 && !playedMonsterThisTurn) ||
-                    (!crtCard.isMonster() && spellsOnDisk.IndexOf(null) != -1))
+                if ((crtCard.IsMonster() && monstersOnDisk.IndexOf(null) != -1 && canPlayMonster))
+                {
+                    int needsTribute = Utils.NeedsTribute(((Monster)crtCard).getRarity());
+                    int noMonstersOnDisk = monstersOnDisk.FindAll(monster => monster != null).Count;
+                    if(noMonstersOnDisk >= needsTribute)
+                    {
+                        handScript.SetCardHighlightable(index);
+                    }
+                }
+                if(!crtCard.IsMonster() && spellsOnDisk.IndexOf(null) != -1)
                 {
                     handScript.SetCardHighlightable(index);
                 }
             } else
             {
-                //the other way
                 handScript.SetCardUnhighlightable(index);
             }
         }
     }
 
+    private void RehighlightHandCards()
+    {
+        ProcessUsableHandCards(false);
+        ProcessUsableHandCards(true);
+    }
+
     private void ProcessDiscardableHandCards(bool highlight)
     {
-        for (int index = 0; index < cardsInHand.Count; index++)
+        for (int index = 0; index < handScript.GetNoOfCards(); index++)
         {
             if (highlight)
             {
                 handScript.SetCardHighlightable(index);
-                handScript.GetCardScriptForIndex(index).ChangeText();
             }
             else
             {
                 handScript.SetCardUnhighlightable(index);
-                handScript.GetCardScriptForIndex(index).ChangeText();
             }
+            handScript.ChangeTextForIndex(index);
         }
     }
 
@@ -232,8 +250,7 @@ public class Player : MonoBehaviour {
             {
                 if (highlight)
                 {
-                    //if can be played, highlight it
-                    if (diskScript.GetTypeForIndex(index) == Enums.CardType.Spell)
+                    if (diskScript.GetTypeForIndex(index) == Enums.CardType.Spell || crtCard.GetTurnPlayed() != turnCount)
                     {
                         diskScript.HighlightSpell(index);
                     }
@@ -255,7 +272,6 @@ public class Player : MonoBehaviour {
             {
                 if (highlight)
                 {
-                    //if the position can be changed, highlight the card
                     if (diskScript.CanChangePositionForIndex(index))
                     {
                         diskScript.HighlightMonster(index);
@@ -279,27 +295,23 @@ public class Player : MonoBehaviour {
                 diskScript.SwitchAttackModeForIndex(index, highlight);
                 if (highlight)
                 {
-                    //if can attack, highlight it
-                    if (crtCard.getTurnPlayed() != turnCount && diskScript.GetPositionForIndex(index) == Enums.CardPosition.Atk)
+                    if (crtCard.GetTurnPlayed() != turnCount && diskScript.GetPositionForIndex(index) == Enums.CardPosition.Atk)
                     {
                         diskScript.HighlightMonster(index);
-                        diskScript.ChangeTextForIndex(index, true);
                     }
                 }
                 else
                 {
-                    //the other way
                     diskScript.UnhighlightMonster(index);
-                    diskScript.ChangeTextForIndex(index, true);
                 }
+                diskScript.ChangeTextForIndex(index, true);
             }
         }
     }
-
-    //to be called after connection is made with another player (randomly or host first)
-    public void SetIsFirst(bool vIsFirst)
+    
+    public void StartMyTurn()
     {
-        isFirst = vIsFirst;
+        isMyTurn = true;
 
     }
 
@@ -312,11 +324,9 @@ public class Player : MonoBehaviour {
     {
         if (deckScript.CardsLeft() != 0)
         {
-            Card nextCard = deckScript.DrawCard();
-            cardsInHand.Add(nextCard);
             //add animation
-            Enums.CardType cardType = nextCard.isMonster() ? Enums.CardType.Monster : (Enums.CardType) Enum.Parse(typeof(Enums.CardType), ((NonMonster)nextCard).getType().ToString());
-            handScript.AddCard(cardsInHand.Count - 1, cardType, nextCard.getCardNumber());
+            
+            handScript.AddCard(deckScript.DrawCard());
         }
 
         if (turn.getCurrentPhase() == Turn.Phase.Draw)
@@ -325,61 +335,47 @@ public class Player : MonoBehaviour {
         }
     }
 
-    public void SetMonsterOnDisk(int index, Enums.CardFace face)
+    public void SetMonsterOnDisk(int index, Card cardInfo, Enums.CardFace face)
     {
         int diskIndex = monstersOnDisk.IndexOf(null);
-        Card card = cardsInHand[index];
-        card.setTurnPlayed(turnCount);
+        cardInfo.SetTurnPlayed(turnCount);
 
-        monstersOnDisk[diskIndex] = card;
-        monstersOnField[diskIndex] = card;
-        diskScript.SetMonster(diskIndex, face, card.getCardNumber());
-        GameManager.Get().PlaceMonsterOnField(diskIndex, card.getCardName());
-        playedMonsterThisTurn = true;
-        RemoveCardFromHand(index, true);
+        monstersOnDisk[diskIndex] = cardInfo;
+        diskScript.SetMonster(diskIndex, face, cardInfo.GetCardNumber());
+        canPlayMonster = false;
+        RemoveCardFromHand(index);
+
+        RehighlightHandCards();
     }
 
-    public void SetSpellOnDisk(int index, Enums.CardFace face)
+    public void SetSpellOnDisk(int index, Card cardInfo, Enums.CardFace face)
     {
         //activate effect if face is Up
         int diskIndex = spellsOnDisk.IndexOf(null);
-        spellsOnDisk[diskIndex] = cardsInHand[index];
-        spellsOnField[diskIndex] = cardsInHand[index];
-        
-        diskScript.SetSpell(diskIndex, cardsInHand[index].getCardNumber(), (Enums.CardType) Enum.Parse(typeof(Enums.CardType), ((NonMonster) cardsInHand[index]).getType().ToString()), face);
-        GameManager.Get().PlaceSpellOnField(diskIndex, cardsInHand[index].getCardName());
-        RemoveCardFromHand(index, false);
+        cardInfo.SetTurnPlayed(turnCount);
+
+        spellsOnDisk[diskIndex] = cardInfo;
+        diskScript.SetSpell(diskIndex, cardInfo.GetCardNumber(), (Enums.CardType) Enum.Parse(typeof(Enums.CardType), ((NonMonster)cardInfo).getType().ToString()), face);
+        RemoveCardFromHand(index);
+
+        RehighlightHandCards();
     }
 
     //to call this if needed
     public void DiscardRandomCard()
     {
-        int randomPosition = UnityEngine.Random.Range(0, cardsInHand.Count - 1);
-        RemoveCardFromHand(randomPosition, false);
+        int randomPosition = UnityEngine.Random.Range(0, handScript.GetNoOfCards() - 1);
+        RemoveCardFromHand(randomPosition);
     }
 
-    public void RemoveCardFromHand(int index, bool isMonsterIfRelevant)
+    public void RemoveCardFromHand(int index)
     {
-        cardsInHand.RemoveAt(index);
-        handScript.RecalculateIndex(index, isMonsterIfRelevant);
+        handScript.RemoveCard(index);
     }
-
-    public void InitDuel()
-    {
-        disk.GetComponent<Animation>()["Take 001"].speed = 2.0f;
-        disk.GetComponent<Animation>().Play();
-
-        Invoke("ShowDeck", 3.0f);
-    }
-
+    
     public Turn.Phase GetCurrentPhase()
     {
         return turn.getCurrentPhase();
-    }
-
-    private void EndTurn()
-    {
-        //trigger the opponent's next turn
     }
 
     private void WaitForTheOpponent()

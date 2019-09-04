@@ -7,16 +7,6 @@ public class DiskScript : MonoBehaviour {
     public List<GameObject> monstersOnDisk;
     public List<GameObject> spellsOnDisk;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
     private bool IsMonsterHighlightable(int index)
     {
         return monstersOnDisk[index].GetComponent<DeskCardScript>().IsHighlightable();
@@ -42,11 +32,15 @@ public class DiskScript : MonoBehaviour {
         spellsOnDisk[index].GetComponent<DeskCardScript>().SetHighlightable(false);
     }
 
-
     public void SetMonster(int index, Enums.CardFace face, string cardNumber)
     {
         monstersOnDisk[index].GetComponent<DeskCardScript>().SetData(index, Enums.CardType.Monster, face, cardNumber);
         monstersOnDisk[index].SetActive(true);
+
+        string action = (face == Enums.CardFace.Up) ? Constants.SUMMONING_TEXT : Constants.SETTING_TEXT;
+
+        string details = action + ";" + Constants.MONSTER + ";" + Constants.HAND + ";" + cardNumber;
+        GameManager.Get().SendInformation(details);
     }
 
     public void SetSpell(int index, string cardNumber, Enums.CardType spellType, Enums.CardFace face)
@@ -57,6 +51,11 @@ public class DiskScript : MonoBehaviour {
         {
             HighlightSpell(index);
         }
+
+        string action = (face == Enums.CardFace.Up) ? Constants.ACTIVATING_TEXT : Constants.SETTING_TEXT;
+
+        string details = action + ";" + Constants.SPELL + ";" + Constants.HAND + ";" + cardNumber;
+        GameManager.Get().SendInformation(details);
     }
 
     public Enums.CardPosition GetPositionForIndex(int index)
@@ -94,5 +93,15 @@ public class DiskScript : MonoBehaviour {
         {
             spellsOnDisk[index].GetComponent<DeskCardScript>().ChangeText();
         }
+    }
+
+    public int GetDiskMonstersCount()
+    {
+        return monstersOnDisk.Count;
+    }
+
+    public int GetDiskSpellsCount()
+    {
+        return spellsOnDisk.Count;
     }
 }

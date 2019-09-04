@@ -33,7 +33,7 @@ public class DeskCardScript : InteractibleAbstractCard {
             objRenderer = GetComponent<Renderer>();
         }
 
-        Texture2D texture = LoadTexture(cardNumber);
+        Texture2D texture = Utils.LoadTexture(cardNumber, cardType);
         if (texture != null)
         {
             frontImagePlane.GetComponent<Renderer>().material.mainTexture = texture;
@@ -98,7 +98,7 @@ public class DeskCardScript : InteractibleAbstractCard {
                 }
             }
         }
-        if(cardType == Enums.CardType.Spell && face == Enums.CardFace.Down)
+        else if(face == Enums.CardFace.Down)
         {
             SetCanvasText(Constants.ACTIVATING_TEXT);
         }
@@ -180,6 +180,11 @@ public class DeskCardScript : InteractibleAbstractCard {
             if (currentPhase == Turn.Phase.Battle)
             {
                 hasAttackedThisTurn = true;
+
+                //to also add info on the attacked monster
+                string details = Constants.ATTACKING_TEXT + ";" + cardIndex;
+                GameManager.Get().SendInformation(details);
+
                 //prepare attack, give tribute, select for spell/effect usage
                 //SwitchAttackMode();
 
@@ -191,6 +196,12 @@ public class DeskCardScript : InteractibleAbstractCard {
             if ((currentPhase == Turn.Phase.Main1 || currentPhase == Turn.Phase.Main2) && !hasChangedPositionThisTurn)
             {
                 SwitchPosition();
+
+                string action = (position == Enums.CardPosition.Atk) ? Constants.ATK_CHANGE_TEXT : Constants.DEF_CHANGE_TEXT;
+
+                string details = action + ";" + cardIndex;
+                GameManager.Get().SendInformation(details);
+
                 hasChangedPositionThisTurn = true;
             }
         }

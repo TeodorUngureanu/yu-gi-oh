@@ -962,13 +962,13 @@ public class Config
         Debug.Log("_Monster_Cards");
         foreach (KeyValuePair<int, Monster> kvp in _Monster_Cards)
         {
-            Debug.Log(string.Format("Key = {0}, Value = {1}", kvp.Key, kvp.Value.getCardNumber()));
+            Debug.Log(string.Format("Key = {0}, Value = {1}", kvp.Key, kvp.Value.GetCardNumber()));
         }
 
         Debug.Log("_Magic_Cards");
         foreach (KeyValuePair<int, NonMonster> kvp in _Magic_Cards)
         {
-            Debug.Log(string.Format("Key = {0}, Value = {1}", kvp.Key, kvp.Value.getCardNumber()));
+            Debug.Log(string.Format("Key = {0}, Value = {1}", kvp.Key, kvp.Value.GetCardNumber()));
         }
 
         Debug.Log("_User_Deck");

@@ -18,7 +18,7 @@ public class HandScript : MonoBehaviour {
         cardsInHand = new List<GameObject>();
     }
 
-    public void AddCard(int index, Enums.CardType cardType, string cardNumber)
+    public void AddCard(Card nextCard)
     {
         float crtX = x + cardsInHand.Count * xInterval;
         GameObject crtCard = Instantiate<GameObject>(
@@ -26,26 +26,20 @@ public class HandScript : MonoBehaviour {
             new Vector3(crtX, y, z) + gameObject.transform.position,
             Quaternion.Euler(rotationVector.x, rotationVector.y, rotationVector.z),
             gameObject.transform);
-
+        
         crtCard.transform.localScale = scalingVector;
-        crtCard.GetComponent<HandCardScript>().SetData(index, cardType, cardNumber);
-        //string defaultFaceOnDisk = (cardType == "Monster") ? "UP" : "DOWN";
-        //crtCard.GetComponent<CardScript>().SetFace(defaultFaceOnDisk);
+        crtCard.GetComponent<HandCardScript>().SetData(GetNoOfCards() - 1, nextCard);
 
         cardsInHand.Add(crtCard);
     }
 
-    public void RecalculateIndex(int lowestIndex, bool isMonster)
+    public void RemoveCard(int lowestIndex)
     {
         Destroy(cardsInHand[lowestIndex]);
         cardsInHand.RemoveAt(lowestIndex);
         for(int index = 0; index < cardsInHand.Count; index ++)
         {
             GameObject crtCard = cardsInHand[index];
-            if (isMonster && crtCard.GetComponent<HandCardScript>().IsMonster())
-            {
-                SetCardUnhighlightable(index);
-            }
             if (index >= lowestIndex)
             {
                 crtCard.GetComponent<HandCardScript>().SetCardIndex(index);
@@ -64,8 +58,18 @@ public class HandScript : MonoBehaviour {
         cardsInHand[index].GetComponent<HandCardScript>().SetHighlightable(false);
     }
 
-    public HandCardScript GetCardScriptForIndex(int index)
+    public void ChangeTextForIndex(int index)
     {
-        return cardsInHand[index].GetComponent<HandCardScript>();
+        cardsInHand[index].GetComponent<HandCardScript>().ChangeText();
+    }
+
+    public Card GetCardInfoForIndex(int index)
+    {
+        return cardsInHand[index].GetComponent<HandCardScript>().GetCardInfo();
+    }
+
+    public int GetNoOfCards()
+    {
+        return cardsInHand.Count;
     }
 }

@@ -74,7 +74,7 @@ public class Deck : InteractibleElementScript {
         return firstCard;
     }
 
-    public void setIsDrawPhase(bool drawPhase)
+    public void SetIsDrawPhase(bool drawPhase)
     {
         isDrawPhase = drawPhase;
     }

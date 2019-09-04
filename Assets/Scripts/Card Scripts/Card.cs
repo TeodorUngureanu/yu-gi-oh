@@ -24,47 +24,47 @@ public abstract class Card {
         monster = vMonster;
     }
 
-    public string getCardNumber()
+    public string GetCardNumber()
     {
         return cardNumber;
     }
 
-    public byte[] getImage()
+    public byte[] GetImage()
     {
         return image;
     }
 
-    public string getCardName()
+    public string GetCardName()
     {
         return cardName;
     }
     
-    public string getDescription()
+    public string GetDescription()
     {
         return description;
     }
 
-    public int getEffectKey()
+    public int GetEffectKey()
     {
         return effectKey;
     }
 
-    public int getTurnPlayed()
+    public int GetTurnPlayed()
     {
         return turnPlayed;
     }
 
-    public void setTurnPlayed(int crtTurn)
+    public void SetTurnPlayed(int crtTurn)
     {
         turnPlayed = crtTurn;
     }
 
-    public bool isMonster()
+    public bool IsMonster()
     {
         return monster;
     }
 
-    public void setMonster(bool vMonster)
+    public void SetMonster(bool vMonster)
     {
         monster = vMonster;
     }

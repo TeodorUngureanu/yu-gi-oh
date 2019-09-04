@@ -13,6 +13,15 @@ public static class Constants
     public const string DEF_CHANGE_TEXT = "Def position";
     public const string ATTACKING_TEXT = "Attack";
     public const string SACRIFICING_TEXT = "Tribute";
+
+    public const int INITIAL_HAND_SIZE = 5;
+    public const int MAX_HAND_SIZE = 6;
+    public const int STARTING_LIFE_POINTS = 8000;
+
+    public const string MONSTER = "Monster";
+    public const string SPELL = "Spell";
+    public const string HAND = "Hand";
+    public const string DISK = "Disk";
     
     public struct CardInfo
     {
