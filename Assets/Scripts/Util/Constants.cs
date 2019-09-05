@@ -9,10 +9,12 @@ public static class Constants
     public const string SETTING_TEXT = "Set";
     public const string FLIPPING_TEXT = "Flip";
     public const string ACTIVATING_TEXT = "Activate";
-    public const string ATK_CHANGE_TEXT = "Atk position";
-    public const string DEF_CHANGE_TEXT = "Def position";
+    public const string ATK_CHANGE_TEXT = "ATK Position";
+    public const string DEF_CHANGE_TEXT = "DEF Position";
     public const string ATTACKING_TEXT = "Attack";
-    public const string SACRIFICING_TEXT = "Tribute";
+    public const string TRIBUTE_SUMMON_TEXT = "Tribute Summon";
+    public const string TRIBUTE_SET_TEXT = "Tribute Set";
+    public const string SACRIFICE_TEXT = "Sacrifice";
 
     public const int INITIAL_HAND_SIZE = 5;
     public const int MAX_HAND_SIZE = 6;
@@ -22,6 +24,7 @@ public static class Constants
     public const string SPELL = "Spell";
     public const string HAND = "Hand";
     public const string DISK = "Disk";
+    public const string UNKNOWN = "UNKNOWN";
     
     public struct CardInfo
     {

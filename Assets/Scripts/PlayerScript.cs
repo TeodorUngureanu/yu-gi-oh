@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour {
+public class PlayerScript : MonoBehaviour {
 
     public GameObject disk, deck, hand;
 
@@ -155,7 +155,7 @@ public class Player : MonoBehaviour {
         ProcessDiscardableHandCards(start);
     }
 
-    private void HighlightPlayerCards()
+    public void HighlightPlayerCards()
     {
         if (turn.isMainPhase())
         {
@@ -174,9 +174,10 @@ public class Player : MonoBehaviour {
         }
     }
 
-    private void UnhighlightEverything()
+    public void UnhighlightEverything()
     {
         ProcessPosChangeableDiskMonsters(false);
+        ProcessTributeAvailableMonsters(false);
         ProcessUsableHandCards(false);
         ProcessUsableDiskSpells(false);
     }
@@ -308,6 +309,26 @@ public class Player : MonoBehaviour {
             }
         }
     }
+
+    public void ProcessTributeAvailableMonsters(bool highlight)
+    {
+        for (int index = 0; index < monstersOnDisk.Count; index++)
+        {
+            Card crtCard = monstersOnDisk[index];
+            if (crtCard != null)
+            {
+                if (highlight)
+                {
+                    diskScript.HighlightMonster(index);
+                }
+                else
+                {
+                    diskScript.UnhighlightMonster(index);
+                }
+                diskScript.ChangeTextForIndex(index, true);
+            }
+        }
+    }
     
     public void StartMyTurn()
     {
@@ -335,20 +356,22 @@ public class Player : MonoBehaviour {
         }
     }
 
-    public void SetMonsterOnDisk(int index, Card cardInfo, Enums.CardFace face)
+    public int SetMonsterOnDisk(int index, Card cardInfo, Enums.CardFace face, List<int> tributes)
     {
         int diskIndex = monstersOnDisk.IndexOf(null);
         cardInfo.SetTurnPlayed(turnCount);
 
         monstersOnDisk[diskIndex] = cardInfo;
-        diskScript.SetMonster(diskIndex, face, cardInfo.GetCardNumber());
+        diskScript.SetMonster(diskIndex, face, cardInfo.GetCardNumber(), tributes);
         canPlayMonster = false;
         RemoveCardFromHand(index);
 
         RehighlightHandCards();
+
+        return diskIndex;
     }
 
-    public void SetSpellOnDisk(int index, Card cardInfo, Enums.CardFace face)
+    public int SetSpellOnDisk(int index, Card cardInfo, Enums.CardFace face)
     {
         //activate effect if face is Up
         int diskIndex = spellsOnDisk.IndexOf(null);
@@ -359,6 +382,17 @@ public class Player : MonoBehaviour {
         RemoveCardFromHand(index);
 
         RehighlightHandCards();
+
+        return diskIndex;
+    }
+
+    public void DestroyMonsters(List<int> indices)
+    {
+        for(int index = 0; index < indices.Count; index++)
+        {
+            diskScript.DestroyMonster(index);
+            monstersOnDisk[index] = null;
+        }
     }
 
     //to call this if needed
@@ -371,6 +405,23 @@ public class Player : MonoBehaviour {
     public void RemoveCardFromHand(int index)
     {
         handScript.RemoveCard(index);
+    }
+
+    public string GetCardNumberForIndex(int index)
+    {
+        return monstersOnDisk[index].GetCardNumber();
+    }
+
+    public Card GetCardInfoForIndex(int index, bool isMonster)
+    {
+        if(isMonster)
+        {
+            return monstersOnDisk[index];
+        }
+        else
+        {
+            return spellsOnDisk[index];
+        }
     }
     
     public Turn.Phase GetCurrentPhase()

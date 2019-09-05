@@ -9,43 +9,49 @@ public class DiskScript : MonoBehaviour {
 
     private bool IsMonsterHighlightable(int index)
     {
-        return monstersOnDisk[index].GetComponent<DeskCardScript>().IsHighlightable();
+        return monstersOnDisk[index].GetComponent<DiskCardScript>().IsHighlightable();
     }
 
     public void HighlightMonster(int index)
     {
-        monstersOnDisk[index].GetComponent<DeskCardScript>().SetHighlightable(true);
+        monstersOnDisk[index].GetComponent<DiskCardScript>().SetHighlightable(true);
     }
 
     public void UnhighlightMonster(int index)
     {
-        monstersOnDisk[index].GetComponent<DeskCardScript>().SetHighlightable(false);
+        monstersOnDisk[index].GetComponent<DiskCardScript>().SetHighlightable(false);
     }
 
     public void HighlightSpell(int index)
     {
-        spellsOnDisk[index].GetComponent<DeskCardScript>().SetHighlightable(true);
+        spellsOnDisk[index].GetComponent<DiskCardScript>().SetHighlightable(true);
     }
 
     public void UnhighlightSpell(int index)
     {
-        spellsOnDisk[index].GetComponent<DeskCardScript>().SetHighlightable(false);
+        spellsOnDisk[index].GetComponent<DiskCardScript>().SetHighlightable(false);
     }
 
-    public void SetMonster(int index, Enums.CardFace face, string cardNumber)
+    public void SetMonster(int index, Enums.CardFace face, string cardNumber, List<int> tributes)
     {
-        monstersOnDisk[index].GetComponent<DeskCardScript>().SetData(index, Enums.CardType.Monster, face, cardNumber);
+        monstersOnDisk[index].GetComponent<DiskCardScript>().SetData(index, Enums.CardType.Monster, face, cardNumber);
         monstersOnDisk[index].SetActive(true);
 
+
+        string cardNumberToSend = (face == Enums.CardFace.Up) ? cardNumber : Constants.UNKNOWN;
         string action = (face == Enums.CardFace.Up) ? Constants.SUMMONING_TEXT : Constants.SETTING_TEXT;
 
-        string details = action + ";" + Constants.MONSTER + ";" + Constants.HAND + ";" + cardNumber;
+        string details = action + ";" + Constants.MONSTER + ";" + index + ";" + cardNumberToSend + ";" +  tributes.Count;
+        for (int i = 0; i < tributes.Count; i++)
+        {
+            details += ";" + tributes[i];
+        }
         GameManager.Get().SendInformation(details);
     }
 
     public void SetSpell(int index, string cardNumber, Enums.CardType spellType, Enums.CardFace face)
     {
-        spellsOnDisk[index].GetComponent<DeskCardScript>().SetData(index, spellType, face, cardNumber);
+        spellsOnDisk[index].GetComponent<DiskCardScript>().SetData(index, spellType, face, cardNumber);
         spellsOnDisk[index].SetActive(true);
         if(spellType == Enums.CardType.Spell)
         {
@@ -54,45 +60,51 @@ public class DiskScript : MonoBehaviour {
 
         string action = (face == Enums.CardFace.Up) ? Constants.ACTIVATING_TEXT : Constants.SETTING_TEXT;
 
-        string details = action + ";" + Constants.SPELL + ";" + Constants.HAND + ";" + cardNumber;
+        string details = action + ";" + Constants.SPELL + ";" + Constants.HAND + ";" + index + ";" + cardNumber;
         GameManager.Get().SendInformation(details);
     }
 
     public Enums.CardPosition GetPositionForIndex(int index)
     {
-        return index > 4 ? Enums.CardPosition.Def : monstersOnDisk[index].GetComponent<DeskCardScript>().GetPosition(); ;
+        return index > 4 ? Enums.CardPosition.Def : monstersOnDisk[index].GetComponent<DiskCardScript>().GetPosition(); ;
     }
 
     public void SwitchAttackModeForIndex(int index, bool isAttackMode)
     {
-        monstersOnDisk[index].GetComponent<DeskCardScript>().SetBattlingMonster(isAttackMode);
+        monstersOnDisk[index].GetComponent<DiskCardScript>().SetBattlingMonster(isAttackMode);
     }
 
     public void RefreshVariablesForIndex(int index)
     {
-        monstersOnDisk[index].GetComponent<DeskCardScript>().RefreshTurnRestrictions();
+        monstersOnDisk[index].GetComponent<DiskCardScript>().RefreshTurnRestrictions();
     }
 
     public Enums.CardType GetTypeForIndex(int index)
     {
-        return spellsOnDisk[index].GetComponent<DeskCardScript>().GetCardType();
+        return spellsOnDisk[index].GetComponent<DiskCardScript>().GetCardType();
     }
 
     public bool CanChangePositionForIndex(int index)
     {
-        return monstersOnDisk[index].GetComponent<DeskCardScript>().CanChangePositionThisTurn();
+        return monstersOnDisk[index].GetComponent<DiskCardScript>().CanChangePositionThisTurn();
     }
 
     public void ChangeTextForIndex(int index, bool monster)
     {
         if(monster)
         {
-            monstersOnDisk[index].GetComponent<DeskCardScript>().ChangeText();
+            monstersOnDisk[index].GetComponent<DiskCardScript>().ChangeText();
         }
         else
         {
-            spellsOnDisk[index].GetComponent<DeskCardScript>().ChangeText();
+            spellsOnDisk[index].GetComponent<DiskCardScript>().ChangeText();
         }
+    }
+
+    public void DestroyMonster(int index)
+    {
+        monstersOnDisk[index].SetActive(false);
+        monstersOnDisk[index].GetComponent<DiskCardScript>().ResetData();
     }
 
     public int GetDiskMonstersCount()

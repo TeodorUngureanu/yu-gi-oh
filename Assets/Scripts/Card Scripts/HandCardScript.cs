@@ -27,7 +27,7 @@ public class HandCardScript : InteractibleAbstractCard
         cardIndex = vCardIndex;
         cardInfo = vCardInfo;
 
-        cardType = cardInfo.IsMonster() ? Enums.CardType.Monster : (Enums.CardType)Enum.Parse(typeof(Enums.CardType), ((NonMonster)cardInfo).getType().ToString()); ;
+        cardType = cardInfo.IsMonster() ? Enums.CardType.Monster : (Enums.CardType) Enum.Parse(typeof(Enums.CardType), ((NonMonster)cardInfo).getType().ToString()); ;
 
         objRenderer = GetComponent<Renderer>();
 
@@ -96,7 +96,7 @@ public class HandCardScript : InteractibleAbstractCard
             }
             else
             {
-                SetCanvasText(Constants.SACRIFICING_TEXT);
+                SetCanvasText((summoningFace == Enums.CardFace.Up) ? Constants.TRIBUTE_SUMMON_TEXT : Constants.TRIBUTE_SET_TEXT);
             }
         }
         else
@@ -130,6 +130,7 @@ public class HandCardScript : InteractibleAbstractCard
         {
             if (Input.GetMouseButtonDown(0))
             {
+                canvas.enabled = false;
                 InteractWithElement();
             }
 

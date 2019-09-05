@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DeskCardScript : InteractibleAbstractCard {
+public class DiskCardScript : InteractibleAbstractCard {
     
     public GameObject frontImagePlane;
     public Canvas canvas;
@@ -50,6 +50,14 @@ public class DeskCardScript : InteractibleAbstractCard {
             RotateCard();
         }
     }
+    
+    public void ResetData()
+    {
+        face = Enums.CardFace.Up;
+        position = Enums.CardPosition.Atk;
+        hasChangedPositionThisTurn = true;
+        hasAttackedThisTurn = false;
+    }
 
     public void SetFace(Enums.CardFace newFace)
     {
@@ -70,7 +78,7 @@ public class DeskCardScript : InteractibleAbstractCard {
     {
         Vector3 crtRotation = this.gameObject.transform.localEulerAngles;
         crtRotation.x += 180;
-        this.gameObject.transform.localEulerAngles = crtRotation ;
+        this.gameObject.transform.localEulerAngles = crtRotation;
     }
 
     private void SetCanvasText(string newText)
@@ -85,17 +93,20 @@ public class DeskCardScript : InteractibleAbstractCard {
             if (GameManager.Get().GetTurnPhase() == Turn.Phase.Battle)
             {
                 SetCanvasText(Constants.ATTACKING_TEXT);
+                return;
+            }
+            if(GameManager.Get().IsPlayerSacrificing())
+            {
+                SetCanvasText(Constants.SACRIFICE_TEXT);
+                return;
+            }
+            if (face == Enums.CardFace.Down)
+            {
+                SetCanvasText(Constants.FLIPPING_TEXT);
             }
             else
             {
-                if (face == Enums.CardFace.Down)
-                {
-                    SetCanvasText(Constants.FLIPPING_TEXT);
-                }
-                else
-                {
-                    SetCanvasText((position == Enums.CardPosition.Def) ? Constants.ATK_CHANGE_TEXT : Constants.DEF_CHANGE_TEXT);
-                }
+                SetCanvasText((position == Enums.CardPosition.Def) ? Constants.ATK_CHANGE_TEXT : Constants.DEF_CHANGE_TEXT);
             }
         }
         else if(face == Enums.CardFace.Down)
@@ -180,27 +191,32 @@ public class DeskCardScript : InteractibleAbstractCard {
             if (currentPhase == Turn.Phase.Battle)
             {
                 hasAttackedThisTurn = true;
-
-                //to also add info on the attacked monster
-                string details = Constants.ATTACKING_TEXT + ";" + cardIndex;
-                GameManager.Get().SendInformation(details);
-
-                //prepare attack, give tribute, select for spell/effect usage
-                //SwitchAttackMode();
+                GameManager.Get().AttackWithMonster(cardIndex);
 
                 //after attack, unhighlight it
                 UnhighlightObject();
                 highlightable = false;
             }
 
+            if(GameManager.Get().IsPlayerSacrificing())
+            {
+                GameManager.Get().AddTribute(false, cardIndex);
+                UnhighlightObject();
+                highlightable = false;
+                return;
+            }
+
             if ((currentPhase == Turn.Phase.Main1 || currentPhase == Turn.Phase.Main2) && !hasChangedPositionThisTurn)
             {
-                SwitchPosition();
-
                 string action = (position == Enums.CardPosition.Atk) ? Constants.ATK_CHANGE_TEXT : Constants.DEF_CHANGE_TEXT;
+                string cardNumber = GameManager.Get().GetCardNumberForMonster(cardIndex);
 
-                string details = action + ";" + cardIndex;
+                string details = action + ";" + cardIndex + ";" + cardNumber + ";" + face;
                 GameManager.Get().SendInformation(details);
+
+                GameManager.Get().SwitchMonsterPosition(cardIndex, face, position);
+
+                SwitchPosition();
 
                 hasChangedPositionThisTurn = true;
             }
