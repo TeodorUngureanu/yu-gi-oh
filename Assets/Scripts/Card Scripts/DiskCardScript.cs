@@ -12,6 +12,7 @@ public class DiskCardScript : InteractibleAbstractCard {
     private Enums.CardFace face = Enums.CardFace.Up;
     private Enums.CardPosition position = Enums.CardPosition.Atk;
     private bool hasChangedPositionThisTurn = true, hasAttackedThisTurn = false;
+    private bool isActivatedSpell = false;
 
     private const int DEF_COEFF = 1, ATK_COEFF = -1;
     private Vector3 posTransitionVector = new Vector3(-0.00044f, 0.0002f, 0.00101f);
@@ -45,18 +46,45 @@ public class DiskCardScript : InteractibleAbstractCard {
             RotateCard();
             TweakCardTransform(DEF_COEFF);
         }
-        if(!IsMonster() && face == Enums.CardFace.Up)
+        if (!IsMonster())
+        {
+            if(face == Enums.CardFace.Down) {
+                RotateCard();
+            }
+            if(face == Enums.CardFace.Up || cardType == Enums.CardType.Trap)
+            {
+                UnhighlightObject();
+                highlightable = false;
+            }
+        }
+    }
+
+    public void ResetData()
+    {
+        if (face == Enums.CardFace.Down)
         {
             RotateCard();
         }
-    }
-    
-    public void ResetData()
-    {
+        if(position == Enums.CardPosition.Def)
+        {
+            TweakCardTransform(ATK_COEFF);
+        }
+
         face = Enums.CardFace.Up;
         position = Enums.CardPosition.Atk;
         hasChangedPositionThisTurn = true;
         hasAttackedThisTurn = false;
+        isActivatedSpell = false;
+    }
+
+    public bool IsActivatedSpell()
+    {
+        return isActivatedSpell;
+    }
+
+    public Enums.CardFace GetFace()
+    {
+        return face;
     }
 
     public void SetFace(Enums.CardFace newFace)
@@ -92,7 +120,14 @@ public class DiskCardScript : InteractibleAbstractCard {
         {
             if (GameManager.Get().GetTurnPhase() == Turn.Phase.Battle)
             {
-                SetCanvasText(Constants.ATTACKING_TEXT);
+                if (GameManager.Get().GetAttackingMonsterIndex() == cardIndex)
+                {
+                    SetCanvasText(Constants.CANCELLING_TEXT);
+                } else
+                {
+                    SetCanvasText(Constants.ATTACKING_TEXT);
+                }
+                    
                 return;
             }
             if(GameManager.Get().IsPlayerSacrificing())
@@ -135,9 +170,22 @@ public class DiskCardScript : InteractibleAbstractCard {
 
     void OnMouseOver()
     {
-        if (highlightable)
+        if (highlightable && Input.GetMouseButtonDown(0))
         {
-            if (Input.GetMouseButtonDown(0))
+            if (IsMonster())
+            {
+                ChangeText();
+                if (GameManager.Get().GetAttackingMonsterIndex() == cardIndex)
+                {
+                    GameManager.Get().CancelAttack();
+                }
+                else
+                {
+                    InteractWithElement();
+                    HighlightObject();
+                    highlightable = true;
+                }
+            } else
             {
                 canvas.enabled = false;
                 InteractWithElement();
@@ -170,7 +218,7 @@ public class DiskCardScript : InteractibleAbstractCard {
         SetPosition((position == Enums.CardPosition.Atk) ? Enums.CardPosition.Def : Enums.CardPosition.Atk);
         int coefficient = (position == Enums.CardPosition.Def) ? DEF_COEFF : ATK_COEFF;
 
-        if(IsMonster() && face == Enums.CardFace.Down)
+        if(face == Enums.CardFace.Down)
         {
             SetFace(Enums.CardFace.Up);
             RotateCard();
@@ -190,12 +238,7 @@ public class DiskCardScript : InteractibleAbstractCard {
 
             if (currentPhase == Turn.Phase.Battle)
             {
-                hasAttackedThisTurn = true;
                 GameManager.Get().AttackWithMonster(cardIndex);
-
-                //after attack, unhighlight it
-                UnhighlightObject();
-                highlightable = false;
             }
 
             if(GameManager.Get().IsPlayerSacrificing())
@@ -206,20 +249,34 @@ public class DiskCardScript : InteractibleAbstractCard {
                 return;
             }
 
-            if ((currentPhase == Turn.Phase.Main1 || currentPhase == Turn.Phase.Main2) && !hasChangedPositionThisTurn)
+            if ((currentPhase == Turn.Phase.Main1 || currentPhase == Turn.Phase.Main2 || GameManager.Get().IsQuickActivation()) && !hasChangedPositionThisTurn)
             {
                 string action = (position == Enums.CardPosition.Atk) ? Constants.ATK_CHANGE_TEXT : Constants.DEF_CHANGE_TEXT;
                 string cardNumber = GameManager.Get().GetCardNumberForMonster(cardIndex);
 
-                string details = action + ";" + cardIndex + ";" + cardNumber + ";" + face;
-                GameManager.Get().SendInformation(details);
+                List<MessageParameter> parameters = new List<MessageParameter>()
+                {
+                    new MessageParameter(Constants.CARD_NO_KEY, cardNumber),
+                    new MessageParameter(Constants.FACE_KEY, face.ToString())
+                };
 
+                GameManager.Get().SendInformation(action, cardIndex, parameters);
                 GameManager.Get().SwitchMonsterPosition(cardIndex, face, position);
 
                 SwitchPosition();
-
                 hasChangedPositionThisTurn = true;
             }
+        }
+        else
+        {
+            UnhighlightObject();
+            highlightable = false;
+            SetFace(Enums.CardFace.Up);
+            RotateCard();
+            GameManager.Get().FlipSpell(cardIndex, false);
+
+            //Send true if effect is continuous or send entire cardInfo
+            StartCoroutine(GameManager.Get().ActivateSpellCoroutine(cardIndex, false));
         }
     }
 
@@ -232,5 +289,20 @@ public class DiskCardScript : InteractibleAbstractCard {
     public bool CanChangePositionThisTurn()
     {
         return !hasChangedPositionThisTurn && !hasAttackedThisTurn;
+    }
+
+    public void ApplyPostAttackRestrictions()
+    {
+        hasAttackedThisTurn = true;
+        SetBattlingMonster(false);
+
+        //after attack, unhighlight it
+        UnhighlightObject();
+        highlightable = false;
+    }
+
+    public bool HasAttackedThisTurn()
+    {
+        return hasAttackedThisTurn;
     }
 }

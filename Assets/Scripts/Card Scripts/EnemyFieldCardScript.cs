@@ -1,20 +1,40 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class EnemyFieldCardScript : InteractibleAbstractCard
 {
     private Card cardInfo;
+    public Canvas canvas;
+
+    private Enums.CardFace face;
+    private Enums.CardPosition position;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        objRenderer = GetComponent<Renderer>();
+    }
 
     public Card GetCardInfo()
     {
         return cardInfo;
     }
 
-    public void SetCardInfo(int vCardIndex, Card vCardInfo)
+    public Enums.CardPosition GetPosition()
+    {
+        return position;
+    }
+
+    public void SetFace(Enums.CardFace vFace)
+    {
+        face = vFace;
+    }
+
+    public void SetCardInfo(int vCardIndex, Card vCardInfo, Enums.CardFace vFace)
     {
         cardIndex = vCardIndex;
         cardInfo = vCardInfo;
+        face = vFace;
+        position = (face == Enums.CardFace.Up) ? Enums.CardPosition.Atk : Enums.CardPosition.Def;
     }
 
     void OnMouseEnter()
@@ -22,6 +42,7 @@ public class EnemyFieldCardScript : InteractibleAbstractCard
         if (highlightable)
         {
             HighlightObject();
+            canvas.enabled = true;
         }
     }
 
@@ -30,17 +51,16 @@ public class EnemyFieldCardScript : InteractibleAbstractCard
         if (highlightable)
         {
             UnhighlightObject();
+            canvas.enabled = false;
         }
     }
 
     void OnMouseOver()
     {
-        if (highlightable)
+        if (highlightable && Input.GetMouseButtonDown(0))
         {
-            if (Input.GetMouseButtonDown(0))
-            {
-                InteractWithElement();
-            }
+            canvas.enabled = false;
+            InteractWithElement();
         }
     }
 
@@ -51,6 +71,6 @@ public class EnemyFieldCardScript : InteractibleAbstractCard
 
     public override void InteractWithElement()
     {
-        GameManager.Get().AttackTarget(cardIndex);
+        GameManager.Get().AttackTarget(cardIndex, position, face);
     }
 }

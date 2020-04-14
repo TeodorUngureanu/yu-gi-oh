@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class FieldScript : MonoBehaviour {
@@ -9,7 +10,7 @@ public class FieldScript : MonoBehaviour {
     public List<GameObject> monsterField, spellField;
     public List<GameObject> enemyMonsterField, enemySpellField;
 
-    public List<int> attackableMonsters;
+    private List<int> attackableMonsters;
 
     private Dictionary<string, int> fieldEffects;
     private List<GameObject> tributeCircleInstances;
@@ -19,6 +20,20 @@ public class FieldScript : MonoBehaviour {
     {
         tributeCircleInstances = new List<GameObject>();
         attackableMonsters = new List<int>();
+
+        MockDataForTesting();
+    }
+
+    private void MockDataForTesting()
+    {
+        Card testCardInfo = new Monster("47060154", File.ReadAllBytes("Assets/Resources/Images/Card Images/MysticClown.png"),
+            "Mystic Clown", "blahblahblah", 0, 9, 1, 1500, 1000, 4, false);
+
+        Card testCardInfo2 = new Monster("15025844", File.ReadAllBytes("Assets/Resources/Images/Card Images/MysticalElf.png"),
+            "Mystical Elf", "blahblahblah", 0, 5, 19, 800, 2000, 4, false);
+
+        SetEnemyMonster(0, testCardInfo, Enums.CardFace.Up);
+        SetEnemyMonster(1, testCardInfo2, Enums.CardFace.Down);
     }
 
     public void ClearField()
@@ -64,6 +79,23 @@ public class FieldScript : MonoBehaviour {
         crtMonster.SetActive(true);
     }
 
+    public void FlipMonster(int index, bool isEnemy)
+    {
+        GameObject crtMonster;
+
+        if(isEnemy)
+        {
+            crtMonster = enemyMonsterField[index];
+        }
+        else
+        {
+            crtMonster = monsterField[index];
+        }
+
+        crtMonster.transform.localEulerAngles += new Vector3(180, 0, 0);
+        crtMonster.GetComponent<EnemyFieldCardScript>().SetFace(Enums.CardFace.Up);
+    }
+
     public void SetSpell(int index, Card cardInfo, Enums.CardFace face)
     {
         Debug.Log("Setting spell on field on position " + index);
@@ -71,20 +103,33 @@ public class FieldScript : MonoBehaviour {
         GameObject crtSpell = spellField[index];
         SetSpellCardRotation(crtSpell, face);
 
-        ApplyTexture(crtSpell, cardInfo.GetCardNumber(), (Enums.CardType)Enum.Parse(typeof(Enums.CardType), ((NonMonster)cardInfo).getType().ToString()));
+        ApplyTexture(crtSpell, cardInfo.GetCardNumber(), (Enums.CardType)Enum.Parse(typeof(Enums.CardType), ((NonMonster)cardInfo).GetSpellType().ToString()));
     }
 
     private void SetSpellCardRotation(GameObject crtSpell, Enums.CardFace face)
     {
-        Vector3 crtRotation = crtSpell.transform.localEulerAngles;
-
         if (face == Enums.CardFace.Up)
         {
-            crtRotation += new Vector3(180, 0, 0);
+            crtSpell.transform.localEulerAngles += new Vector3(180, 0, 0);
+        }
+        
+        crtSpell.SetActive(true);
+    }
+
+    public void FlipSpell(int index, bool isEnemy)
+    {
+        GameObject crtSpell;
+        if (isEnemy)
+        {
+            crtSpell = enemySpellField[index];
+        }
+        else
+        {
+            crtSpell = spellField[index];
         }
 
-        crtSpell.transform.localEulerAngles = crtRotation;
-        crtSpell.SetActive(true);
+        crtSpell.transform.localEulerAngles += new Vector3(180, 0, 0);
+        crtSpell.GetComponent<EnemyFieldCardScript>().SetFace(Enums.CardFace.Up);
     }
 
     private void ApplyTexture(GameObject parent, string cardNumber, Enums.CardType cardType)
@@ -115,7 +160,7 @@ public class FieldScript : MonoBehaviour {
             Quaternion.Euler(fieldCard.transform.localEulerAngles + new Vector3(90, 0, 90)),
             fieldCard.transform);
         
-        newTributeCircle.transform.SetParent(fieldCard.transform);
+        //newTributeCircle.transform.SetParent(fieldCard.transform);
 
         tributeCircleInstances.Add(newTributeCircle);
     }
@@ -129,20 +174,37 @@ public class FieldScript : MonoBehaviour {
         tributeCircleInstances.Clear();
     } 
 
-    public void DestroyFieldMonsters(bool isEnemy, List<int> indices)
+    public void DestroyFieldMonsters(bool isEnemy, List<int> fieldIndices)
     {
-        for (int index = 0; index < indices.Count; index++)
+        for (int index = 0; index < fieldIndices.Count; index++)
         {
             if (isEnemy)
             {
-                enemyMonsterField[index].SetActive(false);
-                enemyMonsterField[index].transform.localEulerAngles = new Vector3(0, 90, 0);
-                attackableMonsters.Remove(index);
+                enemyMonsterField[fieldIndices[index]].SetActive(false);
+                enemyMonsterField[fieldIndices[index]].transform.localEulerAngles = new Vector3(0, 0, 0);
+                attackableMonsters.Remove(fieldIndices[index]);
             }
             else
             {
-                monsterField[index].SetActive(false);
-                monsterField[index].transform.localEulerAngles = new Vector3(0, 90, 0);
+                monsterField[fieldIndices[index]].SetActive(false);
+                monsterField[fieldIndices[index]].transform.localEulerAngles = new Vector3(0, 90, 0);
+            }
+        }
+    }
+
+    public void DestroyFieldSpells(bool isEnemy, List<int> fieldIndices)
+    {
+        for (int index = 0; index < fieldIndices.Count; index++)
+        {
+            if (isEnemy)
+            {
+                enemySpellField[fieldIndices[index]].SetActive(false);
+                enemySpellField[fieldIndices[index]].transform.localEulerAngles = new Vector3(0, 0, 0);
+            }
+            else
+            {
+                spellField[fieldIndices[index]].SetActive(false);
+                spellField[fieldIndices[index]].transform.localEulerAngles = new Vector3(0, 90, 0);
             }
         }
     }
@@ -150,7 +212,7 @@ public class FieldScript : MonoBehaviour {
     public void SetEnemyMonster(int index, Card cardInfo, Enums.CardFace face)
     {
         GameObject crtMonster = enemyMonsterField[index];
-        crtMonster.GetComponent<EnemyFieldCardScript>().SetCardInfo(index, cardInfo);
+        crtMonster.GetComponent<EnemyFieldCardScript>().SetCardInfo(index, cardInfo, face);
         SetMonsterCardRotation(crtMonster, face);
 
         if (cardInfo != null)
@@ -163,7 +225,7 @@ public class FieldScript : MonoBehaviour {
     public void SetEnemySpell(int index, Card cardInfo, Enums.CardFace face)
     {
         GameObject crtSpell = enemySpellField[index];
-        crtSpell.GetComponent<EnemyFieldCardScript>().SetCardInfo(index, cardInfo);
+        crtSpell.GetComponent<EnemyFieldCardScript>().SetCardInfo(index, cardInfo, face);
         SetSpellCardRotation(crtSpell, face);
 
         if (cardInfo != null)
@@ -205,7 +267,8 @@ public class FieldScript : MonoBehaviour {
         if(crtMonster.GetComponent<EnemyFieldCardScript>().GetCardInfo() == null)
         {
             Card cardInfo = Config.Get().GetCardInfoByNumber(cardNumber, true);
-            crtMonster.GetComponent<EnemyFieldCardScript>().SetCardInfo(index, cardInfo);
+            Enums.CardFace newFace = oldFace == Enums.CardFace.Up ? Enums.CardFace.Down : Enums.CardFace.Up;
+            crtMonster.GetComponent<EnemyFieldCardScript>().SetCardInfo(index, cardInfo, newFace);
         }
 
         SwitchMonsterPosition(true, index, oldFace, oldPos);
@@ -242,12 +305,24 @@ public class FieldScript : MonoBehaviour {
             Quaternion.Euler(fieldCard.transform.localEulerAngles + new Vector3(90, 0, 90)),
             fieldCard.transform);
 
-        attackSwordInstance.transform.SetParent(fieldCard.transform);
+        //attackSwordInstance.transform.SetParent(fieldCard.transform);
     }
 
     public void DestroySword()
     {
-        Destroy(attackSwordInstance);
-        attackSwordInstance = null;
+        if (attackSwordInstance != null)
+        {
+            Destroy(attackSwordInstance);
+            attackSwordInstance = null;
+        }
+    }
+
+    public Card GetEnemyCardInfo(int index, bool isMonster)
+    {
+        if(isMonster)
+        {
+            return enemyMonsterField[index].GetComponent<EnemyFieldCardScript>().GetCardInfo();
+        }
+        return enemySpellField[index].GetComponent<EnemyFieldCardScript>().GetCardInfo();
     }
 }

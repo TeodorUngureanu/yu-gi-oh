@@ -1,11 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class DiskScript : MonoBehaviour {
 
+    public GameObject diskInformation;
+    private DiskInfoScript diskInfoScript;
+
     public List<GameObject> monstersOnDisk;
     public List<GameObject> spellsOnDisk;
+
+    private void Awake()
+    {
+        diskInfoScript = diskInformation.GetComponent<DiskInfoScript>();
+    }
 
     private bool IsMonsterHighlightable(int index)
     {
@@ -40,13 +49,15 @@ public class DiskScript : MonoBehaviour {
 
         string cardNumberToSend = (face == Enums.CardFace.Up) ? cardNumber : Constants.UNKNOWN;
         string action = (face == Enums.CardFace.Up) ? Constants.SUMMONING_TEXT : Constants.SETTING_TEXT;
-
-        string details = action + ";" + Constants.MONSTER + ";" + index + ";" + cardNumberToSend + ";" +  tributes.Count;
-        for (int i = 0; i < tributes.Count; i++)
+        string tributeIndices = string.Join(";", tributes.Select(i => i.ToString()).ToArray());
+        
+        List<MessageParameter> parameters = new List<MessageParameter>()
         {
-            details += ";" + tributes[i];
-        }
-        GameManager.Get().SendInformation(details);
+            new MessageParameter(Constants.CARD_NO_KEY, cardNumberToSend),
+            new MessageParameter(Constants.TRIBUTE_NO_KEY, tributes.Count.ToString()),
+            new MessageParameter(Constants.TRIBUTE_INDICES_KEY, tributeIndices)
+        };
+        GameManager.Get().SendInformation(action, index, parameters);
     }
 
     public void SetSpell(int index, string cardNumber, Enums.CardType spellType, Enums.CardFace face)
@@ -59,9 +70,13 @@ public class DiskScript : MonoBehaviour {
         }
 
         string action = (face == Enums.CardFace.Up) ? Constants.ACTIVATING_TEXT : Constants.SETTING_TEXT;
+        List<MessageParameter> parameters = new List<MessageParameter>()
+        {
+            new MessageParameter(Constants.ORIGIN_KEY, Constants.HAND),
+            new MessageParameter(Constants.CARD_NO_KEY, cardNumber)
+        };
 
-        string details = action + ";" + Constants.SPELL + ";" + Constants.HAND + ";" + index + ";" + cardNumber;
-        GameManager.Get().SendInformation(details);
+        GameManager.Get().SendInformation(action, index, parameters);
     }
 
     public Enums.CardPosition GetPositionForIndex(int index)
@@ -69,9 +84,21 @@ public class DiskScript : MonoBehaviour {
         return index > 4 ? Enums.CardPosition.Def : monstersOnDisk[index].GetComponent<DiskCardScript>().GetPosition(); ;
     }
 
-    public void SwitchAttackModeForIndex(int index, bool isAttackMode)
+    public Enums.CardFace GetFaceForIndex(int index)
     {
-        monstersOnDisk[index].GetComponent<DiskCardScript>().SetBattlingMonster(isAttackMode);
+        return index > 4 ? Enums.CardFace.Up : monstersOnDisk[index].GetComponent<DiskCardScript>().GetFace();
+    }
+
+    public bool SwitchAttackModeForIndex(int index, bool isAttackMode)
+    {
+        DiskCardScript script = monstersOnDisk[index].GetComponent<DiskCardScript>();
+        if(script.HasAttackedThisTurn())
+        {
+            return false;
+        }
+
+        script.SetBattlingMonster(isAttackMode);
+        return true;
     }
 
     public void RefreshVariablesForIndex(int index)
@@ -82,6 +109,11 @@ public class DiskScript : MonoBehaviour {
     public Enums.CardType GetTypeForIndex(int index)
     {
         return spellsOnDisk[index].GetComponent<DiskCardScript>().GetCardType();
+    }
+
+    public bool IsSpellActivated(int index)
+    {
+        return spellsOnDisk[index].GetComponent<DiskCardScript>().IsActivatedSpell();
     }
 
     public bool CanChangePositionForIndex(int index)
@@ -107,6 +139,12 @@ public class DiskScript : MonoBehaviour {
         monstersOnDisk[index].GetComponent<DiskCardScript>().ResetData();
     }
 
+    public void DestroySpell(int index)
+    {
+        spellsOnDisk[index].SetActive(false);
+        spellsOnDisk[index].GetComponent<DiskCardScript>().ResetData();
+    }
+
     public int GetDiskMonstersCount()
     {
         return monstersOnDisk.Count;
@@ -115,5 +153,20 @@ public class DiskScript : MonoBehaviour {
     public int GetDiskSpellsCount()
     {
         return spellsOnDisk.Count;
+    }
+
+    public void ApplyRestrictionsForAttackingMonster(int index)
+    {
+        monstersOnDisk[index].GetComponent<DiskCardScript>().ApplyPostAttackRestrictions();
+    }
+
+    public void UpdateLPOnDisk(long newLP)
+    {
+        diskInfoScript.ChangeLPText(newLP);
+    }
+
+    public void UpdateDeckSizeOnDisk(int newDeckSize)
+    {
+        diskInfoScript.ChangeDeckSizeText(newDeckSize);
     }
 }

@@ -12,6 +12,7 @@ public static class Constants
     public const string ATK_CHANGE_TEXT = "ATK Position";
     public const string DEF_CHANGE_TEXT = "DEF Position";
     public const string ATTACKING_TEXT = "Attack";
+    public const string CANCELLING_TEXT = "Cancel";
     public const string TRIBUTE_SUMMON_TEXT = "Tribute Summon";
     public const string TRIBUTE_SET_TEXT = "Tribute Set";
     public const string SACRIFICE_TEXT = "Sacrifice";
@@ -25,6 +26,30 @@ public static class Constants
     public const string HAND = "Hand";
     public const string DISK = "Disk";
     public const string UNKNOWN = "UNKNOWN";
+
+    //used only for communication between peers
+    public const string CHANGE_PHASE = "ChangePhase";
+    public const string NEW_PHASE_KEY = "newPhase";
+    public const string END_TURN = "End";
+    public const string QUICK_ACTIVATION = "Quick Activation";
+    public const string QA_PHASE_KEY = "phase";
+    public const string QA_START = "start";
+    public const string QA_END = "end";
+    public const string BATTLE = "Battle";
+    public const string TARGET_INDEX_KEY = "targetIndex";
+    public const string CARD_NO_KEY = "cardNumber";
+    public const string FACE_KEY = "face";
+    public const string TYPE_KEY = "cardType";
+    public const string ORIGIN_KEY = "cardOrigin";
+    public const string TRIBUTE_NO_KEY = "noTributes";
+    public const string TRIBUTE_INDICES_KEY = "tributeIndices";
+
+    //used only for showing information on screen
+    public const string DUELIST_PLACEHOLDER = "{duelistName}";
+    public const string DISCARD_INFORMATION = "{duelistName} is discarding cards..";
+
+    public const int MAGIC_TYPE = 1;
+    public const int TRAP_TYPE = 2;
     
     public struct CardInfo
     {

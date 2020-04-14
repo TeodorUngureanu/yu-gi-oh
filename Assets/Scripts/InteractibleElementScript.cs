@@ -165,5 +165,10 @@ public abstract class InteractibleElementScript : MonoBehaviour {
         needsUpdate = true;
     }
 
+    protected bool IsBattlingMonster()
+    {
+        return battlingMonster;
+    }
+
     public abstract void InteractWithElement();
 }

@@ -1014,7 +1014,7 @@ public class Config
     {
         if(isMonster)
         {
-            for(int i = 0; i < _Monster_Cards.Count; i++)
+            for(int i = 1; i <= _Monster_Cards.Count; i++)
             {
                 if(_Monster_Cards[i].GetCardNumber() == cardNumber)
                 {
@@ -1024,7 +1024,7 @@ public class Config
         }
         else
         {
-            for (int i = 0; i < _Magic_Cards.Count; i++)
+            for (int i = 1; i <= _Magic_Cards.Count; i++)
             {
                 if (_Magic_Cards[i].GetCardNumber() == cardNumber)
                 {
