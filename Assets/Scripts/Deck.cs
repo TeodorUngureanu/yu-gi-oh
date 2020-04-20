@@ -46,8 +46,6 @@ public class Deck : InteractibleElementScript {
             }
         }
 
-        mainDeck.RemoveRange(7, 42);
-
         Debug.Log("Deck loaded. No. cards: " + mainDeck.Count);
     }
 

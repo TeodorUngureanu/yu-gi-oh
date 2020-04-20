@@ -14,6 +14,7 @@ public class PlayerScript : MonoBehaviour {
     private bool canOpponentActivateCards;
     private bool isMyTurn = true; //only set for testing
     private bool hasDuelEnded;
+    private bool askingForQuickActivation;
 
     private Deck deckScript;
     private HandScript handScript;
@@ -33,6 +34,7 @@ public class PlayerScript : MonoBehaviour {
         canPlayMonster = true;
         canOpponentActivateCards = false;
         hasDuelEnded = false;
+        askingForQuickActivation = false;
 
         deckScript = deck.GetComponent<Deck>();
         handScript = hand.GetComponent<HandScript>();
@@ -80,6 +82,23 @@ public class PlayerScript : MonoBehaviour {
             return;
         }
 
+        if(askingForQuickActivation)
+        {
+            if(Input.GetKeyDown(KeyCode.Space))
+            {
+                askingForQuickActivation = false;
+                GameManager.Get().StartQuickActivation();
+            }
+            if(Input.GetKeyDown(KeyCode.Escape))
+            {
+                AskForQuickActivation(false);
+                GameManager.Get().StopQuickActivation();
+                //TODO: apply the backlog actions - if any
+            }
+
+            return;
+        }
+
         if (isReadyForDuel && !hasDrawnHand && Input.GetKeyDown(KeyCode.Space))
         {
             for (int index = 0; index < Constants.INITIAL_HAND_SIZE; index++)
@@ -98,7 +117,7 @@ public class PlayerScript : MonoBehaviour {
         //if (turn.getCurrentPhase() == Turn.Phase.Hold && hasDrawnHand && isMyTurn)
         if (turn.getCurrentPhase() == Turn.Phase.Hold && hasDrawnHand)
         {
-            //apply any needed effects or restrictions, then proceed to draw phase
+            //TODO: apply any needed effects or restrictions, then proceed to draw phase
             canPlayMonster = true;
 
             OnPhaseTrigger();
@@ -163,11 +182,16 @@ public class PlayerScript : MonoBehaviour {
 
             if (handScript.GetNoOfCards() > Constants.MAX_HAND_SIZE)
             {
-                GameManager.Get().SetInfoTextOnScreen(Constants.DISCARD_INFORMATION, false);
+                GameManager.Get().SetInfoTextOnScreen(Constants.DISCARD_INFO, false);
                 SetDiscardingProperties(true);
             }
         }
         HighlightPlayerCards();
+    }
+
+    public void AskForQuickActivation(bool asking)
+    {
+        askingForQuickActivation = asking;
     }
 
     private void SetDiscardingProperties(bool start)

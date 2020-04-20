@@ -405,45 +405,76 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    private bool StartQuickActivation()
+    private bool CanQuickPlayCards()
     {
-        if (playerScript.CanQuickPlayCards())
+        return playerScript.CanQuickPlayCards();
+    }
+
+    private void SendQuickActivationMessage(bool willStart)
+    {
+        List<MessageParameter> parameters = new List<MessageParameter>()
         {
-            //TODO: first show the player what the enemy is doing, then ask about quick activation and then do all of this
-            List<MessageParameter> parameters = new List<MessageParameter>()
-            {
-                new MessageParameter(Constants.QA_PHASE_KEY, Constants.QA_START)
-            };
-            SendInformation(Constants.QUICK_ACTIVATION, 0, parameters);
-            playerScript.ProcessQuickActivationCards(true);
-            return true;
+            new MessageParameter(Constants.QA_PHASE_KEY, willStart ? Constants.QA_START : Constants.QA_END)
+        };
+        SendInformation(Constants.QUICK_ACTIVATION, 0, parameters);
+    }
+
+    private bool AskForQuickActivation()
+    {
+        if(!CanQuickPlayCards())
+        {
+            SendQuickActivationMessage(false);
+            return false;
         }
-        return false;
+        SetInfoTextOnScreen(Constants.QUICK_PLAY_INFO + Constants.ASK_QUICK_PLAY, false);
+        playerScript.AskForQuickActivation(true);
+        PauseCurrentPhase();
+        return true;
+    }
+
+    public void StartQuickActivation()
+    {
+        quickActivation = true;
+        SetInfoTextOnScreen("", false);
+        SendQuickActivationMessage(true);
+        playerScript.ProcessQuickActivationCards(true);
+    }
+
+    public void StopQuickActivation()
+    {
+        quickActivation = false;
+        SetInfoTextOnScreen("", false);
+        SendQuickActivationMessage(false);
+        playerScript.ProcessQuickActivationCards(false);
+        playerScript.HighlightPlayerCards();
     }
 
     private void DecodeQuickActivationInfo(Message message)
     {
-        if (StartQuickActivation())
+        //TODO: show the action
+
+        //TODO: store somewhere the action that needs to be taken after the quick plays
+
+        if (!AskForQuickActivation())
         {
-            return;
+            //TODO: apply the backlog actions
         }
     }
 
     private void DecodeBattleInformation(Message message)
     {
-        if (StartQuickActivation())
+        //TODO: show the action
+
+        //TODO: store somewhere the action that needs to be taken after the quick plays
+
+        if (!AskForQuickActivation())
         {
-            return;
+            //TODO: apply the backlog actions
         }
     }
 
     private void DecodeMainInformation(Message message)
     {
-        if(StartQuickActivation())
-        {
-            return;
-        }
-
         string action = message.GetAction();
         int cardIndex = message.GetCardIndex();
         Dictionary<string, string> actionParams = message.ExtractParamDictionary();
@@ -460,6 +491,7 @@ public class GameManager : MonoBehaviour {
             Enums.CardPosition oldPosition = (action == Constants.ATK_CHANGE_TEXT) ? Enums.CardPosition.Atk : Enums.CardPosition.Def;
             fieldScript.SwitchEnemyMonsterPosition(cardIndex, cardNumber, face, oldPosition);
 
+            AskForQuickActivation();
             return;
         }
         
@@ -490,6 +522,7 @@ public class GameManager : MonoBehaviour {
                 }
             }
             fieldScript.SetEnemyMonster(cardIndex, cardInfo, face);
+            AskForQuickActivation();
         }
         else
         {
@@ -501,8 +534,11 @@ public class GameManager : MonoBehaviour {
 
             if(action == Constants.ACTIVATING_TEXT)
             {
-                //also apply effect
+                AskForQuickActivation();
+                //apply effect if not quick activating anything
+                return;
             }
+            AskForQuickActivation();
         }
     }
 

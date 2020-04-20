@@ -21,7 +21,8 @@ public class FieldScript : MonoBehaviour {
         tributeCircleInstances = new List<GameObject>();
         attackableMonsters = new List<int>();
 
-        MockDataForTesting();
+        //TODO: delete this if not needed anymore
+        //MockDataForTesting();
     }
 
     private void MockDataForTesting()
@@ -129,7 +130,10 @@ public class FieldScript : MonoBehaviour {
         }
 
         crtSpell.transform.localEulerAngles += new Vector3(180, 0, 0);
-        crtSpell.GetComponent<EnemyFieldCardScript>().SetFace(Enums.CardFace.Up);
+        if (isEnemy)
+        {
+            crtSpell.GetComponent<EnemyFieldCardScript>().SetFace(Enums.CardFace.Up);
+        }
     }
 
     private void ApplyTexture(GameObject parent, string cardNumber, Enums.CardType cardType)

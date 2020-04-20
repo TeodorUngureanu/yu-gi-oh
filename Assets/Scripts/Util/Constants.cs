@@ -46,7 +46,9 @@ public static class Constants
 
     //used only for showing information on screen
     public const string DUELIST_PLACEHOLDER = "{duelistName}";
-    public const string DISCARD_INFORMATION = "{duelistName} is discarding cards..";
+    public const string DISCARD_INFO = "{duelistName} is discarding cards..";
+    public const string QUICK_PLAY_INFO = "{duelistName} is thinking..";
+    public const string ASK_QUICK_PLAY = " Wanna quick play a card? Space = Yes, Esc = No";
 
     public const int MAGIC_TYPE = 1;
     public const int TRAP_TYPE = 2;
