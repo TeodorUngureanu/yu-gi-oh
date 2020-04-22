@@ -8,10 +8,11 @@ public class InfoScreenScript : MonoBehaviour
 {
     public GameObject playerName, enemyName;
     public GameObject playerCrown, enemyCrown;
+    public GameObject playerHand, enemyHand;
     public GameObject playerLP, enemyLP;
     public GameObject phasesParentObj;
     public List<GameObject> screenPhases;
-    public GameObject infoTextArea;
+    public GameObject infoTextArea, handInfoArea;
     public GameObject victoryScreen, defeatScreen;
 
     private Dictionary<string, GameObject> phaseMap;
@@ -46,12 +47,23 @@ public class InfoScreenScript : MonoBehaviour
 
     public void SetDuelistName(string name, bool isEnemy)
     {
-        if(isEnemy)
+        if (isEnemy)
         {
             enemyName.GetComponent<Text>().text = name;
         } else
         {
             playerName.GetComponent<Text>().text = name;
+        }
+    }
+
+    public void ChangeHandSize(string newHandSize, bool isEnemy)
+    {
+        if(isEnemy)
+        {
+            enemyHand.GetComponent<Text>().text = newHandSize;
+        } else
+        {
+            playerHand.GetComponent<Text>().text = newHandSize;
         }
     }
 
@@ -86,15 +98,15 @@ public class InfoScreenScript : MonoBehaviour
 
     public void SetInfoText(string info, bool isEnemy)
     {
-        if (info.Equals(""))
-        {
-            infoTextArea.GetComponent<Text>().text = "";
-        }
-        else
+        if (!info.Equals(""))
         {
             GameObject duelistName = isEnemy ? enemyName : playerName;
             string processedInfo = info.Replace(Constants.DUELIST_PLACEHOLDER, duelistName.GetComponent<Text>().text);
             infoTextArea.GetComponent<Text>().text = processedInfo;
+        }
+        else
+        {
+            infoTextArea.GetComponent<Text>().text = info;
         }
     }
 
@@ -102,6 +114,7 @@ public class InfoScreenScript : MonoBehaviour
     {
         phasesParentObj.SetActive(false);
         infoTextArea.SetActive(false);
+        handInfoArea.SetActive(false);
         if (isEnemyWinner)
         {
             enemyCrown.SetActive(true);

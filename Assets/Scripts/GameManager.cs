@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour {
     private InfoScreenScript infoScreenScript;
 
     private int enemyLifePoints = Constants.STARTING_LIFE_POINTS;
+    private int enemyHand = Constants.INITIAL_HAND_SIZE;
     private Tribute tribute;
     private int attackingMonsterIndex = 100;
     private bool playerDiscarding = false, sacrificing = false, attacking = false, quickActivation = false;
@@ -410,11 +411,11 @@ public class GameManager : MonoBehaviour {
         return playerScript.CanQuickPlayCards();
     }
 
-    private void SendQuickActivationMessage(bool willStart)
+    private void SendQuickActivationEndMessage()
     {
         List<MessageParameter> parameters = new List<MessageParameter>()
         {
-            new MessageParameter(Constants.QA_PHASE_KEY, willStart ? Constants.QA_START : Constants.QA_END)
+            new MessageParameter(Constants.QA_PHASE_KEY, Constants.QA_END)
         };
         SendInformation(Constants.QUICK_ACTIVATION, 0, parameters);
     }
@@ -423,7 +424,7 @@ public class GameManager : MonoBehaviour {
     {
         if(!CanQuickPlayCards())
         {
-            SendQuickActivationMessage(false);
+            SendQuickActivationEndMessage();
             return false;
         }
         SetInfoTextOnScreen(Constants.QUICK_PLAY_INFO + Constants.ASK_QUICK_PLAY, false);
@@ -436,7 +437,6 @@ public class GameManager : MonoBehaviour {
     {
         quickActivation = true;
         SetInfoTextOnScreen("", false);
-        SendQuickActivationMessage(true);
         playerScript.ProcessQuickActivationCards(true);
     }
 
@@ -444,7 +444,7 @@ public class GameManager : MonoBehaviour {
     {
         quickActivation = false;
         SetInfoTextOnScreen("", false);
-        SendQuickActivationMessage(false);
+        SendQuickActivationEndMessage();
         playerScript.ProcessQuickActivationCards(false);
         playerScript.HighlightPlayerCards();
     }
@@ -564,6 +564,11 @@ public class GameManager : MonoBehaviour {
     private void ChangePhaseOnScreen(string newPhase, bool isEnemy)
     {
         infoScreenScript.ChangePhase(newPhase, isEnemy);
+    }
+
+    public void SetHandSizeOnScreen(int newSize, bool isEnemy)
+    {
+        infoScreenScript.ChangeHandSize(newSize.ToString(), isEnemy);
     }
 
     public void SetInfoTextOnScreen(string infoText, bool isEnemy)

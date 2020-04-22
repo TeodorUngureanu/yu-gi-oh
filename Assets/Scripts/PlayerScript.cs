@@ -430,6 +430,7 @@ public class PlayerScript : MonoBehaviour {
     {
         //TODO: add animation
         handScript.AddCard(deckScript.DrawCard());
+        GameManager.Get().SetHandSizeOnScreen(handScript.GetNoOfCards(), false);
         diskScript.UpdateDeckSizeOnDisk(deckScript.CardsLeft());
 
         if (deckScript.CardsLeft() != 0)
@@ -550,6 +551,7 @@ public class PlayerScript : MonoBehaviour {
     public void RemoveCardFromHand(int index)
     {
         handScript.RemoveCard(index);
+        GameManager.Get().SetHandSizeOnScreen(handScript.GetNoOfCards(), false);
     }
 
     public string GetCardNumberForIndex(int index)
