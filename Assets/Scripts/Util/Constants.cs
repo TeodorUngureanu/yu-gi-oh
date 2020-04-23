@@ -31,6 +31,7 @@ public static class Constants
     public const string CHANGE_PHASE = "ChangePhase";
     public const string NEW_PHASE_KEY = "newPhase";
     public const string END_TURN = "End";
+    public const string DRAW = "Draw";
     public const string QUICK_ACTIVATION = "Quick Activation";
     public const string QA_PHASE_KEY = "phase";
     public const string QA_START = "start";

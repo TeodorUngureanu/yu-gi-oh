@@ -9,6 +9,8 @@ public class InfoScreenScript : MonoBehaviour
     public GameObject playerName, enemyName;
     public GameObject playerCrown, enemyCrown;
     public GameObject playerHand, enemyHand;
+    public GameObject playerDeck, enemyDeck;
+    public GameObject playerGraveyard, enemyGraveyard;
     public GameObject playerLP, enemyLP;
     public GameObject phasesParentObj;
     public List<GameObject> screenPhases;
@@ -64,6 +66,30 @@ public class InfoScreenScript : MonoBehaviour
         } else
         {
             playerHand.GetComponent<Text>().text = newHandSize;
+        }
+    }
+
+    public void ChangeDeckSize(string newDeckSize, bool isEnemy)
+    {
+        if (isEnemy)
+        {
+            enemyDeck.GetComponent<Text>().text = newDeckSize;
+        }
+        else
+        {
+            playerDeck.GetComponent<Text>().text = newDeckSize;
+        }
+    }
+
+    public void ChangeGraveyardSize(string newGraveyardSize, bool isEnemy)
+    {
+        if (isEnemy)
+        {
+            enemyGraveyard.GetComponent<Text>().text = newGraveyardSize;
+        }
+        else
+        {
+            playerGraveyard.GetComponent<Text>().text = newGraveyardSize;
         }
     }
 

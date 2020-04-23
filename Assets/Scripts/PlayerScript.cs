@@ -70,6 +70,7 @@ public class PlayerScript : MonoBehaviour {
         deck.SetActive(true);
         isReadyForDuel = true;
         diskScript.UpdateDeckSizeOnDisk(deckScript.CardsLeft());
+        GameManager.Get().SetDeckSizeOnScreen(deckScript.CardsLeft(), false);
 
         //temporarily, while not using headset
         Cursor.visible = true;
@@ -431,7 +432,10 @@ public class PlayerScript : MonoBehaviour {
         //TODO: add animation
         handScript.AddCard(deckScript.DrawCard());
         GameManager.Get().SetHandSizeOnScreen(handScript.GetNoOfCards(), false);
-        diskScript.UpdateDeckSizeOnDisk(deckScript.CardsLeft());
+
+        int cardsLeftInDeck = deckScript.CardsLeft();
+        diskScript.UpdateDeckSizeOnDisk(cardsLeftInDeck);
+        GameManager.Get().SetDeckSizeOnScreen(cardsLeftInDeck, false);
 
         if (deckScript.CardsLeft() != 0)
         {
@@ -540,8 +544,8 @@ public class PlayerScript : MonoBehaviour {
             GameManager.Get().SendInformation(Constants.QUICK_ACTIVATION, 0, new List<MessageParameter>());
         }
     }
-
-    //to call this if needed
+    
+    //TODO: delete this if it won't be used
     public void DiscardRandomCard()
     {
         int randomPosition = UnityEngine.Random.Range(0, handScript.GetNoOfCards() - 1);

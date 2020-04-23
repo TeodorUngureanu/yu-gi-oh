@@ -364,6 +364,49 @@ public class GameManager : MonoBehaviour {
         playerScript.HighlightPlayerCards();
     }
 
+    private bool CanQuickPlayCards()
+    {
+        return playerScript.CanQuickPlayCards();
+    }
+
+    private void SendQuickActivationEndMessage()
+    {
+        List<MessageParameter> parameters = new List<MessageParameter>()
+        {
+            new MessageParameter(Constants.QA_PHASE_KEY, Constants.QA_END)
+        };
+        SendInformation(Constants.QUICK_ACTIVATION, 0, parameters);
+    }
+
+    private bool AskForQuickActivation()
+    {
+        if (!CanQuickPlayCards())
+        {
+            SendQuickActivationEndMessage();
+            return false;
+        }
+        SetInfoTextOnScreen(Constants.QUICK_PLAY_INFO + Constants.ASK_QUICK_PLAY, false);
+        playerScript.AskForQuickActivation(true);
+        PauseCurrentPhase();
+        return true;
+    }
+
+    public void StartQuickActivation()
+    {
+        quickActivation = true;
+        SetInfoTextOnScreen("", false);
+        playerScript.ProcessQuickActivationCards(true);
+    }
+
+    public void StopQuickActivation()
+    {
+        quickActivation = false;
+        SetInfoTextOnScreen("", false);
+        SendQuickActivationEndMessage();
+        playerScript.ProcessQuickActivationCards(false);
+        playerScript.HighlightPlayerCards();
+    }
+
     public void SendInformation(string action, int cardIndex, List<MessageParameter> parameters)
     {
         if(quickActivation)
@@ -391,6 +434,9 @@ public class GameManager : MonoBehaviour {
             case Constants.CHANGE_PHASE:
                 DecodeEnemyPhaseChange(message);
                 break;
+            case Constants.DRAW:
+                DecodeCardDraw(message);
+                break;
             case Constants.QUICK_ACTIVATION:
                 //maybe the opponent can activate something
                 DecodeQuickActivationInfo(message);
@@ -406,47 +452,19 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    private bool CanQuickPlayCards()
+    private void DecodeEnemyPhaseChange(Message message)
     {
-        return playerScript.CanQuickPlayCards();
-    }
-
-    private void SendQuickActivationEndMessage()
-    {
-        List<MessageParameter> parameters = new List<MessageParameter>()
+        string newPhase;
+        Dictionary<string, string> actionParams = message.ExtractParamDictionary();
+        if (actionParams.TryGetValue(Constants.NEW_PHASE_KEY, out newPhase))
         {
-            new MessageParameter(Constants.QA_PHASE_KEY, Constants.QA_END)
-        };
-        SendInformation(Constants.QUICK_ACTIVATION, 0, parameters);
-    }
-
-    private bool AskForQuickActivation()
-    {
-        if(!CanQuickPlayCards())
-        {
-            SendQuickActivationEndMessage();
-            return false;
+            ChangePhaseOnScreen(newPhase, true);
         }
-        SetInfoTextOnScreen(Constants.QUICK_PLAY_INFO + Constants.ASK_QUICK_PLAY, false);
-        playerScript.AskForQuickActivation(true);
-        PauseCurrentPhase();
-        return true;
     }
 
-    public void StartQuickActivation()
+    private void DecodeCardDraw(Message message)
     {
-        quickActivation = true;
-        SetInfoTextOnScreen("", false);
-        playerScript.ProcessQuickActivationCards(true);
-    }
-
-    public void StopQuickActivation()
-    {
-        quickActivation = false;
-        SetInfoTextOnScreen("", false);
-        SendQuickActivationEndMessage();
-        playerScript.ProcessQuickActivationCards(false);
-        playerScript.HighlightPlayerCards();
+        Dictionary<string, string> actionParams = message.ExtractParamDictionary();
     }
 
     private void DecodeQuickActivationInfo(Message message)
@@ -541,17 +559,7 @@ public class GameManager : MonoBehaviour {
             AskForQuickActivation();
         }
     }
-
-    private void DecodeEnemyPhaseChange(Message message)
-    {
-        string newPhase;
-        Dictionary<string, string> actionParams = message.ExtractParamDictionary();
-        if (actionParams.TryGetValue(Constants.NEW_PHASE_KEY, out newPhase))
-        {
-            ChangePhaseOnScreen(newPhase, true);
-        }
-    }
-
+    
     public void ChangePhase(string newPhase)
     {
         List<MessageParameter> parameters = new List<MessageParameter>() {
@@ -569,6 +577,17 @@ public class GameManager : MonoBehaviour {
     public void SetHandSizeOnScreen(int newSize, bool isEnemy)
     {
         infoScreenScript.ChangeHandSize(newSize.ToString(), isEnemy);
+    }
+
+    public void SetDeckSizeOnScreen(int newSize, bool isEnemy)
+    {
+        infoScreenScript.ChangeDeckSize(newSize.ToString(), isEnemy);
+    }
+
+    //TODO: call this when the graveyard size increases/decreases for any player
+    public void SetGraveyardSizeOnScreen(int newSize, bool isEnemy)
+    {
+        infoScreenScript.ChangeGraveyardSize(newSize.ToString(), isEnemy);
     }
 
     public void SetInfoTextOnScreen(string infoText, bool isEnemy)

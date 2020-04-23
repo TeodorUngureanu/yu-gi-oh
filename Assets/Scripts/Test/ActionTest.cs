@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class ActionTest : MonoBehaviour
 {
+    private List<string> enemyPhases = new List<string>()
+    {
+        "Hold", "Draw", "Main1", "Battle", "Main2", "End" 
+    };
+    private int phaseIndex = 0;
+
     public void InitiateFlipTest()
     {
         Card testCardInfo2 = new Monster("15025844", File.ReadAllBytes("Assets/Resources/Images/Card Images/MysticalElf.png"),
@@ -30,5 +36,25 @@ public class ActionTest : MonoBehaviour
         };
         Message testMessage = new Message(Constants.SUMMONING_TEXT, 2, parameters);
         GameManager.Get().ReceiveInformation(Utils.SerializeMessage(testMessage));
+    }
+
+    private void IncrementPhaseIndex()
+    {
+        if(++phaseIndex == enemyPhases.Count)
+        {
+            phaseIndex = 0;
+        }
+    }
+
+    public void InitiatePhaseChangeTest()
+    {
+        List<MessageParameter> parameters = new List<MessageParameter>()
+        {
+            new MessageParameter(Constants.NEW_PHASE_KEY, enemyPhases[phaseIndex])
+        };
+        Message testMessage = new Message(Constants.CHANGE_PHASE, 0, parameters);
+        GameManager.Get().ReceiveInformation(Utils.SerializeMessage(testMessage));
+
+        IncrementPhaseIndex();
     }
 }
