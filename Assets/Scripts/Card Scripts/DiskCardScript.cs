@@ -9,6 +9,7 @@ public class DiskCardScript : InteractibleAbstractCard {
     public GameObject frontImagePlane;
     public Canvas canvas;
 
+    private Card cardInfo;
     private Enums.CardFace face = Enums.CardFace.Up;
     private Enums.CardPosition position = Enums.CardPosition.Atk;
     private bool hasChangedPositionThisTurn = true, hasAttackedThisTurn = false;
@@ -24,17 +25,18 @@ public class DiskCardScript : InteractibleAbstractCard {
         objRenderer = GetComponent<Renderer>();
     }
 
-    public void SetData(int vCardIndex, Enums.CardType vCardType, Enums.CardFace vFace, string cardNumber)
+    public void SetData(int vCardIndex, Enums.CardType vCardType, Enums.CardFace vFace, Card vCardInfo)
     {
         cardIndex = vCardIndex;
         cardType = vCardType;
+        cardInfo = vCardInfo;
 
-        if(objRenderer == null)
+        if (objRenderer == null)
         {
             objRenderer = GetComponent<Renderer>();
         }
 
-        Texture2D texture = Utils.LoadTexture(cardNumber, cardType);
+        Texture2D texture = Utils.LoadTexture(cardInfo.GetCardNumber(), cardType);
         if (texture != null)
         {
             frontImagePlane.GetComponent<Renderer>().material.mainTexture = texture;
@@ -248,15 +250,19 @@ public class DiskCardScript : InteractibleAbstractCard {
                 highlightable = false;
                 return;
             }
+            
+            if(GameManager.Get().IsQuickActivation())
+            {
+                //TODO: send information and apply the effect after - only works for quick effect monsters
+            }
 
-            if ((currentPhase == Turn.Phase.Main1 || currentPhase == Turn.Phase.Main2 || GameManager.Get().IsQuickActivation()) && !hasChangedPositionThisTurn)
+            if ((currentPhase == Turn.Phase.Main1 || currentPhase == Turn.Phase.Main2) && !hasChangedPositionThisTurn)
             {
                 string action = (position == Enums.CardPosition.Atk) ? Constants.ATK_CHANGE_TEXT : Constants.DEF_CHANGE_TEXT;
-                string cardNumber = GameManager.Get().GetCardNumberForMonster(cardIndex);
 
                 List<MessageParameter> parameters = new List<MessageParameter>()
                 {
-                    new MessageParameter(Constants.CARD_NO_KEY, cardNumber),
+                    new MessageParameter(Constants.CARD_NO_KEY, cardInfo.GetCardNumber()),
                     new MessageParameter(Constants.FACE_KEY, face.ToString())
                 };
 
@@ -274,9 +280,8 @@ public class DiskCardScript : InteractibleAbstractCard {
             SetFace(Enums.CardFace.Up);
             RotateCard();
             GameManager.Get().FlipSpell(cardIndex, false);
-
-            //Send true if effect is continuous or send entire cardInfo
-            StartCoroutine(GameManager.Get().ActivateSpellCoroutine(cardIndex, false));
+            
+            StartCoroutine(GameManager.Get().ActivateSpellCoroutine(cardIndex, (NonMonster) cardInfo, Constants.DISK));
         }
     }
 

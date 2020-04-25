@@ -10,7 +10,7 @@ public class ActionTest : MonoBehaviour
     };
     private int phaseIndex = 0;
 
-    public void InitiateFlipTest()
+    public void InitiateEnemyFlipTest()
     {
         Card testCardInfo2 = new Monster("15025844", File.ReadAllBytes("Assets/Resources/Images/Card Images/MysticalElf.png"),
             "Mystical Elf", "blahblahblah", 0, 5, 19, 800, 2000, 4, false);
@@ -46,7 +46,7 @@ public class ActionTest : MonoBehaviour
         }
     }
 
-    public void InitiatePhaseChangeTest()
+    public void InitiateEnemyPhaseChangeTest()
     {
         List<MessageParameter> parameters = new List<MessageParameter>()
         {
@@ -56,5 +56,11 @@ public class ActionTest : MonoBehaviour
         GameManager.Get().ReceiveInformation(Utils.SerializeMessage(testMessage));
 
         IncrementPhaseIndex();
+    }
+
+    public void InitiateEnemyDrawTest()
+    {
+        Message testMessage = new Message(Constants.DRAW, 0, new List<MessageParameter>());
+        GameManager.Get().ReceiveInformation(Utils.SerializeMessage(testMessage));
     }
 }

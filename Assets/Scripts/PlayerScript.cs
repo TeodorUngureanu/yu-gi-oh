@@ -70,7 +70,7 @@ public class PlayerScript : MonoBehaviour {
         deck.SetActive(true);
         isReadyForDuel = true;
         diskScript.UpdateDeckSizeOnDisk(deckScript.CardsLeft());
-        GameManager.Get().SetDeckSizeOnScreen(deckScript.CardsLeft(), false);
+        GameManager.Get().SetDeckSizeOnScreen(deckScript.CardsLeft(), false); //TODO: remove this - will be set when we get some info at the beginning of the duel
 
         //temporarily, while not using headset
         Cursor.visible = true;
@@ -437,6 +437,8 @@ public class PlayerScript : MonoBehaviour {
         diskScript.UpdateDeckSizeOnDisk(cardsLeftInDeck);
         GameManager.Get().SetDeckSizeOnScreen(cardsLeftInDeck, false);
 
+        GameManager.Get().SendInformation(Constants.DRAW, 0, new List<MessageParameter>());
+
         if (deckScript.CardsLeft() != 0)
         {
             ComputeDeckHeight(-1);
@@ -461,7 +463,7 @@ public class PlayerScript : MonoBehaviour {
         cardInfo.SetTurnPlayed(turnCount);
 
         monstersOnDisk[diskIndex] = cardInfo;
-        diskScript.SetMonster(diskIndex, face, cardInfo.GetCardNumber(), tributes);
+        diskScript.SetMonster(diskIndex, face, cardInfo, tributes);
         canPlayMonster = false;
         RemoveCardFromHand(handIndex);
 
@@ -483,7 +485,7 @@ public class PlayerScript : MonoBehaviour {
 
         spellsOnDisk[diskIndex] = cardInfo;
         Enums.CardType cardType = (Enums.CardType)Enum.Parse(typeof(Enums.CardType), ((NonMonster)cardInfo).GetSpellType().ToString());
-        diskScript.SetSpell(diskIndex, cardInfo.GetCardNumber(), cardType, face);
+        diskScript.SetSpell(diskIndex, cardInfo, cardType, face);
         RemoveCardFromHand(handIndex);
 
         if (face == Enums.CardFace.Down && (((NonMonster)cardInfo).IsQuickPlaySpell() || cardType == Enums.CardType.Trap))
@@ -556,11 +558,6 @@ public class PlayerScript : MonoBehaviour {
     {
         handScript.RemoveCard(index);
         GameManager.Get().SetHandSizeOnScreen(handScript.GetNoOfCards(), false);
-    }
-
-    public string GetCardNumberForIndex(int index)
-    {
-        return monstersOnDisk[index].GetCardNumber();
     }
 
     public Card GetCardInfoForIndex(int index, bool isMonster)

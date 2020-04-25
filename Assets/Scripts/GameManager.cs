@@ -16,7 +16,8 @@ public class GameManager : MonoBehaviour {
     private InfoScreenScript infoScreenScript;
 
     private int enemyLifePoints = Constants.STARTING_LIFE_POINTS;
-    private int enemyHand = Constants.INITIAL_HAND_SIZE;
+    private int enemyHand = 0;
+    private int enemyDeck = 50; //TODO: remove this initialization when we get this info at the beginning of the duel
     private Tribute tribute;
     private int attackingMonsterIndex = 100;
     private bool playerDiscarding = false, sacrificing = false, attacking = false, quickActivation = false;
@@ -176,8 +177,7 @@ public class GameManager : MonoBehaviour {
         fieldScript.SetSpell(diskIndex, cardInfo, face);
         if(face == Enums.CardFace.Up)
         {
-            //Send true if effect is continuous or send entire cardInfo
-            StartCoroutine(ActivateSpellCoroutine(diskIndex, false));
+            StartCoroutine(ActivateSpellCoroutine(diskIndex, (NonMonster) cardInfo, Constants.HAND));
         }
     }
 
@@ -187,22 +187,25 @@ public class GameManager : MonoBehaviour {
         fieldScript.FlipSpell(index, isEnemy);
     }
 
-    public IEnumerator ActivateSpellCoroutine(int index, bool isContinuous)
+    public IEnumerator ActivateSpellCoroutine(int index, NonMonster cardInfo, string cardOrigin)
     {
         yield return new WaitForSeconds(2);
 
         //TODO: apply spell effect
+        
+        List<MessageParameter> parameters = new List<MessageParameter>()
+        {
+            new MessageParameter(Constants.ORIGIN_KEY, cardOrigin),
+            new MessageParameter(Constants.CARD_NO_KEY, cardInfo.GetCardNumber())
+        };
 
-        if(!isContinuous)
+        GameManager.Get().SendInformation(Constants.ACTIVATING_TEXT, index, parameters);
+
+        if (!cardInfo.IsContinuous())
         {
             playerScript.DestroySpells(new List<int>() { index });
             fieldScript.DestroyFieldSpells(false, new List<int>() { index });
         }
-    }
-
-    public string GetCardNumberForMonster(int index)
-    {
-        return playerScript.GetCardNumberForIndex(index);
     }
 
     public Turn.Phase GetTurnPhase()
@@ -438,11 +441,9 @@ public class GameManager : MonoBehaviour {
                 DecodeCardDraw(message);
                 break;
             case Constants.QUICK_ACTIVATION:
-                //maybe the opponent can activate something
                 DecodeQuickActivationInfo(message);
                 break;
             case Constants.BATTLE:
-                //calculate attack result and do further things if needed
                 DecodeBattleInformation(message);
                 break;
             default:
@@ -464,7 +465,8 @@ public class GameManager : MonoBehaviour {
 
     private void DecodeCardDraw(Message message)
     {
-        Dictionary<string, string> actionParams = message.ExtractParamDictionary();
+        SetHandSizeOnScreen(++enemyHand, true);
+        SetDeckSizeOnScreen(--enemyDeck, true);
     }
 
     private void DecodeQuickActivationInfo(Message message)

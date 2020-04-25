@@ -41,13 +41,12 @@ public class DiskScript : MonoBehaviour {
         spellsOnDisk[index].GetComponent<DiskCardScript>().SetHighlightable(false);
     }
 
-    public void SetMonster(int index, Enums.CardFace face, string cardNumber, List<int> tributes)
+    public void SetMonster(int index, Enums.CardFace face, Card cardInfo, List<int> tributes)
     {
-        monstersOnDisk[index].GetComponent<DiskCardScript>().SetData(index, Enums.CardType.Monster, face, cardNumber);
+        monstersOnDisk[index].GetComponent<DiskCardScript>().SetData(index, Enums.CardType.Monster, face, cardInfo);
         monstersOnDisk[index].SetActive(true);
 
-
-        string cardNumberToSend = (face == Enums.CardFace.Up) ? cardNumber : Constants.UNKNOWN;
+        string cardNumberToSend = (face == Enums.CardFace.Up) ? cardInfo.GetCardNumber() : Constants.UNKNOWN;
         string action = (face == Enums.CardFace.Up) ? Constants.SUMMONING_TEXT : Constants.SETTING_TEXT;
         string tributeIndices = string.Join(";", tributes.Select(i => i.ToString()).ToArray());
         
@@ -60,9 +59,9 @@ public class DiskScript : MonoBehaviour {
         GameManager.Get().SendInformation(action, index, parameters);
     }
 
-    public void SetSpell(int index, string cardNumber, Enums.CardType spellType, Enums.CardFace face)
+    public void SetSpell(int index, Card cardInfo, Enums.CardType spellType, Enums.CardFace face)
     {
-        spellsOnDisk[index].GetComponent<DiskCardScript>().SetData(index, spellType, face, cardNumber);
+        spellsOnDisk[index].GetComponent<DiskCardScript>().SetData(index, spellType, face, cardInfo);
         spellsOnDisk[index].SetActive(true);
         if(spellType == Enums.CardType.Spell)
         {
@@ -73,7 +72,7 @@ public class DiskScript : MonoBehaviour {
         List<MessageParameter> parameters = new List<MessageParameter>()
         {
             new MessageParameter(Constants.ORIGIN_KEY, Constants.HAND),
-            new MessageParameter(Constants.CARD_NO_KEY, cardNumber)
+            new MessageParameter(Constants.CARD_NO_KEY, cardInfo.GetCardNumber())
         };
 
         GameManager.Get().SendInformation(action, index, parameters);
