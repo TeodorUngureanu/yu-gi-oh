@@ -280,8 +280,8 @@ public class DiskCardScript : InteractibleAbstractCard {
             SetFace(Enums.CardFace.Up);
             RotateCard();
             GameManager.Get().FlipSpell(cardIndex, false);
-            
-            StartCoroutine(GameManager.Get().ActivateSpellCoroutine(cardIndex, (NonMonster) cardInfo, Constants.DISK));
+
+            GameManager.Get().ActivateSpell(cardIndex, (NonMonster)cardInfo, Constants.DISK);
         }
     }
 

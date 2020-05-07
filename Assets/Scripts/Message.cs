@@ -8,6 +8,9 @@ public class Message
     public int cardIndex;
     public List<MessageParameter> parameters;
 
+    [NonSerialized]
+    public bool isEnemyAction;
+
     public Message(string vAction, int vCardIndex, List<MessageParameter> vParameters)
     {
         action = vAction;
@@ -33,6 +36,16 @@ public class Message
     public void SetCardIndex(int vCardIndex)
     {
         cardIndex = vCardIndex;
+    }
+
+    public bool IsEnemyAction()
+    {
+        return isEnemyAction;
+    }
+
+    public void SetEnemyAction(bool isEnemyAction)
+    {
+        this.isEnemyAction = isEnemyAction;
     }
 
     public Dictionary<string, string> ExtractParamDictionary()

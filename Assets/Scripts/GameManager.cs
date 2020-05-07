@@ -22,6 +22,11 @@ public class GameManager : MonoBehaviour {
     private int attackingMonsterIndex = 100;
     private bool playerDiscarding = false, sacrificing = false, attacking = false, quickActivation = false;
 
+    private delegate void Actions();
+
+    private Actions actionsToBeDone;
+    private List<Message> actionBacklog;
+
     public static GameManager Get()
     {
         return instance;
@@ -35,6 +40,7 @@ public class GameManager : MonoBehaviour {
             playerScript = player.GetComponent<PlayerScript>();
             fieldScript = field.GetComponent<FieldScript>();
             infoScreenScript = duelInfoCanvas.GetComponent<InfoScreenScript>();
+            actionBacklog = new List<Message>();
         }
         else
         {
@@ -177,7 +183,7 @@ public class GameManager : MonoBehaviour {
         fieldScript.SetSpell(diskIndex, cardInfo, face);
         if(face == Enums.CardFace.Up)
         {
-            StartCoroutine(ActivateSpellCoroutine(diskIndex, (NonMonster) cardInfo, Constants.HAND));
+            ActivateSpell(diskIndex, (NonMonster) cardInfo, Constants.HAND);
         }
     }
 
@@ -187,12 +193,8 @@ public class GameManager : MonoBehaviour {
         fieldScript.FlipSpell(index, isEnemy);
     }
 
-    public IEnumerator ActivateSpellCoroutine(int index, NonMonster cardInfo, string cardOrigin)
+    public void ActivateSpell(int index, NonMonster cardInfo, string cardOrigin)
     {
-        yield return new WaitForSeconds(2);
-
-        //TODO: apply spell effect
-        
         List<MessageParameter> parameters = new List<MessageParameter>()
         {
             new MessageParameter(Constants.ORIGIN_KEY, cardOrigin),
@@ -201,10 +203,40 @@ public class GameManager : MonoBehaviour {
 
         GameManager.Get().SendInformation(Constants.ACTIVATING_TEXT, index, parameters);
 
+        SetInfoTextOnScreen(Constants.QUICK_PLAY_INFO, true);
+
+        Message message = new Message(Constants.ACTIVATING_TEXT, index, parameters);
+        message.SetEnemyAction(false);
+        actionBacklog.Add(message);
+        actionsToBeDone += ActivateSpellAction;
+    }
+
+    private Message PopActionFromBacklog()
+    {
+        Message firstAction = actionBacklog[0];
+        actionBacklog.RemoveAt(0);
+        return firstAction;
+    }
+
+    private void ActivateSpellAction()
+    {
+        Message currentMessage = PopActionFromBacklog();
+
+        int spellIndex = currentMessage.GetCardIndex();
+        string cardNumber;
+        currentMessage.ExtractParamDictionary().TryGetValue(Constants.CARD_NO_KEY, out cardNumber);
+
+        NonMonster cardInfo = (NonMonster) Config.Get().GetCardInfoByNumber(cardNumber, false);
+        bool isEnemyAction = currentMessage.IsEnemyAction();
+
+        //TODO: apply spell effect
+
         if (!cardInfo.IsContinuous())
         {
-            playerScript.DestroySpells(new List<int>() { index });
-            fieldScript.DestroyFieldSpells(false, new List<int>() { index });
+            if(!isEnemyAction) {
+                playerScript.DestroySpells(new List<int>() { spellIndex });
+            }
+            fieldScript.DestroyFieldSpells(isEnemyAction, new List<int>() { spellIndex });
         }
     }
 
@@ -551,14 +583,15 @@ public class GameManager : MonoBehaviour {
 
             //set or activate card
             fieldScript.SetEnemySpell(cardIndex, cardInfo, face);
-
+            
             if(action == Constants.ACTIVATING_TEXT)
             {
-                AskForQuickActivation();
-                //apply effect if not quick activating anything
-                return;
+                message.SetEnemyAction(true);
+                actionBacklog.Add(message);
+                actionsToBeDone += ActivateSpellAction;
             }
             AskForQuickActivation();
+            //apply effect if not quick activating anything and if it's not a setting action
         }
     }
     
