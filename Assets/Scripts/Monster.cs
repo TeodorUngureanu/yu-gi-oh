@@ -7,7 +7,7 @@
     private readonly int rarity; // Number of stars
     private readonly bool hasEffect;
     private readonly bool isFusion;
-    private readonly bool isFlippable; //TODO: set this in constructor when it's available in DB
+    private readonly bool isFlippable = false; //TODO: set this in constructor when it's available in DB
 
     public Monster(string vCardNumber, byte[] vImage, string vCardName, string vDescription, int vEffectKey, int vAttribute, int vType, int vAttackPoints, int vDefensePoints, int vRarity, bool vIsFusion)
         : base(vCardNumber, vImage, vCardName, vDescription, vEffectKey, true)

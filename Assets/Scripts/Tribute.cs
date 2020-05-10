@@ -5,13 +5,13 @@ using UnityEngine;
 public class Tribute
 {
     private readonly int handMonsterIndex;
-    private readonly Card cardInfo;
+    private readonly Monster cardInfo;
     private readonly Enums.CardFace face;
 
     private readonly int tributesNeeded;
     private List<int> tributeIndices;
 
-    public Tribute(int vHandMonsterIndex, Card vCardInfo, Enums.CardFace vFace, int vTributesNeeded)
+    public Tribute(int vHandMonsterIndex, Monster vCardInfo, Enums.CardFace vFace, int vTributesNeeded)
     {
         handMonsterIndex = vHandMonsterIndex;
         cardInfo = vCardInfo;
@@ -26,7 +26,7 @@ public class Tribute
         return handMonsterIndex;
     }
 
-    public Card GetCardInfo()
+    public Monster GetCardInfo()
     {
         return cardInfo;
     }

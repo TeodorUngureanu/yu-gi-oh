@@ -34,12 +34,13 @@ public static class Constants
     public const string DRAW = "Draw";
     public const string QUICK_ACTIVATION = "Quick Activation";
     public const string QA_PHASE_KEY = "phase";
-    public const string QA_START = "start";
-    public const string QA_END = "end";
+    public const string QA_ACCEPT = "yeah";
+    public const string QA_DENY = "nope";
     public const string BATTLE = "Battle";
     public const string TARGET_INDEX_KEY = "targetIndex";
     public const string CARD_NO_KEY = "cardNumber";
     public const string FACE_KEY = "face";
+    public const string FLIPPABLE_KEY = "isFlippabe";
     public const string TYPE_KEY = "cardType";
     public const string ORIGIN_KEY = "cardOrigin";
     public const string TRIBUTE_NO_KEY = "noTributes";

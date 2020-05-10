@@ -94,7 +94,6 @@ public class PlayerScript : MonoBehaviour {
             {
                 AskForQuickActivation(false);
                 GameManager.Get().StopQuickActivation();
-                //TODO: apply the backlog actions - if any
             }
 
             return;
@@ -457,17 +456,17 @@ public class PlayerScript : MonoBehaviour {
         }
     }
 
-    public int SetMonsterOnDisk(int handIndex, Card cardInfo, Enums.CardFace face, List<int> tributes)
+    public int SetMonsterOnDisk(int handIndex, Monster cardInfo, Enums.CardFace face)
     {
         int diskIndex = monstersOnDisk.IndexOf(null);
         cardInfo.SetTurnPlayed(turnCount);
 
         monstersOnDisk[diskIndex] = cardInfo;
-        diskScript.SetMonster(diskIndex, face, cardInfo, tributes);
+        diskScript.SetMonster(diskIndex, face, cardInfo);
         canPlayMonster = false;
         RemoveCardFromHand(handIndex);
 
-        if(face == Enums.CardFace.Down && ((Monster)cardInfo).IsFlippable())
+        if(face == Enums.CardFace.Down && cardInfo.IsFlippable())
         {
             quickPlayCards.Add("MONSTER_" + diskIndex);
         }
@@ -477,18 +476,17 @@ public class PlayerScript : MonoBehaviour {
         return diskIndex;
     }
 
-    public int SetSpellOnDisk(int handIndex, Card cardInfo, Enums.CardFace face)
+    public int SetSpellOnDisk(int handIndex, NonMonster cardInfo, Enums.CardFace face)
     {
-        //TODO: activate effect if face is Up
         int diskIndex = spellsOnDisk.IndexOf(null);
         cardInfo.SetTurnPlayed(turnCount);
 
         spellsOnDisk[diskIndex] = cardInfo;
-        Enums.CardType cardType = (Enums.CardType)Enum.Parse(typeof(Enums.CardType), ((NonMonster)cardInfo).GetSpellType().ToString());
+        Enums.CardType cardType = (Enums.CardType) Enum.Parse(typeof(Enums.CardType), cardInfo.GetSpellType().ToString());
         diskScript.SetSpell(diskIndex, cardInfo, cardType, face);
         RemoveCardFromHand(handIndex);
 
-        if (face == Enums.CardFace.Down && (((NonMonster)cardInfo).IsQuickPlaySpell() || cardType == Enums.CardType.Trap))
+        if (face == Enums.CardFace.Down && (cardInfo.IsQuickPlaySpell() || cardType == Enums.CardType.Trap))
         {
             quickPlayCards.Add("SPELL_" + diskIndex);
         }
@@ -498,13 +496,15 @@ public class PlayerScript : MonoBehaviour {
         return diskIndex;
     }
 
-    public void FlipMonster(int index)
+    public bool FlipMonster(int index)
     {
-        if (((Monster)monstersOnDisk[index]).IsFlippable())
+        bool hasFlipEffect;
+        if (hasFlipEffect = ((Monster)monstersOnDisk[index]).IsFlippable())
         {
             RemoveQuickPlayCard("MONSTER_", index);
-            //TODO: activate flip effect (if possible)
         }
+
+        return hasFlipEffect;
     }
 
     public void DestroyMonsters(List<int> diskIndices)
@@ -541,7 +541,7 @@ public class PlayerScript : MonoBehaviour {
             GameManager.Get().SetQuickActivation(false);
             List<MessageParameter> parameters = new List<MessageParameter>()
             {
-                new MessageParameter(Constants.QA_PHASE_KEY, Constants.QA_END)
+                new MessageParameter(Constants.QA_PHASE_KEY, Constants.QA_DENY)
             };
             GameManager.Get().SendInformation(Constants.QUICK_ACTIVATION, 0, new List<MessageParameter>());
         }

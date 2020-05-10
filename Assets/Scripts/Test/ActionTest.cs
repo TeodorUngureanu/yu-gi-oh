@@ -21,7 +21,13 @@ public class ActionTest : MonoBehaviour
             new MessageParameter(Constants.TYPE_KEY, Constants.MONSTER)
         };
         Message testMessage = new Message(Constants.FLIPPING_TEXT, 1, paramList);
+
+        testMessage.SetEnemyAction(true);
         testMessage.SetParameters(paramList);
+
+        //this is to test if the newly added field is not serialized (should not be)
+        string serializedMessage = Utils.SerializeMessage(testMessage);
+        Debug.Log(serializedMessage);
 
         GameManager.Get().ReceiveInformation(Utils.SerializeMessage(testMessage));
     }

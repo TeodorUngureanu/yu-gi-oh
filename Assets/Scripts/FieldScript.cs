@@ -54,14 +54,14 @@ public class FieldScript : MonoBehaviour {
         return value;
     }
 
-    public void SetMonster(int index, Card cardInfo, Enums.CardFace face)
+    public void SetMonster(int index, string cardNumber, Enums.CardFace face)
     {
         Debug.Log("Setting monster on field on position " + index);
 
         GameObject crtMonster = monsterField[index];
         SetMonsterCardRotation(crtMonster, face);
 
-        ApplyTexture(crtMonster, cardInfo.GetCardNumber(), Enums.CardType.Monster);
+        ApplyTexture(crtMonster, cardNumber, Enums.CardType.Monster);
     }
 
     private void SetMonsterCardRotation(GameObject crtMonster, Enums.CardFace face)
@@ -97,14 +97,14 @@ public class FieldScript : MonoBehaviour {
         crtMonster.GetComponent<EnemyFieldCardScript>().SetFace(Enums.CardFace.Up);
     }
 
-    public void SetSpell(int index, Card cardInfo, Enums.CardFace face)
+    public void SetSpell(int index, NonMonster cardInfo, Enums.CardFace face)
     {
         Debug.Log("Setting spell on field on position " + index);
 
         GameObject crtSpell = spellField[index];
         SetSpellCardRotation(crtSpell, face);
 
-        ApplyTexture(crtSpell, cardInfo.GetCardNumber(), (Enums.CardType)Enum.Parse(typeof(Enums.CardType), ((NonMonster)cardInfo).GetSpellType().ToString()));
+        ApplyTexture(crtSpell, cardInfo.GetCardNumber(), (Enums.CardType)Enum.Parse(typeof(Enums.CardType), cardInfo.GetSpellType().ToString()));
     }
 
     private void SetSpellCardRotation(GameObject crtSpell, Enums.CardFace face)

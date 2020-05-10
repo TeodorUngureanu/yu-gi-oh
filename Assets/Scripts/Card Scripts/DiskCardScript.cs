@@ -251,6 +251,7 @@ public class DiskCardScript : InteractibleAbstractCard {
                 return;
             }
             
+            //might not need this
             if(GameManager.Get().IsQuickActivation())
             {
                 //TODO: send information and apply the effect after - only works for quick effect monsters
@@ -258,16 +259,7 @@ public class DiskCardScript : InteractibleAbstractCard {
 
             if ((currentPhase == Turn.Phase.Main1 || currentPhase == Turn.Phase.Main2) && !hasChangedPositionThisTurn)
             {
-                string action = (position == Enums.CardPosition.Atk) ? Constants.ATK_CHANGE_TEXT : Constants.DEF_CHANGE_TEXT;
-
-                List<MessageParameter> parameters = new List<MessageParameter>()
-                {
-                    new MessageParameter(Constants.CARD_NO_KEY, cardInfo.GetCardNumber()),
-                    new MessageParameter(Constants.FACE_KEY, face.ToString())
-                };
-
-                GameManager.Get().SendInformation(action, cardIndex, parameters);
-                GameManager.Get().SwitchMonsterPosition(cardIndex, face, position);
+                GameManager.Get().SwitchMonsterPosition(cardIndex, face, position, (Monster) cardInfo);
 
                 SwitchPosition();
                 hasChangedPositionThisTurn = true;

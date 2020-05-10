@@ -154,11 +154,11 @@ public class HandCardScript : InteractibleAbstractCard
         {
             if (IsMonster())
             {
-                GameManager.Get().SummonMonster(cardIndex, cardInfo, summoningFace);
+                GameManager.Get().SummonMonster(cardIndex, (Monster) cardInfo, summoningFace);
             }
             else
             {
-                GameManager.Get().UseSpell(cardIndex, cardInfo, summoningFace);
+                GameManager.Get().UseSpell(cardIndex, (NonMonster) cardInfo, summoningFace);
             }
         }
     }
