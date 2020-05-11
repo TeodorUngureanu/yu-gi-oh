@@ -28,7 +28,7 @@ public class HandScript : MonoBehaviour {
             gameObject.transform);
         
         crtCard.transform.localScale = scalingVector;
-        crtCard.GetComponent<HandCardScript>().SetData(GetNoOfCards() - 1, nextCard);
+        crtCard.GetComponent<HandCardScript>().SetData(GetNoOfCards(), nextCard);
 
         cardsInHand.Add(crtCard);
     }

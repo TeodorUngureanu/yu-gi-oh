@@ -59,4 +59,14 @@ public class Utils
 
         return null;
     }
+
+    public static string SerializeMessage(Message message)
+    {
+        return JsonUtility.ToJson(message);
+    }
+
+    public static Message DeserializeMessage(string messageAsString)
+    {
+        return JsonUtility.FromJson<Message>(messageAsString);
+    }
 }

@@ -12,6 +12,12 @@ public class HandCardScript : InteractibleAbstractCard
     private Enums.CardFace summoningFace;
     private Card cardInfo;
 
+    protected override void Awake()
+    {
+        base.Awake();
+        objRenderer = GetComponent<Renderer>();
+    }
+
     public void SetCardIndex(int vCardIndex)
     {
         cardIndex = vCardIndex;
@@ -26,10 +32,7 @@ public class HandCardScript : InteractibleAbstractCard
     {
         cardIndex = vCardIndex;
         cardInfo = vCardInfo;
-
-        cardType = cardInfo.IsMonster() ? Enums.CardType.Monster : (Enums.CardType)Enum.Parse(typeof(Enums.CardType), ((NonMonster)cardInfo).getType().ToString()); ;
-
-        objRenderer = GetComponent<Renderer>();
+        cardType = cardInfo.IsMonster() ? Enums.CardType.Monster : (Enums.CardType) Enum.Parse(typeof(Enums.CardType), ((NonMonster)cardInfo).GetSpellType().ToString());
 
         if (canvas != null)
         {
@@ -90,13 +93,13 @@ public class HandCardScript : InteractibleAbstractCard
         }
         if (IsMonster())
         {
-            if(Utils.NeedsTribute(((Monster)cardInfo).getRarity()) == 0)
+            if(Utils.NeedsTribute(((Monster)cardInfo).GetRarity()) == 0)
             {
                 SetCanvasText((summoningFace == Enums.CardFace.Up) ? Constants.SUMMONING_TEXT : Constants.SETTING_TEXT);
             }
             else
             {
-                SetCanvasText(Constants.SACRIFICING_TEXT);
+                SetCanvasText((summoningFace == Enums.CardFace.Up) ? Constants.TRIBUTE_SUMMON_TEXT : Constants.TRIBUTE_SET_TEXT);
             }
         }
         else
@@ -130,6 +133,7 @@ public class HandCardScript : InteractibleAbstractCard
         {
             if (Input.GetMouseButtonDown(0))
             {
+                canvas.enabled = false;
                 InteractWithElement();
             }
 
@@ -150,11 +154,11 @@ public class HandCardScript : InteractibleAbstractCard
         {
             if (IsMonster())
             {
-                GameManager.Get().SummonMonster(cardIndex, cardInfo, summoningFace);
+                GameManager.Get().SummonMonster(cardIndex, (Monster) cardInfo, summoningFace);
             }
             else
             {
-                GameManager.Get().UseSpell(cardIndex, cardInfo, summoningFace);
+                GameManager.Get().UseSpell(cardIndex, (NonMonster) cardInfo, summoningFace);
             }
         }
     }

@@ -4,14 +4,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DeskCardScript : InteractibleAbstractCard {
+public class DiskCardScript : InteractibleAbstractCard {
     
     public GameObject frontImagePlane;
     public Canvas canvas;
 
+    private Card cardInfo;
     private Enums.CardFace face = Enums.CardFace.Up;
     private Enums.CardPosition position = Enums.CardPosition.Atk;
     private bool hasChangedPositionThisTurn = true, hasAttackedThisTurn = false;
+    private bool isActivatedSpell = false;
 
     private const int DEF_COEFF = 1, ATK_COEFF = -1;
     private Vector3 posTransitionVector = new Vector3(-0.00044f, 0.0002f, 0.00101f);
@@ -23,17 +25,18 @@ public class DeskCardScript : InteractibleAbstractCard {
         objRenderer = GetComponent<Renderer>();
     }
 
-    public void SetData(int vCardIndex, Enums.CardType vCardType, Enums.CardFace vFace, string cardNumber)
+    public void SetData(int vCardIndex, Enums.CardType vCardType, Enums.CardFace vFace, Card vCardInfo)
     {
         cardIndex = vCardIndex;
         cardType = vCardType;
+        cardInfo = vCardInfo;
 
-        if(objRenderer == null)
+        if (objRenderer == null)
         {
             objRenderer = GetComponent<Renderer>();
         }
 
-        Texture2D texture = Utils.LoadTexture(cardNumber, cardType);
+        Texture2D texture = Utils.LoadTexture(cardInfo.GetCardNumber(), cardType);
         if (texture != null)
         {
             frontImagePlane.GetComponent<Renderer>().material.mainTexture = texture;
@@ -45,10 +48,45 @@ public class DeskCardScript : InteractibleAbstractCard {
             RotateCard();
             TweakCardTransform(DEF_COEFF);
         }
-        if(!IsMonster() && face == Enums.CardFace.Up)
+        if (!IsMonster())
+        {
+            if(face == Enums.CardFace.Down) {
+                RotateCard();
+            }
+            if(face == Enums.CardFace.Up || cardType == Enums.CardType.Trap)
+            {
+                UnhighlightObject();
+                highlightable = false;
+            }
+        }
+    }
+
+    public void ResetData()
+    {
+        if (face == Enums.CardFace.Down)
         {
             RotateCard();
         }
+        if(position == Enums.CardPosition.Def)
+        {
+            TweakCardTransform(ATK_COEFF);
+        }
+
+        face = Enums.CardFace.Up;
+        position = Enums.CardPosition.Atk;
+        hasChangedPositionThisTurn = true;
+        hasAttackedThisTurn = false;
+        isActivatedSpell = false;
+    }
+
+    public bool IsActivatedSpell()
+    {
+        return isActivatedSpell;
+    }
+
+    public Enums.CardFace GetFace()
+    {
+        return face;
     }
 
     public void SetFace(Enums.CardFace newFace)
@@ -70,7 +108,7 @@ public class DeskCardScript : InteractibleAbstractCard {
     {
         Vector3 crtRotation = this.gameObject.transform.localEulerAngles;
         crtRotation.x += 180;
-        this.gameObject.transform.localEulerAngles = crtRotation ;
+        this.gameObject.transform.localEulerAngles = crtRotation;
     }
 
     private void SetCanvasText(string newText)
@@ -84,18 +122,28 @@ public class DeskCardScript : InteractibleAbstractCard {
         {
             if (GameManager.Get().GetTurnPhase() == Turn.Phase.Battle)
             {
-                SetCanvasText(Constants.ATTACKING_TEXT);
+                if (GameManager.Get().GetAttackingMonsterIndex() == cardIndex)
+                {
+                    SetCanvasText(Constants.CANCELLING_TEXT);
+                } else
+                {
+                    SetCanvasText(Constants.ATTACKING_TEXT);
+                }
+                    
+                return;
+            }
+            if(GameManager.Get().IsPlayerSacrificing())
+            {
+                SetCanvasText(Constants.SACRIFICE_TEXT);
+                return;
+            }
+            if (face == Enums.CardFace.Down)
+            {
+                SetCanvasText(Constants.FLIPPING_TEXT);
             }
             else
             {
-                if (face == Enums.CardFace.Down)
-                {
-                    SetCanvasText(Constants.FLIPPING_TEXT);
-                }
-                else
-                {
-                    SetCanvasText((position == Enums.CardPosition.Def) ? Constants.ATK_CHANGE_TEXT : Constants.DEF_CHANGE_TEXT);
-                }
+                SetCanvasText((position == Enums.CardPosition.Def) ? Constants.ATK_CHANGE_TEXT : Constants.DEF_CHANGE_TEXT);
             }
         }
         else if(face == Enums.CardFace.Down)
@@ -124,9 +172,22 @@ public class DeskCardScript : InteractibleAbstractCard {
 
     void OnMouseOver()
     {
-        if (highlightable)
+        if (highlightable && Input.GetMouseButtonDown(0))
         {
-            if (Input.GetMouseButtonDown(0))
+            if (IsMonster())
+            {
+                ChangeText();
+                if (GameManager.Get().GetAttackingMonsterIndex() == cardIndex)
+                {
+                    GameManager.Get().CancelAttack();
+                }
+                else
+                {
+                    InteractWithElement();
+                    HighlightObject();
+                    highlightable = true;
+                }
+            } else
             {
                 canvas.enabled = false;
                 InteractWithElement();
@@ -159,7 +220,7 @@ public class DeskCardScript : InteractibleAbstractCard {
         SetPosition((position == Enums.CardPosition.Atk) ? Enums.CardPosition.Def : Enums.CardPosition.Atk);
         int coefficient = (position == Enums.CardPosition.Def) ? DEF_COEFF : ATK_COEFF;
 
-        if(IsMonster() && face == Enums.CardFace.Down)
+        if(face == Enums.CardFace.Down)
         {
             SetFace(Enums.CardFace.Up);
             RotateCard();
@@ -179,31 +240,40 @@ public class DeskCardScript : InteractibleAbstractCard {
 
             if (currentPhase == Turn.Phase.Battle)
             {
-                hasAttackedThisTurn = true;
+                GameManager.Get().AttackWithMonster(cardIndex);
+            }
 
-                //to also add info on the attacked monster
-                string details = Constants.ATTACKING_TEXT + ";" + cardIndex;
-                GameManager.Get().SendInformation(details);
-
-                //prepare attack, give tribute, select for spell/effect usage
-                //SwitchAttackMode();
-
-                //after attack, unhighlight it
+            if(GameManager.Get().IsPlayerSacrificing())
+            {
+                GameManager.Get().AddTribute(false, cardIndex);
                 UnhighlightObject();
                 highlightable = false;
+                return;
+            }
+            
+            //might not need this
+            if(GameManager.Get().IsQuickActivation())
+            {
+                //TODO: send information and apply the effect after - only works for quick effect monsters
             }
 
             if ((currentPhase == Turn.Phase.Main1 || currentPhase == Turn.Phase.Main2) && !hasChangedPositionThisTurn)
             {
+                GameManager.Get().SwitchMonsterPosition(cardIndex, face, position, (Monster) cardInfo);
+
                 SwitchPosition();
-
-                string action = (position == Enums.CardPosition.Atk) ? Constants.ATK_CHANGE_TEXT : Constants.DEF_CHANGE_TEXT;
-
-                string details = action + ";" + cardIndex;
-                GameManager.Get().SendInformation(details);
-
                 hasChangedPositionThisTurn = true;
             }
+        }
+        else
+        {
+            UnhighlightObject();
+            highlightable = false;
+            SetFace(Enums.CardFace.Up);
+            RotateCard();
+            GameManager.Get().FlipSpell(cardIndex, false);
+
+            GameManager.Get().ActivateSpell(cardIndex, (NonMonster)cardInfo, Constants.DISK);
         }
     }
 
@@ -216,5 +286,20 @@ public class DeskCardScript : InteractibleAbstractCard {
     public bool CanChangePositionThisTurn()
     {
         return !hasChangedPositionThisTurn && !hasAttackedThisTurn;
+    }
+
+    public void ApplyPostAttackRestrictions()
+    {
+        hasAttackedThisTurn = true;
+        SetBattlingMonster(false);
+
+        //after attack, unhighlight it
+        UnhighlightObject();
+        highlightable = false;
+    }
+
+    public bool HasAttackedThisTurn()
+    {
+        return hasAttackedThisTurn;
     }
 }

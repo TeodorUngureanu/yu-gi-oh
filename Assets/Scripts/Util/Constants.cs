@@ -9,10 +9,13 @@ public static class Constants
     public const string SETTING_TEXT = "Set";
     public const string FLIPPING_TEXT = "Flip";
     public const string ACTIVATING_TEXT = "Activate";
-    public const string ATK_CHANGE_TEXT = "Atk position";
-    public const string DEF_CHANGE_TEXT = "Def position";
+    public const string ATK_CHANGE_TEXT = "ATK Position";
+    public const string DEF_CHANGE_TEXT = "DEF Position";
     public const string ATTACKING_TEXT = "Attack";
-    public const string SACRIFICING_TEXT = "Tribute";
+    public const string CANCELLING_TEXT = "Cancel";
+    public const string TRIBUTE_SUMMON_TEXT = "Tribute Summon";
+    public const string TRIBUTE_SET_TEXT = "Tribute Set";
+    public const string SACRIFICE_TEXT = "Sacrifice";
 
     public const int INITIAL_HAND_SIZE = 5;
     public const int MAX_HAND_SIZE = 6;
@@ -22,6 +25,35 @@ public static class Constants
     public const string SPELL = "Spell";
     public const string HAND = "Hand";
     public const string DISK = "Disk";
+    public const string UNKNOWN = "UNKNOWN";
+
+    //used only for communication between peers
+    public const string CHANGE_PHASE = "ChangePhase";
+    public const string NEW_PHASE_KEY = "newPhase";
+    public const string END_TURN = "End";
+    public const string DRAW = "Draw";
+    public const string QUICK_ACTIVATION = "Quick Activation";
+    public const string QA_PHASE_KEY = "phase";
+    public const string QA_ACCEPT = "yeah";
+    public const string QA_DENY = "nope";
+    public const string BATTLE = "Battle";
+    public const string TARGET_INDEX_KEY = "targetIndex";
+    public const string CARD_NO_KEY = "cardNumber";
+    public const string FACE_KEY = "face";
+    public const string FLIPPABLE_KEY = "isFlippabe";
+    public const string TYPE_KEY = "cardType";
+    public const string ORIGIN_KEY = "cardOrigin";
+    public const string TRIBUTE_NO_KEY = "noTributes";
+    public const string TRIBUTE_INDICES_KEY = "tributeIndices";
+
+    //used only for showing information on screen
+    public const string DUELIST_PLACEHOLDER = "{duelistName}";
+    public const string DISCARD_INFO = "{duelistName} is discarding cards..";
+    public const string QUICK_PLAY_INFO = "{duelistName} is thinking..";
+    public const string ASK_QUICK_PLAY = " Wanna quick play a card? Space = Yes, Esc = No";
+
+    public const int MAGIC_TYPE = 1;
+    public const int TRAP_TYPE = 2;
     
     public struct CardInfo
     {

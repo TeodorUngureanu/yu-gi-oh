@@ -1,18 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using UnityEngine;
+﻿public class Monster : Card {
 
-public class Monster : Card {
-
-    private int attribute;
-    private int type;
-    private int attackPoints;
-    private int defensePoints;
-    private int rarity; // Number of stars
-    private bool hasEffect;
-    private bool isFusion;
-    private string position;
+    private readonly int attribute;
+    private readonly int type;
+    private readonly int attackPoints;
+    private readonly int defensePoints;
+    private readonly int rarity; // Number of stars
+    private readonly bool hasEffect;
+    private readonly bool isFusion;
+    private readonly bool isFlippable = false; //TODO: set this in constructor when it's available in DB
 
     public Monster(string vCardNumber, byte[] vImage, string vCardName, string vDescription, int vEffectKey, int vAttribute, int vType, int vAttackPoints, int vDefensePoints, int vRarity, bool vIsFusion)
         : base(vCardNumber, vImage, vCardName, vDescription, vEffectKey, true)
@@ -25,47 +20,43 @@ public class Monster : Card {
         isFusion = vIsFusion;
     }
 
-    public int getAttribute()
+    public int GetAttribute()
     {
         return attribute;
     }
 
-    public int getType()
+    public int GetMonsterType()
     {
         return type;
     }
 
-    public int getAttackPoints()
+    public int GetAttackPoints()
     {
         return attackPoints;
     }
 
-    public int getDefensePoints()
+    public int GetDefensePoints()
     {
         return defensePoints;
     }
 
-    public int getRarity()
+    public int GetRarity()
     {
         return rarity;
     }
 
-    public bool hasAnEffect()
+    public bool HasAnEffect()
     {
         return hasEffect;
     }
 
-    public bool isFusionCard()
+    public bool IsFusionCard()
     {
         return isFusion;
     }
-    public string getPosition()
-    {
-        return position;
-    }
 
-    public void setPosition(string pos)
+    public bool IsFlippable()
     {
-        position = pos;
+        return isFlippable;
     }
 }

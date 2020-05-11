@@ -11,12 +11,12 @@ public class Config
 {
     private static Config instance = new Config();
 
-    private int mainDeck;
-    private int wins;
-    private int draws;
-    private int losses;
-    private string dbName = "URI=file:Yugioh.db";
-    private string path = "C:/Users/teodo/Desktop/Card Images/New folder/";
+    private readonly int mainDeck;
+    private readonly int wins;
+    private readonly int draws;
+    private readonly int losses;
+    private readonly string dbName = "URI=file:Yugioh.db";
+    private readonly string path = "C:/Users/teodo/Desktop/Card Images/New folder/";
 
     public Dictionary<string, int> _User_Config = new Dictionary<string, int>();
     public Dictionary<int, Dictionary<string, string>> _Card_Attribute = new Dictionary<int, Dictionary<string, string>>();
@@ -1010,4 +1010,28 @@ public class Config
         }
     }
 
+    public Card GetCardInfoByNumber(string cardNumber, bool isMonster)
+    {
+        if(isMonster)
+        {
+            for(int i = 1; i <= _Monster_Cards.Count; i++)
+            {
+                if(_Monster_Cards[i].GetCardNumber() == cardNumber)
+                {
+                    return (Card)_Monster_Cards[i];
+                }
+            }
+        }
+        else
+        {
+            for (int i = 1; i <= _Magic_Cards.Count; i++)
+            {
+                if (_Magic_Cards[i].GetCardNumber() == cardNumber)
+                {
+                    return (Card)_Magic_Cards[i];
+                }
+            }
+        }
+        return null;
+    }
 }
