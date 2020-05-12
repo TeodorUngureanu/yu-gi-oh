@@ -38,7 +38,6 @@ public class ExampleClass : MonoBehaviour
         turner = Input.GetAxis("Mouse X") * sensitivity;
         looker = -Input.GetAxis("Mouse Y") * sensitivity;
 
-        Debug.Log(turner);
         if (turner != 0)
         {
             //Code for action on mouse moving right

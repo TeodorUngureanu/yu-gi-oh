@@ -1034,4 +1034,87 @@ public class Config
         }
         return null;
     }
+
+    public void SaveDeck(int deckNumber, Dictionary<string, int> deck)
+    {
+        Debug.Log("1");
+
+        foreach (KeyValuePair<string, int> damn in deck)
+        {
+            Debug.Log(damn.Key + ", " + damn.Value);
+        }
+
+        // Open the db connection.
+        using (var connection = new SqliteConnection(dbName))
+        {
+            connection.Open();
+
+            // Create an sql command that creates a new table.
+            using (var command = connection.CreateCommand())
+            {
+                bool noRow = false;
+
+                command.CommandText = "SELECT COUNT(*) FROM User_Deck WHERE ID_User = 1 AND ID_Deck = " + deckNumber;
+                using (IDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        if (reader.GetInt32(0).Equals(0))
+                        {
+                            noRow = true;
+                            break;
+                        }
+                    }
+
+                    reader.Close();
+                }
+
+                if (noRow == true)
+                {
+                    command.CommandText = "INSERT INTO User_Deck(ID_User, ID_Deck) VALUES (1, " + deckNumber + "); ";
+                    command.ExecuteNonQuery();
+                }
+
+                command.CommandText = "DELETE FROM Deck_Cards WHERE ID_Deck = " + deckNumber + "; ";
+                command.ExecuteNonQuery();
+
+                string stmt = "";
+
+                foreach (KeyValuePair<int, Monster> kvp in _Monster_Cards)
+                {
+                    foreach (KeyValuePair<string, int> kvpDeck in deck)
+                    {
+                        if (kvp.Value.GetCardNumber() == kvpDeck.Key)
+                        {
+                            for (int i = 0; i < kvpDeck.Value; i++)
+                            {
+                                stmt += "(" + deckNumber + ", " + kvp.Key + ", 1, 1), ";
+                            }
+                        }
+                    }
+                }
+
+                foreach (KeyValuePair<int, NonMonster> kvp in _Magic_Cards)
+                {
+                    foreach (KeyValuePair<string, int> kvpDeck in deck)
+                    {
+                        if (kvp.Value.GetCardNumber() == kvpDeck.Key)
+                        {
+                            for (int i = 0; i < kvpDeck.Value; i++)
+                            {
+                                stmt += "(" + deckNumber + ", " + kvp.Key + ", 2, 1), ";
+                            }
+                        }
+                    }
+                }
+
+                stmt = stmt.Substring(0, stmt.Length - 2);
+
+                command.CommandText = "INSERT INTO Deck_Cards(ID_Deck, ID_Card, Card_Type, Card_Order) VALUES " + stmt + "; ";
+                Debug.Log(command.CommandText);
+                command.ExecuteNonQuery();
+            }
+
+        }
+    }
 }
