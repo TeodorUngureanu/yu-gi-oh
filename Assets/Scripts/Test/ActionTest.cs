@@ -44,6 +44,16 @@ public class ActionTest : MonoBehaviour
         GameManager.Get().ReceiveInformation(Utils.SerializeMessage(testMessage));
     }
 
+    public void InitiateQuickActivationEndTest()
+    {
+        List<MessageParameter> parameters = new List<MessageParameter>()
+        {
+            new MessageParameter(Constants.PHASE_KEY, Constants.DENY)
+        };
+        Message testMessage = new Message(Constants.QUICK_ACTIVATION, 0, parameters);
+        GameManager.Get().ReceiveInformation(Utils.SerializeMessage(testMessage));
+    }
+
     private void IncrementPhaseIndex()
     {
         if(++phaseIndex == enemyPhases.Count)

@@ -21,17 +21,18 @@ public class FieldScript : MonoBehaviour {
         tributeCircleInstances = new List<GameObject>();
         attackableMonsters = new List<int>();
 
-        //TODO: delete this if not needed anymore
+        //TODO: delete this if not needed anymore - battle phase to be re-tested first
         //MockDataForTesting();
     }
 
     private void MockDataForTesting()
     {
-        Card testCardInfo = new Monster("47060154", File.ReadAllBytes("Assets/Resources/Images/Card Images/MysticClown.png"),
+        Monster testCardInfo = new Monster("47060154", File.ReadAllBytes("Assets/Resources/Images/Card Images/MysticClown.png"),
             "Mystic Clown", "blahblahblah", 0, 9, 1, 1500, 1000, 4, false);
 
-        Card testCardInfo2 = new Monster("15025844", File.ReadAllBytes("Assets/Resources/Images/Card Images/MysticalElf.png"),
+        Monster testCardInfo2 = new Monster("15025844", File.ReadAllBytes("Assets/Resources/Images/Card Images/MysticalElf.png"),
             "Mystical Elf", "blahblahblah", 0, 5, 19, 800, 2000, 4, false);
+        testCardInfo2.SetIsFlippable(true);
 
         SetEnemyMonster(0, testCardInfo, Enums.CardFace.Up);
         SetEnemyMonster(1, testCardInfo2, Enums.CardFace.Down);
@@ -216,7 +217,7 @@ public class FieldScript : MonoBehaviour {
     public void SetEnemyMonster(int index, Card cardInfo, Enums.CardFace face)
     {
         GameObject crtMonster = enemyMonsterField[index];
-        crtMonster.GetComponent<EnemyFieldCardScript>().SetCardInfo(index, cardInfo, face);
+        crtMonster.GetComponent<EnemyFieldCardScript>().SetCardProperties(index, cardInfo, face);
         SetMonsterCardRotation(crtMonster, face);
 
         if (cardInfo != null)
@@ -229,7 +230,7 @@ public class FieldScript : MonoBehaviour {
     public void SetEnemySpell(int index, Card cardInfo, Enums.CardFace face)
     {
         GameObject crtSpell = enemySpellField[index];
-        crtSpell.GetComponent<EnemyFieldCardScript>().SetCardInfo(index, cardInfo, face);
+        crtSpell.GetComponent<EnemyFieldCardScript>().SetCardProperties(index, cardInfo, face);
         SetSpellCardRotation(crtSpell, face);
 
         if (cardInfo != null)
@@ -272,7 +273,7 @@ public class FieldScript : MonoBehaviour {
         {
             Card cardInfo = Config.Get().GetCardInfoByNumber(cardNumber, true);
             Enums.CardFace newFace = oldFace == Enums.CardFace.Up ? Enums.CardFace.Down : Enums.CardFace.Up;
-            crtMonster.GetComponent<EnemyFieldCardScript>().SetCardInfo(index, cardInfo, newFace);
+            crtMonster.GetComponent<EnemyFieldCardScript>().SetCardProperties(index, cardInfo, newFace);
         }
 
         SwitchMonsterPosition(true, index, oldFace, oldPos);

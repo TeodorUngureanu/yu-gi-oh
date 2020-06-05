@@ -251,10 +251,10 @@ public class DiskCardScript : InteractibleAbstractCard {
                 return;
             }
             
-            //might not need this
             if(GameManager.Get().IsQuickActivation())
             {
-                //TODO: send information and apply the effect after - only works for quick effect monsters
+                GameManager.Get().TriggerQuickEffectActivation(cardIndex, true);
+                return;
             }
 
             if ((currentPhase == Turn.Phase.Main1 || currentPhase == Turn.Phase.Main2) && !hasChangedPositionThisTurn)
@@ -272,6 +272,12 @@ public class DiskCardScript : InteractibleAbstractCard {
             SetFace(Enums.CardFace.Up);
             RotateCard();
             GameManager.Get().FlipSpell(cardIndex, false);
+
+            if (GameManager.Get().IsQuickActivation())
+            {
+                GameManager.Get().TriggerQuickEffectActivation(cardIndex, false);
+                return;
+            }
 
             GameManager.Get().ActivateSpell(cardIndex, (NonMonster)cardInfo, Constants.DISK);
         }

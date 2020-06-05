@@ -14,7 +14,8 @@ public class PlayerScript : MonoBehaviour {
     private bool canOpponentActivateCards;
     private bool isMyTurn = true; //only set for testing
     private bool hasDuelEnded;
-    private bool askingForQuickActivation;
+    private bool askingForQuickActivation, askingForEffectActivation;
+    private bool paused = false;
 
     private Deck deckScript;
     private HandScript handScript;
@@ -78,24 +79,38 @@ public class PlayerScript : MonoBehaviour {
 
     void Update()
     {
-        if(hasDuelEnded)
+        if(paused || hasDuelEnded)
         {
             return;
         }
 
+        if (askingForEffectActivation)
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                GameManager.Get().StopFlipEffectChoicePhase(true);
+                AskForEffectActivation(false);
+            }
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                GameManager.Get().StopFlipEffectChoicePhase(false);
+                AskForEffectActivation(false);
+            }
+            return;
+        }
         if(askingForQuickActivation)
         {
             if(Input.GetKeyDown(KeyCode.Space))
             {
-                askingForQuickActivation = false;
+                AskForQuickActivation(false);
                 GameManager.Get().StartQuickActivation();
             }
             if(Input.GetKeyDown(KeyCode.Escape))
             {
                 AskForQuickActivation(false);
                 GameManager.Get().StopQuickActivation();
+                GameManager.Get().SendQuickActivationEndMessage();
             }
-
             return;
         }
 
@@ -194,6 +209,11 @@ public class PlayerScript : MonoBehaviour {
         askingForQuickActivation = asking;
     }
 
+    public void AskForEffectActivation(bool asking)
+    {
+        askingForEffectActivation = asking;
+    }
+
     private void SetDiscardingProperties(bool start)
     {
         GameManager.Get().SetPlayerDiscarding(start);
@@ -225,6 +245,11 @@ public class PlayerScript : MonoBehaviour {
         ProcessTributeAvailableMonsters(false);
         ProcessUsableHandCards(false);
         ProcessUsableDiskSpells(false);
+    }
+
+    public void PauseSwitch(bool shouldPause)
+    {
+        paused = shouldPause;
     }
 
     private void RefreshStuffWhenTurnStarts()
@@ -539,11 +564,6 @@ public class PlayerScript : MonoBehaviour {
         {
             //TODO: get out of quick activation phase if during it
             GameManager.Get().SetQuickActivation(false);
-            List<MessageParameter> parameters = new List<MessageParameter>()
-            {
-                new MessageParameter(Constants.QA_PHASE_KEY, Constants.QA_DENY)
-            };
-            GameManager.Get().SendInformation(Constants.QUICK_ACTIVATION, 0, new List<MessageParameter>());
         }
     }
     

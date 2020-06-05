@@ -29,7 +29,7 @@ public class EnemyFieldCardScript : InteractibleAbstractCard
         face = vFace;
     }
 
-    public void SetCardInfo(int vCardIndex, Card vCardInfo, Enums.CardFace vFace)
+    public void SetCardProperties(int vCardIndex, Card vCardInfo, Enums.CardFace vFace)
     {
         cardIndex = vCardIndex;
         cardInfo = vCardInfo;
