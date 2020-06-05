@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour {
     private int enemyHand = 0;
     private int enemyDeck = 50; //TODO: remove this initialization when we get this info at the beginning of the duel
     private Tribute tribute;
-    private int attackingMonsterIndex = 100;
+    private int attackingMonsterIndex = 100, flippableMonsterIndex = 100;
     private bool playerDiscarding = false, sacrificing = false, attacking = false, quickActivation = false;
 
     private delegate void Actions();
@@ -170,6 +170,8 @@ public class GameManager : MonoBehaviour {
             new MessageParameter(Constants.TRIBUTE_INDICES_KEY, tributeIndicesString)
         };
         GameManager.Get().SendInformation(action, diskIndex, parameters);
+        SetInfoTextOnScreen(Constants.QUICK_PLAY_INFO, true);
+        PauseCurrentPhase();
     }
 
     public void SwitchMonsterPosition(int index, Enums.CardFace oldFace, Enums.CardPosition oldPosition, Monster info)
@@ -185,7 +187,7 @@ public class GameManager : MonoBehaviour {
 
         string action = Constants.FLIPPING_TEXT;
 
-        if (!info.IsFlippable())
+        if (oldFace == Enums.CardFace.Up)
         {
             action = (oldPosition == Enums.CardPosition.Atk) ? Constants.ATK_CHANGE_TEXT : Constants.DEF_CHANGE_TEXT;
         }
@@ -198,8 +200,8 @@ public class GameManager : MonoBehaviour {
         {
             Message message = new Message(Constants.FLIPPING_TEXT, index, parameters);
             message.SetEnemyAction(false);
-            actionBacklog.Add(message);
-            actionsToBeDone += FlipMonsterAction;
+            actionBacklog.Insert(0, message);
+            actionsToBeDone = FlipMonsterAction + actionsToBeDone;
         }
     }
 
@@ -213,13 +215,6 @@ public class GameManager : MonoBehaviour {
 
         Monster cardInfo = (Monster) Config.Get().GetCardInfoByNumber(cardNumber, false);
         bool isEnemyAction = currentMessage.IsEnemyAction();
-
-        //TODO: activate effect using the card Number
-    }
-
-    private void FlipEnemyMonster(int index)
-    {
-        fieldScript.FlipMonster(index, true);
     }
 
     private void DestroyOwnMonsters(List<int> indices)
@@ -244,7 +239,6 @@ public class GameManager : MonoBehaviour {
             };
 
             GameManager.Get().SendInformation(Constants.SETTING_TEXT, index, parameters);
-
             SetInfoTextOnScreen(Constants.QUICK_PLAY_INFO, true);
             PauseCurrentPhase();
         }
@@ -264,15 +258,15 @@ public class GameManager : MonoBehaviour {
             new MessageParameter(Constants.CARD_NO_KEY, cardInfo.GetCardNumber())
         };
 
-        GameManager.Get().SendInformation(Constants.ACTIVATING_TEXT, index, parameters);
+        SendInformation(Constants.ACTIVATING_TEXT, index, parameters);
 
         SetInfoTextOnScreen(Constants.QUICK_PLAY_INFO, true);
         PauseCurrentPhase();
 
         Message message = new Message(Constants.ACTIVATING_TEXT, index, parameters);
         message.SetEnemyAction(false);
-        actionBacklog.Add(message);
-        actionsToBeDone += ActivateSpellAction;
+        actionBacklog.Insert(0, message);
+        actionsToBeDone = ActivateSpellAction + actionsToBeDone;
     }
 
     private Message PopActionFromBacklog()
@@ -326,6 +320,7 @@ public class GameManager : MonoBehaviour {
     private void PauseCurrentPhase()
     {
         playerScript.UnhighlightEverything();
+        playerScript.PauseSwitch(true);
     }
 
     public void StartMyTurn()
@@ -351,11 +346,13 @@ public class GameManager : MonoBehaviour {
         PauseCurrentPhase();
         if (fieldScript.GetNoAttackableMonsters() == 0)
         {
-            //attack life points directly
-            Monster attackingMonster = (Monster)playerScript.GetCardInfoForIndex(attackingMonsterIndex, true);
-            DecreaseLifePoints(attackingMonster.GetAttackPoints(), true);
+            SendInformation(Constants.ATTACKING_TEXT, index, new List<MessageParameter>());
+            SetInfoTextOnScreen(Constants.QUICK_PLAY_INFO, true);
 
-            AfterAttack();
+            Message message = new Message(Constants.ATTACKING_TEXT, index, new List<MessageParameter>());
+            message.SetEnemyAction(false);
+            actionBacklog.Insert(0, message);
+            actionsToBeDone = PostBattleAction + actionsToBeDone;
         }
         else
         {
@@ -363,12 +360,145 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    private void PostBattleAction()
+    {
+        Message currentMessage = PopActionFromBacklog();
+        Dictionary<string, string> parameters = currentMessage.ExtractParamDictionary();
+
+        bool isEnemy = currentMessage.IsEnemyAction();
+        int monsterIndex = currentMessage.GetCardIndex();
+        string targetIndexParam;
+
+        if (parameters.TryGetValue(Constants.TARGET_INDEX_KEY, out targetIndexParam))
+        {
+            actionBacklog.Add(currentMessage);
+            actionsToBeDone = DamageCalculationAction + actionsToBeDone;
+
+            string targetPositionParam, targetFaceParam;
+
+            parameters.TryGetValue(Constants.TARGET_POS_KEY, out targetPositionParam);
+            parameters.TryGetValue(Constants.TARGET_FACE_KEY, out targetFaceParam);
+
+            Enums.CardPosition targetPosition = (Enums.CardPosition) Enum.Parse(typeof(Enums.CardPosition), targetPositionParam);
+            Enums.CardFace targetFace = (Enums.CardFace) Enum.Parse(typeof(Enums.CardFace), targetFaceParam);
+            int targetIndex = Int32.Parse(targetIndexParam);
+
+            Monster targetMonster;
+
+            if(isEnemy)
+            {
+                targetMonster = (Monster)playerScript.GetCardInfoForIndex(targetIndex, true);
+            } else
+            {
+                targetMonster = (Monster)fieldScript.GetEnemyCardInfo(targetIndex, true);
+            }
+
+            if (targetPosition == Enums.CardPosition.Def && targetFace == Enums.CardFace.Down)
+            {
+                if(isEnemy)
+                {
+                    playerScript.FlipMonster(targetIndex);
+                    List<MessageParameter> sendParameters = new List<MessageParameter>()
+                    {
+                        new MessageParameter(Constants.CARD_NO_KEY, targetMonster.GetCardNumber())
+                    };
+                    
+                    GameManager.Get().SendInformation(Constants.FLIPPING_TEXT, targetIndex, sendParameters);
+                   
+                    if (targetMonster.IsFlippable())
+                    {
+                        flippableMonsterIndex = targetIndex;
+                        SetInfoTextOnScreen(Constants.QUICK_PLAY_INFO + Constants.ASK_FLIP_EFFECT, false);
+                        playerScript.AskForEffectActivation(true);
+                        PauseCurrentPhase();
+                        return;
+                    }
+                } else
+                {
+                    if (targetMonster.IsFlippable())
+                    {
+                        SetInfoTextOnScreen(Constants.QUICK_PLAY_INFO, true);
+                        PauseCurrentPhase();
+                        return;
+                    }
+                }
+            }
+            ApplyActionBacklog();
+        }
+        else
+        {
+            //attack life points directly
+            Monster attackingMonster = (Monster)playerScript.GetCardInfoForIndex(monsterIndex, true);
+            DecreaseLifePoints(attackingMonster.GetAttackPoints(), true);
+            AfterAttack();
+        }
+    }
+
+    private void ApplyActionBacklog()
+    {
+        if(actionsToBeDone != null)
+        {
+            actionsToBeDone();
+        }
+    }
+
+    private void DamageCalculationAction()
+    {
+        Message currentMessage = PopActionFromBacklog();
+        Dictionary<string, string> parameters = currentMessage.ExtractParamDictionary();
+
+        int monsterIndex = currentMessage.GetCardIndex();
+        string targetIndexParam, targetPositionParam, targetFaceParam;
+
+        parameters.TryGetValue(Constants.TARGET_INDEX_KEY, out targetIndexParam);
+        parameters.TryGetValue(Constants.TARGET_POS_KEY, out targetPositionParam);
+        parameters.TryGetValue(Constants.TARGET_FACE_KEY, out targetFaceParam);
+
+        Enums.CardPosition targetPosition = (Enums.CardPosition)Enum.Parse(typeof(Enums.CardPosition), targetPositionParam);
+        Enums.CardFace targetFace = (Enums.CardFace)Enum.Parse(typeof(Enums.CardFace), targetFaceParam);
+        int targetIndex = Int32.Parse(targetIndexParam);
+
+        Monster attackingMonster = (Monster) playerScript.GetCardInfoForIndex(attackingMonsterIndex, true);
+        Monster targetMonster = (Monster)fieldScript.GetEnemyCardInfo(targetIndex, true);
+
+        int enemyMonsterRelevantPoints = targetPosition == Enums.CardPosition.Atk ?
+                targetMonster.GetAttackPoints() : targetMonster.GetDefensePoints();
+        int diff = attackingMonster.GetAttackPoints() - enemyMonsterRelevantPoints;
+
+        if (diff > 0)
+        {
+            fieldScript.DestroyFieldMonsters(true, new List<int>() { targetIndex });
+            if (targetPosition == Enums.CardPosition.Atk)
+            {
+                DecreaseLifePoints(diff, true);
+            }
+        }
+
+        if (diff < 0)
+        {
+            DecreaseLifePoints(-diff, false);
+            if (targetPosition == Enums.CardPosition.Atk)
+            {
+                DestroyOwnMonsters(new List<int>() { attackingMonsterIndex });
+            }
+        }
+
+        if (diff == 0 && targetPosition == Enums.CardPosition.Atk)
+        {
+            DestroyOwnMonsters(new List<int>() { attackingMonsterIndex });
+            fieldScript.DestroyFieldMonsters(true, new List<int>() { targetIndex });
+        }
+
+        AfterAttack();
+    }
+ 
     public void CancelAttack()
     {
         SetAttacking(false);
         fieldScript.DestroySword();
         fieldScript.ProcessAttackableMonsters(false);
         playerScript.HighlightPlayerCards();
+        playerScript.PauseSwitch(false);
     }
 
     private void AfterAttack()
@@ -409,50 +539,21 @@ public class GameManager : MonoBehaviour {
 
     public void AttackTarget(int targetIndex, Enums.CardPosition targetPosition, Enums.CardFace targetFace)
     {
-        string details = Constants.ATTACKING_TEXT + ";" + attackingMonsterIndex + ";" + targetIndex;
         List<MessageParameter> parameters = new List<MessageParameter>()
         {
-            new MessageParameter(Constants.TARGET_INDEX_KEY, targetIndex.ToString())
+            new MessageParameter(Constants.TARGET_INDEX_KEY, targetIndex.ToString()),
+            new MessageParameter(Constants.TARGET_POS_KEY, targetPosition.ToString()),
+            new MessageParameter(Constants.TARGET_FACE_KEY, targetFace.ToString())
         };
         SendInformation(Constants.ATTACKING_TEXT, attackingMonsterIndex, parameters);
+        SetInfoTextOnScreen(Constants.QUICK_PLAY_INFO, true);
 
-        //TODO: wait for the response, update stuff if needed and then do this
-        Monster attackingMonster = (Monster) playerScript.GetCardInfoForIndex(attackingMonsterIndex, true);
-        Monster targetMonster = (Monster) fieldScript.GetEnemyCardInfo(targetIndex, true);
+        PauseCurrentPhase();
 
-        if (targetPosition == Enums.CardPosition.Def && targetFace == Enums.CardFace.Down)
-        {
-            FlipEnemyMonster(targetIndex);
-        }
-
-        int enemyMonsterRelevantPoints = targetPosition == Enums.CardPosition.Atk ?
-            targetMonster.GetAttackPoints() : targetMonster.GetDefensePoints();
-        int diff = attackingMonster.GetAttackPoints() - enemyMonsterRelevantPoints;
-
-        if(diff > 0)
-        {
-            fieldScript.DestroyFieldMonsters(true, new List<int>() { targetIndex });
-            if (targetPosition == Enums.CardPosition.Atk)
-            {
-                DecreaseLifePoints(diff, true);
-            }
-        }
-
-        if(diff < 0)
-        {
-            DecreaseLifePoints(-diff, false);
-            if(targetPosition == Enums.CardPosition.Atk)
-            {
-                DestroyOwnMonsters(new List<int>() { attackingMonsterIndex });
-            }
-        }
-
-        if (diff == 0 && targetPosition == Enums.CardPosition.Atk)
-        {
-            DestroyOwnMonsters(new List<int>() { attackingMonsterIndex });
-            fieldScript.DestroyFieldMonsters(true, new List<int>() { targetIndex });
-        }
-        AfterAttack();
+        Message message = new Message(Constants.ATTACKING_TEXT, attackingMonsterIndex, parameters);
+        message.SetEnemyAction(false);
+        actionBacklog.Insert(0, message);
+        actionsToBeDone = PostBattleAction + actionsToBeDone;
     }
 
     private IEnumerator PostAttackOperationsCoroutine()
@@ -461,6 +562,81 @@ public class GameManager : MonoBehaviour {
 
         fieldScript.DestroySword();
         playerScript.HighlightPlayerCards();
+        playerScript.PauseSwitch(false);
+    }
+
+    public void StopFlipEffectChoicePhase(bool shouldActivate)
+    {
+        List<MessageParameter> parameters = new List<MessageParameter>()
+        {
+            new MessageParameter(Constants.PHASE_KEY, shouldActivate ? Constants.ACCEPT : Constants.DENY)
+        };
+
+        if (shouldActivate)
+        {
+            Message message = new Message(Constants.FLIP_EFFECT_ACTIVATION, flippableMonsterIndex, parameters);
+            message.SetEnemyAction(false);
+            actionBacklog.Add(message);
+            actionsToBeDone = ActivateCardEffect + actionsToBeDone;
+        }
+
+        SendInformation(Constants.FLIP_EFFECT_ACTIVATION, flippableMonsterIndex, parameters);
+        flippableMonsterIndex = 100;
+    }
+
+    public void TriggerQuickEffectActivation(int cardIndex, bool isMonster)
+    {
+        StopQuickActivation();
+        playerScript.RemoveQuickPlayCard(isMonster ? "MONSTER_" : "SPELL_", cardIndex);
+
+        List<MessageParameter> parameters = new List<MessageParameter>()
+        {
+            new MessageParameter(Constants.PHASE_KEY, Constants.ACTIVATING_TEXT),
+            new MessageParameter(Constants.TYPE_KEY, isMonster ? Constants.MONSTER : Constants.SPELL)
+        };
+
+        SendInformation(Constants.QUICK_ACTIVATION, cardIndex, parameters);
+        SetInfoTextOnScreen(Constants.QUICK_PLAY_INFO, true);
+
+        PauseCurrentPhase();
+
+        Message message = new Message(Constants.QUICK_ACTIVATION, cardIndex, parameters);
+        message.SetEnemyAction(false);
+        actionBacklog.Insert(0, message);
+        actionsToBeDone = ActivateCardEffect + actionsToBeDone;
+    }
+
+    private void ActivateCardEffect()
+    {
+        Message currentMessage = PopActionFromBacklog();
+        Dictionary<string, string> parameters = currentMessage.ExtractParamDictionary();
+
+        int cardIndex = currentMessage.GetCardIndex();
+        bool isEnemy = currentMessage.IsEnemyAction(), isMonster = false;
+
+        string action = currentMessage.GetAction();
+        if(action == Constants.FLIP_EFFECT_ACTIVATION)
+        {
+            isMonster = true;
+        }
+        if(action == Constants.QUICK_ACTIVATION)
+        {
+            string cardType;
+            parameters.TryGetValue(Constants.TYPE_KEY, out cardType);
+
+            isMonster = cardType == Constants.MONSTER;
+        }
+
+        Card card;
+        if(isEnemy)
+        {
+            card = playerScript.GetCardInfoForIndex(cardIndex, isMonster);
+        } else
+        {
+            card = fieldScript.GetEnemyCardInfo(cardIndex, isMonster);
+        }
+
+        //TODO: activate the effect (will need some more information in the message)
     }
 
     private bool CanQuickPlayCards()
@@ -468,11 +644,11 @@ public class GameManager : MonoBehaviour {
         return playerScript.CanQuickPlayCards();
     }
 
-    private void SendQuickActivationEndMessage()
+    public void SendQuickActivationEndMessage()
     {
         List<MessageParameter> parameters = new List<MessageParameter>()
         {
-            new MessageParameter(Constants.QA_PHASE_KEY, Constants.QA_DENY)
+            new MessageParameter(Constants.PHASE_KEY, Constants.DENY)
         };
         SendInformation(Constants.QUICK_ACTIVATION, 0, parameters);
     }
@@ -482,6 +658,7 @@ public class GameManager : MonoBehaviour {
         if (!CanQuickPlayCards())
         {
             StopQuickActivation();
+            SendQuickActivationEndMessage();
             return false;
         }
         SetInfoTextOnScreen(Constants.QUICK_PLAY_INFO + Constants.ASK_QUICK_PLAY, false);
@@ -501,18 +678,19 @@ public class GameManager : MonoBehaviour {
     {
         quickActivation = false;
         SetInfoTextOnScreen("", false);
-        SendQuickActivationEndMessage();
         playerScript.ProcessQuickActivationCards(false);
-        playerScript.HighlightPlayerCards();
+ 
+        ApplyActionBacklog();
 
-        actionsToBeDone();
+        playerScript.HighlightPlayerCards();
+        playerScript.PauseSwitch(false);
     }
 
     public void SendInformation(string action, int cardIndex, List<MessageParameter> parameters)
     {
         if(quickActivation)
         {
-            parameters.Add(new MessageParameter(Constants.QA_PHASE_KEY, action));
+            parameters.Add(new MessageParameter(Constants.PHASE_KEY, action));
             action = Constants.QUICK_ACTIVATION;
         }
 
@@ -526,6 +704,7 @@ public class GameManager : MonoBehaviour {
     {
         Message message = Utils.DeserializeMessage(serializedMessage);
 
+        message.SetEnemyAction(true);
         string action = message.GetAction();
         switch(action)
         {
@@ -539,9 +718,10 @@ public class GameManager : MonoBehaviour {
                 DecodeCardDraw(message);
                 break;
             case Constants.QUICK_ACTIVATION:
+            case Constants.FLIP_EFFECT_ACTIVATION:
                 DecodeQuickActivationInfo(message);
                 break;
-            case Constants.BATTLE:
+            case Constants.ATTACKING_TEXT:
                 DecodeBattleInformation(message);
                 break;
             default:
@@ -569,36 +749,54 @@ public class GameManager : MonoBehaviour {
 
     private void DecodeQuickActivationInfo(Message message)
     {
+        string action = message.GetAction();
         string activationPhase;
-        message.ExtractParamDictionary().TryGetValue(Constants.QA_PHASE_KEY, out activationPhase);
-        if(activationPhase == Constants.QA_DENY)
+        message.ExtractParamDictionary().TryGetValue(Constants.PHASE_KEY, out activationPhase);
+        if(activationPhase == Constants.DENY)
         {
-            actionsToBeDone();
+            StopQuickActivation();
             return;
         }
-        //TODO: show the action, put what's left in the backlog
+
+        if(action == Constants.FLIP_EFFECT_ACTIVATION)
+        {
+            //TODO: show the flip effect somehow
+            actionBacklog.Add(message);
+            actionsToBeDone = ActivateCardEffect + actionsToBeDone;
+        } else
+        {
+            //TODO: show the action, put what's left in the backlog
+        }
 
         if (!AskForQuickActivation())
         {
-            //TODO: apply the backlog actions
+            ApplyActionBacklog();
         }
     }
 
     private void DecodeBattleInformation(Message message)
     {
-        //TODO: show the action, put what's left in the backlog
-        
+        Dictionary<string, string> parameters = message.ExtractParamDictionary();
+        string targetIndexString;
+        parameters.TryGetValue(Constants.TARGET_INDEX_KEY, out targetIndexString);
+
+        fieldScript.AddAttackSword(true, message.GetCardIndex());
+
+        //TODO: show somehow which monster is going to be attacked
+        int targetIndex = Int32.Parse(targetIndexString);
+
+        message.SetEnemyAction(true);
+        actionBacklog.Insert(0, message);
+        actionsToBeDone = PostBattleAction + actionsToBeDone;
 
         if (!AskForQuickActivation())
         {
-            //TODO: apply the backlog actions
+            ApplyActionBacklog();
         }
     }
 
     private void DecodeMainInformation(Message message)
     {
-        message.SetEnemyAction(true);
-
         string action = message.GetAction();
         int cardIndex = message.GetCardIndex();
         Dictionary<string, string> actionParams = message.ExtractParamDictionary();
@@ -646,10 +844,10 @@ public class GameManager : MonoBehaviour {
                 }
             }
 
-            if(action == Constants.FLIPPING_TEXT)
+            if(action == Constants.FLIPPING_TEXT && ((Monster)cardInfo).IsFlippable())
             {
-                actionBacklog.Add(message);
-                actionsToBeDone += FlipMonsterAction;
+                actionBacklog.Insert(0, message);
+                actionsToBeDone = FlipMonsterAction + actionsToBeDone;
             }
 
             fieldScript.SetEnemyMonster(cardIndex, cardInfo, face);
@@ -664,8 +862,8 @@ public class GameManager : MonoBehaviour {
             
             if(action == Constants.ACTIVATING_TEXT)
             {
-                actionBacklog.Add(message);
-                actionsToBeDone += ActivateSpellAction;
+                actionBacklog.Insert(0, message);
+                actionsToBeDone = ActivateSpellAction + actionsToBeDone;
             }
             AskForQuickActivation();
         }

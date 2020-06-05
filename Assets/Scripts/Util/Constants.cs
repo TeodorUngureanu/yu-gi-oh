@@ -33,11 +33,13 @@ public static class Constants
     public const string END_TURN = "End";
     public const string DRAW = "Draw";
     public const string QUICK_ACTIVATION = "Quick Activation";
-    public const string QA_PHASE_KEY = "phase";
-    public const string QA_ACCEPT = "yeah";
-    public const string QA_DENY = "nope";
-    public const string BATTLE = "Battle";
+    public const string FLIP_EFFECT_ACTIVATION = "Flip Effect Activation";
+    public const string PHASE_KEY = "phase";
+    public const string ACCEPT = "yeah";
+    public const string DENY = "nope";
     public const string TARGET_INDEX_KEY = "targetIndex";
+    public const string TARGET_POS_KEY = "targetPosition";
+    public const string TARGET_FACE_KEY = "targetFace";
     public const string CARD_NO_KEY = "cardNumber";
     public const string FACE_KEY = "face";
     public const string FLIPPABLE_KEY = "isFlippabe";
@@ -51,6 +53,7 @@ public static class Constants
     public const string DISCARD_INFO = "{duelistName} is discarding cards..";
     public const string QUICK_PLAY_INFO = "{duelistName} is thinking..";
     public const string ASK_QUICK_PLAY = " Wanna quick play a card? Space = Yes, Esc = No";
+    public const string ASK_FLIP_EFFECT = " Wanna activate flip effect? Space = Yes, Esc = No";
 
     public const int MAGIC_TYPE = 1;
     public const int TRAP_TYPE = 2;
