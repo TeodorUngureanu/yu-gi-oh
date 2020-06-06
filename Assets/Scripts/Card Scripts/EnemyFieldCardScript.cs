@@ -39,6 +39,15 @@ public class EnemyFieldCardScript : InteractibleAbstractCard
 
     void OnMouseEnter()
     {
+        string cardNumber = null;
+        Enums.CardType cardType = Enums.CardType.Monster;
+
+        if (cardInfo != null) {
+            cardNumber = cardInfo.GetCardNumber();
+            cardType = cardInfo.IsMonster() ? Enums.CardType.Monster : Enums.CardType.Spell;
+        }
+
+        UIManager.Get().ShowInformation(cardNumber, cardType);
         if (highlightable)
         {
             HighlightObject();
@@ -48,6 +57,7 @@ public class EnemyFieldCardScript : InteractibleAbstractCard
 
     void OnMouseExit()
     {
+        UIManager.Get().HideInformation();
         if (highlightable)
         {
             UnhighlightObject();

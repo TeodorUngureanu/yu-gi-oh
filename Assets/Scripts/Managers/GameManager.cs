@@ -3,18 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
 
     public GameObject player, field;
-    public GameObject duelInfoCanvas;
 
     private static GameManager instance;
     private PlayerScript playerScript;
     private Graveyard playerGraveyard, enemyGraveyard;
     private FieldScript fieldScript;
-    private InfoScreenScript infoScreenScript;
 
     private int enemyLifePoints = Constants.STARTING_LIFE_POINTS;
     private int enemyHand = 0;
@@ -22,6 +19,7 @@ public class GameManager : MonoBehaviour {
     private Tribute tribute;
     private int attackingMonsterIndex = 100, flippableMonsterIndex = 100;
     private bool playerDiscarding = false, sacrificing = false, attacking = false, quickActivation = false;
+    private bool cardInfoOn = true;
 
     private delegate void Actions();
 
@@ -40,7 +38,6 @@ public class GameManager : MonoBehaviour {
             instance = this;
             playerScript = player.GetComponent<PlayerScript>();
             fieldScript = field.GetComponent<FieldScript>();
-            infoScreenScript = duelInfoCanvas.GetComponent<InfoScreenScript>();
             actionBacklog = new List<Message>();
         }
         else
@@ -49,6 +46,14 @@ public class GameManager : MonoBehaviour {
         }
 
         Config.Get().Load();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            cardInfoOn = !cardInfoOn;
+        }
     }
 
     public Graveyard GetGraveyard(string key)
@@ -103,6 +108,11 @@ public class GameManager : MonoBehaviour {
     public void SetQuickActivation(bool value)
     {
         quickActivation = value;
+    }
+
+    public bool IsCardInfoOn()
+    {
+        return cardInfoOn;
     }
 
     public void DrawCard()
@@ -169,8 +179,8 @@ public class GameManager : MonoBehaviour {
             new MessageParameter(Constants.TRIBUTE_NO_KEY, tributeIndices.Count.ToString()),
             new MessageParameter(Constants.TRIBUTE_INDICES_KEY, tributeIndicesString)
         };
-        GameManager.Get().SendInformation(action, diskIndex, parameters);
-        SetInfoTextOnScreen(Constants.QUICK_PLAY_INFO, true);
+        SendInformation(action, diskIndex, parameters);
+        UIManager.Get().SetInfoTextOnInfoPanel(Constants.QUICK_PLAY_INFO, true);
         PauseCurrentPhase();
     }
 
@@ -192,8 +202,8 @@ public class GameManager : MonoBehaviour {
             action = (oldPosition == Enums.CardPosition.Atk) ? Constants.ATK_CHANGE_TEXT : Constants.DEF_CHANGE_TEXT;
         }
 
-        GameManager.Get().SendInformation(action, index, parameters);
-        SetInfoTextOnScreen(Constants.QUICK_PLAY_INFO, true);
+        SendInformation(action, index, parameters);
+        UIManager.Get().SetInfoTextOnInfoPanel(Constants.QUICK_PLAY_INFO, true);
         PauseCurrentPhase();
 
         if (oldFace == Enums.CardFace.Down && playerScript.FlipMonster(index))
@@ -238,8 +248,8 @@ public class GameManager : MonoBehaviour {
                 new MessageParameter(Constants.CARD_NO_KEY, cardInfo.GetCardNumber())
             };
 
-            GameManager.Get().SendInformation(Constants.SETTING_TEXT, index, parameters);
-            SetInfoTextOnScreen(Constants.QUICK_PLAY_INFO, true);
+            SendInformation(Constants.SETTING_TEXT, index, parameters);
+            UIManager.Get().SetInfoTextOnInfoPanel(Constants.QUICK_PLAY_INFO, true);
             PauseCurrentPhase();
         }
     }
@@ -260,7 +270,7 @@ public class GameManager : MonoBehaviour {
 
         SendInformation(Constants.ACTIVATING_TEXT, index, parameters);
 
-        SetInfoTextOnScreen(Constants.QUICK_PLAY_INFO, true);
+        UIManager.Get().SetInfoTextOnInfoPanel(Constants.QUICK_PLAY_INFO, true);
         PauseCurrentPhase();
 
         Message message = new Message(Constants.ACTIVATING_TEXT, index, parameters);
@@ -312,7 +322,7 @@ public class GameManager : MonoBehaviour {
     public void DiscardCard(int index)
     {
         playerScript.RemoveCardFromHand(index);
-        SetInfoTextOnScreen("", false);
+        UIManager.Get().SetInfoTextOnInfoPanel("", false);
 
         // Send card to Graveyard
     }
@@ -347,7 +357,7 @@ public class GameManager : MonoBehaviour {
         if (fieldScript.GetNoAttackableMonsters() == 0)
         {
             SendInformation(Constants.ATTACKING_TEXT, index, new List<MessageParameter>());
-            SetInfoTextOnScreen(Constants.QUICK_PLAY_INFO, true);
+            UIManager.Get().SetInfoTextOnInfoPanel(Constants.QUICK_PLAY_INFO, true);
 
             Message message = new Message(Constants.ATTACKING_TEXT, index, new List<MessageParameter>());
             message.SetEnemyAction(false);
@@ -408,7 +418,7 @@ public class GameManager : MonoBehaviour {
                     if (targetMonster.IsFlippable())
                     {
                         flippableMonsterIndex = targetIndex;
-                        SetInfoTextOnScreen(Constants.QUICK_PLAY_INFO + Constants.ASK_FLIP_EFFECT, false);
+                        UIManager.Get().SetInfoTextOnInfoPanel(Constants.QUICK_PLAY_INFO + Constants.ASK_FLIP_EFFECT, false);
                         playerScript.AskForEffectActivation(true);
                         PauseCurrentPhase();
                         return;
@@ -417,7 +427,7 @@ public class GameManager : MonoBehaviour {
                 {
                     if (targetMonster.IsFlippable())
                     {
-                        SetInfoTextOnScreen(Constants.QUICK_PLAY_INFO, true);
+                        UIManager.Get().SetInfoTextOnInfoPanel(Constants.QUICK_PLAY_INFO, true);
                         PauseCurrentPhase();
                         return;
                     }
@@ -520,7 +530,7 @@ public class GameManager : MonoBehaviour {
                 enemyLifePoints = 0;
                 hasDuelEnded = true;
             }
-            infoScreenScript.ChangePoints(enemyLifePoints.ToString(), true);
+            UIManager.Get().UpdatePointsOnInfoPanel(enemyLifePoints.ToString(), true);
         } else
         {
             long newPoints = playerScript.DecreaseLifePoints(points);
@@ -529,11 +539,11 @@ public class GameManager : MonoBehaviour {
                 newPoints = 0;
                 hasDuelEnded = true;
             }
-            infoScreenScript.ChangePoints(newPoints.ToString(), false);
+            UIManager.Get().UpdatePointsOnInfoPanel(newPoints.ToString(), false);
         }
         if(hasDuelEnded)
         {
-            EndDuel(!isEnemy);
+            UIManager.Get().ShowDuelEnd(!isEnemy);
         }
     }
 
@@ -546,7 +556,7 @@ public class GameManager : MonoBehaviour {
             new MessageParameter(Constants.TARGET_FACE_KEY, targetFace.ToString())
         };
         SendInformation(Constants.ATTACKING_TEXT, attackingMonsterIndex, parameters);
-        SetInfoTextOnScreen(Constants.QUICK_PLAY_INFO, true);
+        UIManager.Get().SetInfoTextOnInfoPanel(Constants.QUICK_PLAY_INFO, true);
 
         PauseCurrentPhase();
 
@@ -596,7 +606,7 @@ public class GameManager : MonoBehaviour {
         };
 
         SendInformation(Constants.QUICK_ACTIVATION, cardIndex, parameters);
-        SetInfoTextOnScreen(Constants.QUICK_PLAY_INFO, true);
+        UIManager.Get().SetInfoTextOnInfoPanel(Constants.QUICK_PLAY_INFO, true);
 
         PauseCurrentPhase();
 
@@ -661,7 +671,7 @@ public class GameManager : MonoBehaviour {
             SendQuickActivationEndMessage();
             return false;
         }
-        SetInfoTextOnScreen(Constants.QUICK_PLAY_INFO + Constants.ASK_QUICK_PLAY, false);
+        UIManager.Get().SetInfoTextOnInfoPanel(Constants.QUICK_PLAY_INFO + Constants.ASK_QUICK_PLAY, false);
         playerScript.AskForQuickActivation(true);
         PauseCurrentPhase();
         return true;
@@ -670,14 +680,14 @@ public class GameManager : MonoBehaviour {
     public void StartQuickActivation()
     {
         quickActivation = true;
-        SetInfoTextOnScreen("", false);
+        UIManager.Get().SetInfoTextOnInfoPanel("", false);
         playerScript.ProcessQuickActivationCards(true);
     }
 
     public void StopQuickActivation()
     {
         quickActivation = false;
-        SetInfoTextOnScreen("", false);
+        UIManager.Get().SetInfoTextOnInfoPanel("", false);
         playerScript.ProcessQuickActivationCards(false);
  
         ApplyActionBacklog();
@@ -737,14 +747,14 @@ public class GameManager : MonoBehaviour {
         Dictionary<string, string> actionParams = message.ExtractParamDictionary();
         if (actionParams.TryGetValue(Constants.NEW_PHASE_KEY, out newPhase))
         {
-            ChangePhaseOnScreen(newPhase, true);
+            UIManager.Get().ChangePhaseOnInfoPanel(newPhase, true);
         }
     }
 
     private void DecodeCardDraw(Message message)
     {
-        SetHandSizeOnScreen(++enemyHand, true);
-        SetDeckSizeOnScreen(--enemyDeck, true);
+        UIManager.Get().SetHandSizeOnInfoPanel((++enemyHand).ToString(), true);
+        UIManager.Get().SetDeckSizeOnInfoPanel((--enemyDeck).ToString(), true);
     }
 
     private void DecodeQuickActivationInfo(Message message)
@@ -874,38 +884,7 @@ public class GameManager : MonoBehaviour {
         List<MessageParameter> parameters = new List<MessageParameter>() {
             new MessageParameter(Constants.NEW_PHASE_KEY, newPhase)
         };
-        ChangePhaseOnScreen(newPhase, false);
+        UIManager.Get().ChangePhaseOnInfoPanel(newPhase, false);
         SendInformation(Constants.CHANGE_PHASE, 0, parameters);
-    }
-    
-    private void ChangePhaseOnScreen(string newPhase, bool isEnemy)
-    {
-        infoScreenScript.ChangePhase(newPhase, isEnemy);
-    }
-
-    public void SetHandSizeOnScreen(int newSize, bool isEnemy)
-    {
-        infoScreenScript.ChangeHandSize(newSize.ToString(), isEnemy);
-    }
-
-    public void SetDeckSizeOnScreen(int newSize, bool isEnemy)
-    {
-        infoScreenScript.ChangeDeckSize(newSize.ToString(), isEnemy);
-    }
-
-    //TODO: call this when the graveyard size increases/decreases for any player
-    public void SetGraveyardSizeOnScreen(int newSize, bool isEnemy)
-    {
-        infoScreenScript.ChangeGraveyardSize(newSize.ToString(), isEnemy);
-    }
-
-    public void SetInfoTextOnScreen(string infoText, bool isEnemy)
-    {
-        infoScreenScript.SetInfoText(infoText, isEnemy);
-    }
-
-    public void EndDuel(bool isEnemyWinner)
-    {
-        infoScreenScript.ShowEndGameScreen(isEnemyWinner);
     }
 }

@@ -70,8 +70,8 @@ public class PlayerScript : MonoBehaviour {
 
         deck.SetActive(true);
         isReadyForDuel = true;
-        diskScript.UpdateDeckSizeOnDisk(deckScript.CardsLeft());
-        GameManager.Get().SetDeckSizeOnScreen(deckScript.CardsLeft(), false); //TODO: remove this - will be set when we get some info at the beginning of the duel
+        UIManager.Get().UpdateDeckSizeOnDisk(deckScript.CardsLeft());
+        UIManager.Get().SetDeckSizeOnInfoPanel(deckScript.CardsLeft().ToString(), false); //TODO: remove this - will be set when we get some info at the beginning of the duel
 
         //temporarily, while not using headset
         Cursor.visible = true;
@@ -197,7 +197,7 @@ public class PlayerScript : MonoBehaviour {
 
             if (handScript.GetNoOfCards() > Constants.MAX_HAND_SIZE)
             {
-                GameManager.Get().SetInfoTextOnScreen(Constants.DISCARD_INFO, false);
+                UIManager.Get().SetInfoTextOnInfoPanel(Constants.DISCARD_INFO, false);
                 SetDiscardingProperties(true);
             }
         }
@@ -455,11 +455,11 @@ public class PlayerScript : MonoBehaviour {
     {
         //TODO: add animation
         handScript.AddCard(deckScript.DrawCard());
-        GameManager.Get().SetHandSizeOnScreen(handScript.GetNoOfCards(), false);
+        UIManager.Get().SetHandSizeOnInfoPanel(handScript.GetNoOfCards().ToString(), false);
 
         int cardsLeftInDeck = deckScript.CardsLeft();
-        diskScript.UpdateDeckSizeOnDisk(cardsLeftInDeck);
-        GameManager.Get().SetDeckSizeOnScreen(cardsLeftInDeck, false);
+        UIManager.Get().UpdateDeckSizeOnDisk(cardsLeftInDeck);
+        UIManager.Get().SetDeckSizeOnInfoPanel(cardsLeftInDeck.ToString(), false);
 
         GameManager.Get().SendInformation(Constants.DRAW, 0, new List<MessageParameter>());
 
@@ -476,7 +476,7 @@ public class PlayerScript : MonoBehaviour {
         {
             deck.SetActive(false);
             hasDuelEnded = true;
-            GameManager.Get().EndDuel(true);
+            UIManager.Get().ShowDuelEnd(true);
             UnhighlightEverything();
         }
     }
@@ -577,7 +577,7 @@ public class PlayerScript : MonoBehaviour {
     public void RemoveCardFromHand(int index)
     {
         handScript.RemoveCard(index);
-        GameManager.Get().SetHandSizeOnScreen(handScript.GetNoOfCards(), false);
+        UIManager.Get().SetHandSizeOnInfoPanel(handScript.GetNoOfCards().ToString(), false);
     }
 
     public Card GetCardInfoForIndex(int index, bool isMonster)
@@ -615,7 +615,7 @@ public class PlayerScript : MonoBehaviour {
     public long DecreaseLifePoints(int points)
     {
         lifePoints -= points;
-        diskScript.UpdateLPOnDisk(lifePoints);
+        UIManager.Get().UpdateLPOnDisk(lifePoints);
         return lifePoints;
     }
 }

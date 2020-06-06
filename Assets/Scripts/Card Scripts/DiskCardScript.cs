@@ -59,6 +59,7 @@ public class DiskCardScript : InteractibleAbstractCard {
                 highlightable = false;
             }
         }
+        hasChangedPositionThisTurn = true;
     }
 
     public void ResetData()
@@ -154,6 +155,7 @@ public class DiskCardScript : InteractibleAbstractCard {
 
     void OnMouseEnter()
     {
+        UIManager.Get().ShowInformation(cardInfo.GetCardNumber(), cardInfo.IsMonster() ? Enums.CardType.Monster : Enums.CardType.Spell);
         if (highlightable)
         {
             HighlightObject();
@@ -163,6 +165,7 @@ public class DiskCardScript : InteractibleAbstractCard {
 
     void OnMouseExit()
     {
+        UIManager.Get().HideInformation();
         if (highlightable)
         {
             UnhighlightObject();

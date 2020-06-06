@@ -5,16 +5,8 @@ using UnityEngine;
 
 public class DiskScript : MonoBehaviour {
 
-    public GameObject diskInformation;
-    private DiskInfoScript diskInfoScript;
-
     public List<GameObject> monstersOnDisk;
     public List<GameObject> spellsOnDisk;
-
-    private void Awake()
-    {
-        diskInfoScript = diskInformation.GetComponent<DiskInfoScript>();
-    }
 
     private bool IsMonsterHighlightable(int index)
     {
@@ -136,15 +128,5 @@ public class DiskScript : MonoBehaviour {
     public void ApplyRestrictionsForAttackingMonster(int index)
     {
         monstersOnDisk[index].GetComponent<DiskCardScript>().ApplyPostAttackRestrictions();
-    }
-
-    public void UpdateLPOnDisk(long newLP)
-    {
-        diskInfoScript.ChangeLPText(newLP);
-    }
-
-    public void UpdateDeckSizeOnDisk(int newDeckSize)
-    {
-        diskInfoScript.ChangeDeckSizeText(newDeckSize);
     }
 }

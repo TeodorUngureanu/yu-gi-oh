@@ -110,6 +110,7 @@ public class HandCardScript : InteractibleAbstractCard
 
     void OnMouseEnter()
     {
+        UIManager.Get().ShowInformation(cardInfo.GetCardNumber(), cardInfo.IsMonster() ? Enums.CardType.Monster : Enums.CardType.Spell);
         if (highlightable)
         {
             HighlightObject();
@@ -119,6 +120,7 @@ public class HandCardScript : InteractibleAbstractCard
 
     void OnMouseExit()
     {
+        UIManager.Get().HideInformation();
         if (highlightable)
         {
             UnhighlightObject();
