@@ -14,6 +14,7 @@ public class DiskCardScript : InteractibleAbstractCard {
     private Enums.CardPosition position = Enums.CardPosition.Atk;
     private bool hasChangedPositionThisTurn = true, hasAttackedThisTurn = false;
     private bool isActivatedSpell = false;
+    private bool selectionMode = false;
 
     private const int DEF_COEFF = 1, ATK_COEFF = -1;
     private Vector3 posTransitionVector = new Vector3(-0.00044f, 0.0002f, 0.00101f);
@@ -78,6 +79,7 @@ public class DiskCardScript : InteractibleAbstractCard {
         hasChangedPositionThisTurn = true;
         hasAttackedThisTurn = false;
         isActivatedSpell = false;
+        selectionMode = false;
     }
 
     public bool IsActivatedSpell()
@@ -150,6 +152,15 @@ public class DiskCardScript : InteractibleAbstractCard {
         else if(face == Enums.CardFace.Down)
         {
             SetCanvasText(Constants.ACTIVATING_TEXT);
+        }
+    }
+
+    public void SwitchSelectionMode(bool isSelectionMode)
+    {
+        selectionMode = isSelectionMode;
+        if (isSelectionMode)
+        {
+            SetCanvasText(Constants.SELECTION_TEXT);
         }
     }
 
@@ -239,6 +250,15 @@ public class DiskCardScript : InteractibleAbstractCard {
     {
         if(IsMonster())
         {
+            if(selectionMode)
+            {
+                SwitchSelectionMode(false);
+                UnhighlightObject();
+                highlightable = false;
+                GameManager.Get().SelectMonster(cardIndex);
+                return;
+            }
+
             Turn.Phase currentPhase = GameManager.Get().GetTurnPhase();
 
             if (currentPhase == Turn.Phase.Battle)

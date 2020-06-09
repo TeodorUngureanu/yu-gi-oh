@@ -54,7 +54,7 @@ public class Deck : InteractibleElementScript {
         int noCards = mainDeck.Count;
         for (int i = 0; i < noCards - 1; i++)
         {
-            int randomPosition = UnityEngine.Random.Range(i, noCards);
+            int randomPosition = UnityEngine.Random.Range(0, noCards);
             Card auxCard = mainDeck[i];
             mainDeck[i] = mainDeck[randomPosition];
             mainDeck[randomPosition] = auxCard;

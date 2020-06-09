@@ -49,7 +49,7 @@ public class PlayerScript : MonoBehaviour {
     void Start()
     {
         deckScript.LoadDeck(1); // YUGI
-        deckScript.ShuffleCards();
+        ShuffleDeck();
         deck.SetActive(false);
 
         cardHeight = deck.transform.parent.localScale.y / deckScript.CardsLeft();
@@ -75,6 +75,11 @@ public class PlayerScript : MonoBehaviour {
 
         //temporarily, while not using headset
         Cursor.visible = true;
+    }
+
+    public void ShuffleDeck()
+    {
+        deckScript.ShuffleCards();
     }
 
     void Update()
@@ -241,6 +246,7 @@ public class PlayerScript : MonoBehaviour {
 
     public void UnhighlightEverything()
     {
+        ProcessSelectableMonstersOnDisk(Constants.DUMMY_INEXISTENT_ID, Constants.DUMMY_INEXISTENT_ID, 0, false);
         ProcessPosChangeableDiskMonsters(false);
         ProcessTributeAvailableMonsters(false);
         ProcessUsableHandCards(false);
@@ -440,6 +446,35 @@ public class PlayerScript : MonoBehaviour {
         }
     }
 
+    public void ProcessSelectableMonstersOnDisk(int attribute, int type, int superiorAtkLimit, bool highlight)
+    {
+        for (int index = 0; index < monstersOnDisk.Count; index++)
+        {
+            bool followsConstraints = true;
+            if (monstersOnDisk[index] != null)
+            {
+                Monster monsterInfo = (Monster) monstersOnDisk[index];
+                if((attribute != Constants.DUMMY_INEXISTENT_ID && monsterInfo.GetAttribute() != attribute)
+                    || (type != Constants.DUMMY_INEXISTENT_ID && monsterInfo.GetMonsterType() != type)
+                    || (superiorAtkLimit > 0 && monsterInfo.GetAttackPoints() > superiorAtkLimit))
+                {
+                    followsConstraints = false;
+                }
+
+                diskScript.SwitchSelectionModeForIndex(index, true);
+                if (highlight && followsConstraints)
+                {
+                    diskScript.HighlightMonster(index);
+                }
+                else
+                {
+                    diskScript.ChangeTextForIndex(index, true);
+                    diskScript.UnhighlightMonster(index);
+                }
+            }
+        }
+    }
+
     public void StartMyTurn()
     {
         isMyTurn = true;
@@ -612,9 +647,9 @@ public class PlayerScript : MonoBehaviour {
         diskScript.ApplyRestrictionsForAttackingMonster(index);
     }
 
-    public long DecreaseLifePoints(int points)
+    public long ModifyLifePoints(int points)
     {
-        lifePoints -= points;
+        lifePoints += points;
         UIManager.Get().UpdateLPOnDisk(lifePoints);
         return lifePoints;
     }

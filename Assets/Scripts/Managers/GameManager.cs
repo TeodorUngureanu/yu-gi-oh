@@ -21,6 +21,9 @@ public class GameManager : MonoBehaviour {
     private bool playerDiscarding = false, sacrificing = false, attacking = false, quickActivation = false;
     private bool cardInfoOn = true;
 
+    private int monstersToBeSelected = 0;
+    private List<int> selectedMonsters = new List<int>();
+
     private delegate void Actions();
 
     private Actions actionsToBeDone;
@@ -533,7 +536,7 @@ public class GameManager : MonoBehaviour {
             UIManager.Get().UpdatePointsOnInfoPanel(enemyLifePoints.ToString(), true);
         } else
         {
-            long newPoints = playerScript.DecreaseLifePoints(points);
+            long newPoints = playerScript.ModifyLifePoints((-1) * points);
             if(newPoints < 0)
             {
                 newPoints = 0;
@@ -886,5 +889,52 @@ public class GameManager : MonoBehaviour {
         };
         UIManager.Get().ChangePhaseOnInfoPanel(newPhase, false);
         SendInformation(Constants.CHANGE_PHASE, 0, parameters);
+    }
+
+    public void ModifyPlayerLifePoints(int points)
+    {
+        playerScript.ModifyLifePoints(points);
+    }
+
+    public void ShuffleDeck()
+    {
+        playerScript.ShuffleDeck();
+    }
+
+    public void TriggerMonsterSelection(int noMonsters, int attribute, int type, string owner, string source, int superiorAtkLimit)
+    {
+        monstersToBeSelected = noMonsters;
+        PauseCurrentPhase();
+        switch (source)
+        {
+            case Constants.FIELD:
+                if(owner == Constants.PLAYER || owner == Constants.BOTH)
+                {
+                    playerScript.ProcessSelectableMonstersOnDisk(attribute, type, superiorAtkLimit, true);
+                }
+                if (owner == Constants.ENEMY || owner == Constants.BOTH)
+                {
+                    fieldScript.ProcessSelectableMonstersOnField(attribute, type, superiorAtkLimit, true);
+                }
+                break;
+            case Constants.DECK:
+                //TODO: implement selection from deck (only your own)
+                break;
+            case Constants.GRAVEYARD:
+                //TODO: after graveyard is in place, implement selection from it
+                break;
+        }
+    }
+
+    public void SelectMonster(int index)
+    {
+        selectedMonsters.Add(index);
+        if(--monstersToBeSelected == 0)
+        {
+            Debug.Log("Selected " + selectedMonsters.Count + " monsters");
+            playerScript.UnhighlightEverything();
+            //TODO: send message to the enemy with the selection
+            //TODO: proceed with the action backlog; have the effect stored there or somewhere else before the selection
+        }
     }
 }

@@ -332,4 +332,26 @@ public class FieldScript : MonoBehaviour {
         }
         return enemySpellField[index].GetComponent<EnemyFieldCardScript>().GetCardInfo();
     }
+
+    public void ProcessSelectableMonstersOnField(int attribute, int type, int superiorAtkLimit, bool highlight)
+    {
+        for (int index = 0; index < enemyMonsterField.Count; index++)
+        {
+            Monster monsterInfo = (Monster) GetEnemyCardInfo(index, true);
+
+            if(monsterInfo != null
+                && (attribute == Constants.DUMMY_INEXISTENT_ID || attribute == monsterInfo.GetAttribute())
+                && (type == Constants.DUMMY_INEXISTENT_ID || type == monsterInfo.GetMonsterType())
+                && (superiorAtkLimit == 0 || monsterInfo.GetAttackPoints() <= superiorAtkLimit)
+                && highlight)
+            {
+                enemyMonsterField[index].GetComponent<EnemyFieldCardScript>().SetHighlightable(true);
+            }
+
+            if(!highlight)
+            {
+                enemyMonsterField[index].GetComponent<EnemyFieldCardScript>().SetHighlightable(false);
+            }
+        }
+    }
 }

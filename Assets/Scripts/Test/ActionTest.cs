@@ -62,21 +62,9 @@ public class ActionTest : MonoBehaviour
         }
     }
 
-    public void InitiateEnemyPhaseChangeTest()
+    public void InitiateMonsterSelectionTest()
     {
-        List<MessageParameter> parameters = new List<MessageParameter>()
-        {
-            new MessageParameter(Constants.NEW_PHASE_KEY, enemyPhases[phaseIndex])
-        };
-        Message testMessage = new Message(Constants.CHANGE_PHASE, 0, parameters);
-        GameManager.Get().ReceiveInformation(Utils.SerializeMessage(testMessage));
-
-        IncrementPhaseIndex();
-    }
-
-    public void InitiateEnemyDrawTest()
-    {
-        Message testMessage = new Message(Constants.DRAW, 0, new List<MessageParameter>());
-        GameManager.Get().ReceiveInformation(Utils.SerializeMessage(testMessage));
+        List<string> sources = new List<string>() { Constants.DISK };
+        BaseMethodsManager.Get().TriggerMonsterSelection(1, 1, 0, Constants.PLAYER, sources, 1600);
     }
 }
