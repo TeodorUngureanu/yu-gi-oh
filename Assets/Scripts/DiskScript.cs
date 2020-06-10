@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -91,15 +92,27 @@ public class DiskScript : MonoBehaviour {
         return monstersOnDisk[index].GetComponent<DiskCardScript>().CanChangePositionThisTurn();
     }
 
-    public void ChangeTextForIndex(int index, bool monster)
+    public void ChangeTextForIndex(int index, bool isMonster)
     {
-        if(monster)
+        if(isMonster)
         {
             monstersOnDisk[index].GetComponent<DiskCardScript>().ChangeText();
         }
         else
         {
             spellsOnDisk[index].GetComponent<DiskCardScript>().ChangeText();
+        }
+    }
+
+    public void SwitchSelectionModeForIndex(int index, bool isMonster)
+    {
+        if (isMonster)
+        {
+            monstersOnDisk[index].GetComponent<DiskCardScript>().SwitchSelectionMode(true);
+        }
+        else
+        {
+            spellsOnDisk[index].GetComponent<DiskCardScript>().SwitchSelectionMode(true);
         }
     }
 

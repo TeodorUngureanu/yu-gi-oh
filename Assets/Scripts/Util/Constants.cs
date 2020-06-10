@@ -16,15 +16,22 @@ public static class Constants
     public const string TRIBUTE_SUMMON_TEXT = "Tribute Summon";
     public const string TRIBUTE_SET_TEXT = "Tribute Set";
     public const string SACRIFICE_TEXT = "Sacrifice";
+    public const string SELECTION_TEXT = "Select";
 
     public const int INITIAL_HAND_SIZE = 5;
     public const int MAX_HAND_SIZE = 6;
     public const int STARTING_LIFE_POINTS = 8000;
 
+    public const string PLAYER = "FromPlayer";
+    public const string ENEMY = "FromEnemy";
+    public const string BOTH = "FromBoth";
     public const string MONSTER = "Monster";
     public const string SPELL = "Spell";
     public const string HAND = "Hand";
     public const string DISK = "Disk";
+    public const string FIELD = "Field";
+    public const string DECK = "Deck";
+    public const string GRAVEYARD = "Graveyard";
     public const string UNKNOWN = "UNKNOWN";
 
     //used only for communication between peers
@@ -57,6 +64,8 @@ public static class Constants
 
     public const int MAGIC_TYPE = 1;
     public const int TRAP_TYPE = 2;
+
+    public const int DUMMY_INEXISTENT_ID = 0;
     
     public struct CardInfo
     {
