@@ -16,7 +16,7 @@ public class Config
     private readonly int draws;
     private readonly int losses;
     private readonly string dbName = "URI=file:Yugioh.db";
-    private readonly string path = "C:/Users/teodo/Desktop/Card Images/New folder/";
+    private readonly string path = Application.dataPath; // "C:/Users/teodo/Desktop/Card Images/New folder/";
 
     public Dictionary<string, int> _User_Config = new Dictionary<string, int>();
     public Dictionary<int, Dictionary<string, string>> _Card_Attribute = new Dictionary<int, Dictionary<string, string>>();
