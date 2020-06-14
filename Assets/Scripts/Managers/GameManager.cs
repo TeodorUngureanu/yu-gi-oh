@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Photon.Pun;
+using Photon.Realtime;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour {
+public class GameManager : MonoBehaviourPunCallbacks {
 
     public GameObject player, field;
 
@@ -49,6 +51,22 @@ public class GameManager : MonoBehaviour {
         }
 
         Config.Get().Load();
+    }
+
+    public MyPlayer PlayerPrefab;
+
+    [HideInInspector]
+    public MyPlayer LocalPlayer;
+
+    private void Start()
+    {
+        MyPlayer.RefreshInstance(ref LocalPlayer, PlayerPrefab);
+    }
+
+    public override void OnPlayerEnteredRoom(Player newPlayer)
+    {
+        base.OnPlayerEnteredRoom(newPlayer);
+        MyPlayer.RefreshInstance(ref LocalPlayer, PlayerPrefab);
     }
 
     private void Update()
@@ -710,12 +728,17 @@ public class GameManager : MonoBehaviour {
         Message message = new Message(action, cardIndex, parameters);
         string serializedMessage = Utils.SerializeMessage(message);
 
-        //TODO: send the serialized message
+        if (LocalPlayer && LocalPlayer.GetComponent<MyPlayer>())
+        {
+            Debug.Log("[TEO] Sent");
+            LocalPlayer.GetComponent<MyPlayer>().SendRPCMessage(serializedMessage);
+        }
     }
 
     public void ReceiveInformation(string serializedMessage)
     {
         Message message = Utils.DeserializeMessage(serializedMessage);
+        Debug.Log("[TEO] Received");
 
         message.SetEnemyAction(true);
         string action = message.GetAction();

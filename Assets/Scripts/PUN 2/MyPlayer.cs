@@ -5,25 +5,13 @@ using Photon.Pun;
 
 public class MyPlayer : MonoBehaviourPun, IPunObservable
 {
-    public PhotonView pv;
-
-    public float moveSpeed = 10;
-    public float jumpForce = 800;
-
-    private Vector3 smoothMove;
-
-    private GameObject sceneCamera;
-    public GameObject playerCamera;
+    private float moveSpeed = 10;
+    private float jumpForce = 800;
+    // private Vector3 smoothMove;
 
     void Start()
     {
-        if (photonView.IsMine)
-        {
-            sceneCamera = GameObject.Find("Main Camera");
-
-            sceneCamera.SetActive(false);
-            playerCamera.SetActive(true);
-        }
+        Debug.Log("IsMine " + photonView.IsMine);
     }
 
     private void Update()
@@ -37,8 +25,6 @@ public class MyPlayer : MonoBehaviourPun, IPunObservable
         {
             SmoothMovement();
         }
-
-        // ProcessInputs();
     }
 
     private void ProcessInputs()
@@ -50,18 +36,46 @@ public class MyPlayer : MonoBehaviourPun, IPunObservable
 
     private void SmoothMovement()
     {
-        transform.position = Vector3.Lerp(transform.position, smoothMove, Time.deltaTime * 10);
+        // transform.position = Vector3.Lerp(transform.position, smoothMove, Time.deltaTime * 10);
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)
         {
-            stream.SendNext(transform.position);
+            // stream.SendNext(transform.position);
+            stream.SendNext("Message");
         }
         else if (stream.IsReading)
         {
-            smoothMove = (Vector3)stream.ReceiveNext();
+            // smoothMove = (Vector3)stream.ReceiveNext();
+            string message = (string)stream.ReceiveNext();
         }
+    }
+
+    public static void RefreshInstance(ref MyPlayer player, MyPlayer Prefab)
+    {
+        var position = Vector3.zero;
+        var rotation = Quaternion.identity;
+
+        if (player != null)
+        {
+            position = player.transform.position;
+            rotation = player.transform.rotation;
+            PhotonNetwork.Destroy(player.gameObject);
+        }
+
+        player = PhotonNetwork.Instantiate(Prefab.gameObject.name, position, rotation).GetComponent<MyPlayer>();
+    }
+
+    public void SendRPCMessage(string serializedMessage)
+    {
+        photonView.RPC("SendSerializedMessage", RpcTarget.Others, serializedMessage);
+    }
+
+    [PunRPC]
+    void SendSerializedMessage(string serializedMessage, PhotonMessageInfo info)
+    {
+        GameManager.Get().ReceiveInformation(serializedMessage);
     }
 }

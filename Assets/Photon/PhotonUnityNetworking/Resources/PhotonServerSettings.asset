@@ -34,5 +34,7 @@ MonoBehaviour:
   - DestroySpaceship
   - Fire
   - RespawnSpaceship
+  - SendSerializedMessage
+  - ReceiveSerializedMessage
   DisableAutoOpenWizard: 1
   ShowSettings: 1
