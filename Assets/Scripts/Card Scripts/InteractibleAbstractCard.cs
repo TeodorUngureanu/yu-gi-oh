@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public abstract class InteractibleAbstractCard : InteractibleElementScript {
+﻿public abstract class InteractibleAbstractCard : InteractibleElementScript {
 
     protected int cardIndex;
     protected bool highlightable = false;

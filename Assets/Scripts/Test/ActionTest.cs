@@ -64,7 +64,27 @@ public class ActionTest : MonoBehaviour
 
     public void InitiateMonsterSelectionTest()
     {
-        List<string> sources = new List<string>() { Constants.DISK };
-        BaseMethodsManager.Get().TriggerMonsterSelection(1, 1, 0, Constants.PLAYER, sources, 1600);
+        BaseMethodsManager.Get().TriggerMonsterSelection(2, 0, 0, Constants.PLAYER, Constants.FIELD, 0);
+    }
+
+    public void InitiateSelectionTest()
+    {
+        List<int> indices = new List<int>() { 0 };
+        List<MessageParameter> parameters = new List<MessageParameter>()
+        {
+            new MessageParameter(Constants.SELECT_NO_KEY, "1"),
+            new MessageParameter(Constants.SELECT_INDICES_KEY, Utils.SerializeList(indices)),
+            new MessageParameter(Constants.SELECT_OWNER_KEY, Constants.PLAYER),
+            new MessageParameter(Constants.SELECT_SOURCE_KEY, Constants.FIELD),
+            new MessageParameter(Constants.TYPE_KEY, Constants.MONSTER)
+        };
+        Message testMessage = new Message(Constants.SELECTION_TEXT, 0, parameters);
+        GameManager.Get().ReceiveInformation(Utils.SerializeMessage(testMessage));
+    }
+
+    public void InitiateDeselectionTest()
+    {
+        Message testMessage = new Message(Constants.DESELECT, 0, new List<MessageParameter>());
+        GameManager.Get().ReceiveInformation(Utils.SerializeMessage(testMessage));
     }
 }

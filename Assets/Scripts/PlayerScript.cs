@@ -450,9 +450,9 @@ public class PlayerScript : MonoBehaviour {
     {
         for (int index = 0; index < monstersOnDisk.Count; index++)
         {
-            bool followsConstraints = true;
             if (monstersOnDisk[index] != null)
             {
+                bool followsConstraints = true;
                 Monster monsterInfo = (Monster) monstersOnDisk[index];
                 if((attribute != Constants.DUMMY_INEXISTENT_ID && monsterInfo.GetAttribute() != attribute)
                     || (type != Constants.DUMMY_INEXISTENT_ID && monsterInfo.GetMonsterType() != type)
@@ -470,6 +470,29 @@ public class PlayerScript : MonoBehaviour {
                 {
                     diskScript.ChangeTextForIndex(index, true);
                     diskScript.UnhighlightMonster(index);
+                }
+            }
+        }
+    }
+
+    public void ProcessSelectableSpellsOnDisk(int type, bool highlight)
+    {
+        for (int index = 0; index < spellsOnDisk.Count; index++)
+        {
+            if (spellsOnDisk[index] != null)
+            {
+                NonMonster spellInfo = (NonMonster) spellsOnDisk[index];
+                bool followsConstraints = spellInfo.GetSpellType() == type;
+
+                diskScript.SwitchSelectionModeForIndex(index, false);
+                if (highlight && followsConstraints)
+                {
+                    diskScript.HighlightSpell(index);
+                }
+                else
+                {
+                    diskScript.ChangeTextForIndex(index, false);
+                    diskScript.UnhighlightSpell(index);
                 }
             }
         }
@@ -645,6 +668,19 @@ public class PlayerScript : MonoBehaviour {
     public void ApplyRestrictionsForAttackingMonster(int index)
     {
         diskScript.ApplyRestrictionsForAttackingMonster(index);
+    }
+
+    public void ShowEnemySelection(List<int> indices, bool isMonster, bool selectedByEnemy)
+    {
+        foreach (int index in indices)
+        {
+            diskScript.SwitchEnemySelectionForIndex(index, isMonster, selectedByEnemy);
+        }
+    }
+
+    public void DeselectDiskCards()
+    {
+        diskScript.DeselectAllDiskCards();
     }
 
     public long ModifyLifePoints(int points)

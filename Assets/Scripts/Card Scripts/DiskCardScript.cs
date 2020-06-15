@@ -161,6 +161,9 @@ public class DiskCardScript : InteractibleAbstractCard {
         if (isSelectionMode)
         {
             SetCanvasText(Constants.SELECTION_TEXT);
+        } else
+        {
+            canvas.enabled = false;
         }
     }
 
@@ -188,16 +191,21 @@ public class DiskCardScript : InteractibleAbstractCard {
     {
         if (highlightable && Input.GetMouseButtonDown(0))
         {
+            bool cardWasSelected = selectionMode;
             if (IsMonster())
             {
                 ChangeText();
                 if (GameManager.Get().GetAttackingMonsterIndex() == cardIndex)
                 {
                     GameManager.Get().CancelAttack();
+                    return;
                 }
-                else
+                
+                InteractWithElement();
+
+                if (!cardWasSelected)
                 {
-                    InteractWithElement();
+
                     HighlightObject();
                     highlightable = true;
                 }
@@ -302,7 +310,7 @@ public class DiskCardScript : InteractibleAbstractCard {
                 return;
             }
 
-            GameManager.Get().ActivateSpell(cardIndex, (NonMonster)cardInfo, Constants.DISK);
+            GameManager.Get().ActivateSpell(cardIndex, (NonMonster)cardInfo, Constants.FIELD);
         }
     }
 

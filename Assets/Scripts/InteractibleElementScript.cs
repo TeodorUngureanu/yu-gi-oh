@@ -10,13 +10,13 @@ public abstract class InteractibleElementScript : MonoBehaviour {
         public List<Vector3> data;
     }
     protected static HashSet<Mesh> registeredMeshes = new HashSet<Mesh>();
-    protected Color outlineColor = Color.yellow, outlineSecondColor = Color.red;
+    protected Color outlineColor = Color.yellow, outlineSecondColor = Color.red, outlineThirdColor = Color.green;
     protected float outlineWidth = 7f;
     protected Material outlineMaskMaterial;
     protected Material outlineFillMaterial;
     protected List<Mesh> bakeKeys = new List<Mesh>();
     protected List<ListVector3> bakeValues = new List<ListVector3>();
-    protected bool needsUpdate, battlingMonster = false;
+    protected bool needsUpdate, battlingMonster = false, enemySelection = false;
 
     protected Renderer objRenderer;
 
@@ -124,9 +124,12 @@ public abstract class InteractibleElementScript : MonoBehaviour {
     protected void UpdateMaterialProperties()
     {
         // Apply properties according to mode
-        if(battlingMonster)
+        if (battlingMonster)
         {
             outlineFillMaterial.SetColor("_OutlineColor", outlineSecondColor);
+        } else if (enemySelection)
+        {
+            outlineFillMaterial.SetColor("_OutlineColor", outlineThirdColor);
         } else
         {
             outlineFillMaterial.SetColor("_OutlineColor", outlineColor);
@@ -165,9 +168,20 @@ public abstract class InteractibleElementScript : MonoBehaviour {
         needsUpdate = true;
     }
 
-    protected bool IsBattlingMonster()
+    public void SetEnemySelection(bool vEnemySelection)
     {
-        return battlingMonster;
+        enemySelection = vEnemySelection;
+        needsUpdate = true;
+        if(vEnemySelection)
+        {
+            StartCoroutine(HighlightCoroutine());
+        } 
+    }
+
+    private IEnumerator HighlightCoroutine()
+    {
+        yield return new WaitForSeconds(0.75f);
+        HighlightObject();
     }
 
     public abstract void InteractWithElement();

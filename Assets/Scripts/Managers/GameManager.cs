@@ -23,8 +23,9 @@ public class GameManager : MonoBehaviourPunCallbacks {
     private bool playerDiscarding = false, sacrificing = false, attacking = false, quickActivation = false;
     private bool cardInfoOn = true;
 
-    private int monstersToBeSelected = 0;
-    private List<int> selectedMonsters = new List<int>();
+    private int cardsToBeSelected = 0;
+    private string selectionSource, selectionOwner, selectionCardType;
+    private List<int> selectedCards = new List<int>();
 
     private delegate void Actions();
 
@@ -192,7 +193,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
         string cardNumberToSend = (face == Enums.CardFace.Up) ? cardInfo.GetCardNumber() : Constants.UNKNOWN;
         string action = (face == Enums.CardFace.Up) ? Constants.SUMMONING_TEXT : Constants.SETTING_TEXT;
-        string tributeIndicesString = string.Join(";", tributeIndices.Select(i => i.ToString()).ToArray());
+        string tributeIndicesString = Utils.SerializeList(tributeIndices);
 
         List<MessageParameter> parameters = new List<MessageParameter>()
         {
@@ -771,7 +772,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
     {
         string newPhase;
         Dictionary<string, string> actionParams = message.ExtractParamDictionary();
-        if (actionParams.TryGetValue(Constants.NEW_PHASE_KEY, out newPhase))
+        if (actionParams.TryGetValue(Constants.PHASE_KEY, out newPhase))
         {
             UIManager.Get().ChangePhaseOnInfoPanel(newPhase, true);
         }
@@ -796,9 +797,9 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
         if(action == Constants.FLIP_EFFECT_ACTIVATION)
         {
-            //TODO: show the flip effect somehow
-            actionBacklog.Add(message);
-            actionsToBeDone = ActivateCardEffect + actionsToBeDone;
+            //TODO: show the flip effect somehow - maybe do the same as for spell effects (send each step from the player who activates it)
+            //actionBacklog.Add(message);
+            //actionsToBeDone = ActivateCardEffect + actionsToBeDone;
         } else
         {
             //TODO: show the action, put what's left in the backlog
@@ -818,7 +819,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
         fieldScript.AddAttackSword(true, message.GetCardIndex());
 
-        //TODO: show somehow which monster is going to be attacked
+        //TODO: show somehow which monster is going to be attacked - highlight it (red or green)
         int targetIndex = Int32.Parse(targetIndexString);
 
         message.SetEnemyAction(true);
@@ -839,6 +840,19 @@ public class GameManager : MonoBehaviourPunCallbacks {
         string cardNumber, cardType;
 
         actionParams.TryGetValue(Constants.CARD_NO_KEY, out cardNumber);
+
+        if(action == Constants.DESELECT)
+        {
+            playerScript.DeselectDiskCards();
+            fieldScript.DeselectAllFieldCards();
+            //TODO: also deselect the deck/graveyard cards (if any) - maybe these should be stored
+            //  and here we can check if there is any card selected
+
+            selectionSource = null;
+            selectionOwner = null;
+            selectionCardType = null;
+            selectedCards.Clear();
+        }
 
         if (action == Constants.ATK_CHANGE_TEXT || action == Constants.DEF_CHANGE_TEXT)
         {
@@ -871,23 +885,18 @@ public class GameManager : MonoBehaviourPunCallbacks {
                     string tributes;
                     actionParams.TryGetValue(Constants.TRIBUTE_INDICES_KEY, out tributes);
 
-                    List<int> tributeIndices = JsonUtility.FromJson<List<int>>(tributes);
-                    foreach (int index in tributeIndices)
-                    {
-                        tributeIndices.Add(index);
-                    }
+                    List<int> tributeIndices = Utils.DeserializeList(tributes);
                     fieldScript.DestroyFieldMonsters(true, tributeIndices);
                 }
+                fieldScript.SetEnemyMonster(cardIndex, cardInfo, face);
             }
 
             if(action == Constants.FLIPPING_TEXT && ((Monster)cardInfo).IsFlippable())
             {
+                fieldScript.SetEnemyMonster(cardIndex, cardInfo, face);
                 actionBacklog.Insert(0, message);
                 actionsToBeDone = FlipMonsterAction + actionsToBeDone;
             }
-
-            fieldScript.SetEnemyMonster(cardIndex, cardInfo, face);
-            AskForQuickActivation();
         }
         else
         {
@@ -896,19 +905,38 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
             fieldScript.SetEnemySpell(cardIndex, cardInfo, face);
             
-            if(action == Constants.ACTIVATING_TEXT)
+            /*if(action == Constants.ACTIVATING_TEXT)
             {
                 actionBacklog.Insert(0, message);
                 actionsToBeDone = ActivateSpellAction + actionsToBeDone;
-            }
-            AskForQuickActivation();
+            }*/
         }
+
+        if (action == Constants.SELECTION_TEXT)
+        {
+            string selCount;
+            actionParams.TryGetValue(Constants.SELECT_NO_KEY, out selCount);
+
+            int noSelects = Int32.Parse(selCount);
+            if (noSelects > 0)
+            {
+                string selIndices, selSource, selOwner;
+                actionParams.TryGetValue(Constants.SELECT_INDICES_KEY, out selIndices);
+                actionParams.TryGetValue(Constants.SELECT_SOURCE_KEY, out selSource);
+                actionParams.TryGetValue(Constants.SELECT_OWNER_KEY, out selOwner);
+
+                List<int> selectionIndices = Utils.DeserializeList(selIndices);
+                HighlightSelectedCards(selectionIndices, selSource, selOwner, cardType);
+            }
+        }
+
+        AskForQuickActivation();
     }
     
     public void ChangePhase(string newPhase)
     {
         List<MessageParameter> parameters = new List<MessageParameter>() {
-            new MessageParameter(Constants.NEW_PHASE_KEY, newPhase)
+            new MessageParameter(Constants.PHASE_KEY, newPhase)
         };
         UIManager.Get().ChangePhaseOnInfoPanel(newPhase, false);
         SendInformation(Constants.CHANGE_PHASE, 0, parameters);
@@ -926,7 +954,11 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
     public void TriggerMonsterSelection(int noMonsters, int attribute, int type, string owner, string source, int superiorAtkLimit)
     {
-        monstersToBeSelected = noMonsters;
+        cardsToBeSelected = noMonsters;
+        selectionSource = source;
+        selectionOwner = owner;
+        selectionCardType = Constants.MONSTER;
+
         PauseCurrentPhase();
         switch (source)
         {
@@ -944,20 +976,79 @@ public class GameManager : MonoBehaviourPunCallbacks {
                 //TODO: implement selection from deck (only your own)
                 break;
             case Constants.GRAVEYARD:
-                //TODO: after graveyard is in place, implement selection from it
+                //TODO: after graveyard is in place, implement selection from it - disable the other graveyard if the effect
+                //  forces you to pick only from a certain player's graveyard
                 break;
+        }
+    }
+
+    public void TriggerSpellSelection(int noSpells, int type, string owner)
+    {
+        cardsToBeSelected = noSpells;
+        selectionOwner = owner;
+        selectionCardType = Constants.SPELL;
+
+        PauseCurrentPhase();
+        if (owner == Constants.PLAYER || owner == Constants.BOTH)
+        {
+            playerScript.ProcessSelectableSpellsOnDisk(type, true);
+        }
+        if (owner == Constants.ENEMY || owner == Constants.BOTH)
+        {
+            
         }
     }
 
     public void SelectMonster(int index)
     {
-        selectedMonsters.Add(index);
-        if(--monstersToBeSelected == 0)
+        selectedCards.Add(index);
+        if(--cardsToBeSelected == 0)
         {
-            Debug.Log("Selected " + selectedMonsters.Count + " monsters");
+            Debug.Log("Selected " + selectedCards.Count + " monsters");
             playerScript.UnhighlightEverything();
-            //TODO: send message to the enemy with the selection
+
+            //send message to the enemy with the selection
+            string selIndicesString = Utils.SerializeList(selectedCards);
+            List<MessageParameter> parameters = new List<MessageParameter>() {
+                new MessageParameter(Constants.SELECT_NO_KEY, selectedCards.Count.ToString()),
+                new MessageParameter(Constants.SELECT_INDICES_KEY, selIndicesString),
+                new MessageParameter(Constants.SELECT_SOURCE_KEY, selectionSource),
+                new MessageParameter(Constants.SELECT_OWNER_KEY, selectionOwner),
+                new MessageParameter(Constants.TYPE_KEY, Constants.MONSTER)
+            };
+
+            SendInformation(Constants.SELECTION_TEXT, 0, parameters);
+
             //TODO: proceed with the action backlog; have the effect stored there or somewhere else before the selection
         }
+    }
+
+    private void HighlightSelectedCards(List<int> indices, string source, string owner, string cardType)
+    {
+        owner = Utils.SwitchOwner(owner);
+        switch (source)
+        {
+            case Constants.FIELD:
+                if(owner == Constants.PLAYER || owner == Constants.BOTH)
+                {
+                    playerScript.ShowEnemySelection(indices, cardType == Constants.MONSTER, true);
+                }
+                if (owner == Constants.ENEMY || owner == Constants.BOTH)
+                {
+                    fieldScript.ShowEnemySelection(indices, cardType == Constants.MONSTER, true);
+                }
+                break;
+            case Constants.DECK:
+                //TODO: show the selected card somewhere (just if the effect says so - have a new param for this)
+                break;
+            case Constants.GRAVEYARD:
+                //TODO: show the selection from the graveyard (disable switching from to the other player's graveyard maybe)
+                break;
+        }
+    }
+
+    private void TriggerSelectionUnhighlight()
+    {
+        SendInformation(Constants.DESELECT, 0, new List<MessageParameter>());
     }
 }
