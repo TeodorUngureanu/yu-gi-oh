@@ -28,19 +28,18 @@ public static class Constants
     public const string MONSTER = "Monster";
     public const string SPELL = "Spell";
     public const string HAND = "Hand";
-    public const string DISK = "Disk";
     public const string FIELD = "Field";
     public const string DECK = "Deck";
     public const string GRAVEYARD = "Graveyard";
     public const string UNKNOWN = "UNKNOWN";
 
     //used only for communication between peers
-    public const string CHANGE_PHASE = "ChangePhase";
-    public const string NEW_PHASE_KEY = "newPhase";
-    public const string END_TURN = "End";
     public const string DRAW = "Draw";
+    public const string END_TURN = "End";
+    public const string CHANGE_PHASE = "ChangePhase";
     public const string QUICK_ACTIVATION = "Quick Activation";
     public const string FLIP_EFFECT_ACTIVATION = "Flip Effect Activation";
+    public const string DESELECT = "Deselect";
     public const string PHASE_KEY = "phase";
     public const string ACCEPT = "yeah";
     public const string DENY = "nope";
@@ -54,6 +53,10 @@ public static class Constants
     public const string ORIGIN_KEY = "cardOrigin";
     public const string TRIBUTE_NO_KEY = "noTributes";
     public const string TRIBUTE_INDICES_KEY = "tributeIndices";
+    public const string SELECT_NO_KEY = "noSelected";
+    public const string SELECT_INDICES_KEY = "selectedIndices";
+    public const string SELECT_SOURCE_KEY = "selectSource";
+    public const string SELECT_OWNER_KEY = "selectOwner";
 
     //used only for showing information on screen
     public const string DUELIST_PLACEHOLDER = "{duelistName}";

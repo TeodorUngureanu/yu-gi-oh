@@ -1,9 +1,13 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Utils
 {
+    private static char SEPARATOR = ';';
+
     public static int NeedsTribute(int rarity)
     {
         if (rarity < 5)
@@ -15,6 +19,19 @@ public class Utils
             return 1;
         }
         return 2;
+    }
+
+    public static string SwitchOwner(string owner)
+    {
+        if(owner == Constants.PLAYER)
+        {
+            return Constants.ENEMY;
+        }
+        if(owner == Constants.ENEMY)
+        {
+            return Constants.PLAYER;
+        }
+        return owner;
     }
 
     public static Texture2D LoadTexture(string cardNumber, Enums.CardType cardType)
@@ -58,6 +75,17 @@ public class Utils
         }
 
         return null;
+    }
+
+    public static string SerializeList(List<int> list)
+    {
+        return string.Join(SEPARATOR.ToString(), list.Select(i => i.ToString()).ToArray());
+    }
+
+    public static List<int> DeserializeList(string serializedList)
+    {
+        List<string> stringList = new List<string>(serializedList.Split(SEPARATOR));
+        return stringList.Select(serializedElement => Int32.Parse(serializedElement)).ToList();
     }
 
     public static string SerializeMessage(Message message)

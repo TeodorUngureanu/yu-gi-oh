@@ -33,11 +33,13 @@ public class BaseMethodsManager : MonoBehaviour
         GameManager.Get().ShuffleDeck();
     }
 
-    public void TriggerMonsterSelection(int noMonsters, int attribute, int type, string owner, List<string> sources, int superiorAtkLimit)
+    public void TriggerMonsterSelection(int noMonsters, int attribute, int type, string owner, string source, int superiorAtkLimit)
     {
-        foreach(string source in sources)
-        {
-            GameManager.Get().TriggerMonsterSelection(noMonsters, attribute, type, owner, source, superiorAtkLimit);
-        }
+        GameManager.Get().TriggerMonsterSelection(noMonsters, attribute, type, owner, source, superiorAtkLimit);
+    }
+
+    public void TriggerSpellSelection(int noSpells, int type, string owner)
+    {
+        GameManager.Get().TriggerSpellSelection(noSpells, type, owner);
     }
 }

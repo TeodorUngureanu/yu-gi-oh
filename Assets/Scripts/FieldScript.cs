@@ -21,7 +21,7 @@ public class FieldScript : MonoBehaviour {
         tributeCircleInstances = new List<GameObject>();
         attackableMonsters = new List<int>();
 
-        //TODO: delete this if not needed anymore - battle phase to be re-tested first
+        //TODO: delete this if not needed anymore - testing purpose only
         //MockDataForTesting();
     }
 
@@ -36,6 +36,12 @@ public class FieldScript : MonoBehaviour {
 
         SetEnemyMonster(0, testCardInfo, Enums.CardFace.Up);
         SetEnemyMonster(1, testCardInfo2, Enums.CardFace.Down);
+
+        NonMonster testCardInfo3 = new NonMonster("17092736", File.ReadAllBytes("Assets/Resources/Images/Card Images/AncientTelescope.png"),
+            "Ancient Telescope", "sdasdadjhksa",  0, 1);
+
+        SetEnemySpell(0, null, Enums.CardFace.Down);
+        SetEnemySpell(1, testCardInfo3, Enums.CardFace.Down);
     }
 
     public void ClearField()
@@ -352,6 +358,37 @@ public class FieldScript : MonoBehaviour {
             {
                 enemyMonsterField[index].GetComponent<EnemyFieldCardScript>().SetHighlightable(false);
             }
+        }
+    }
+
+    public void ShowEnemySelection(List<int> indices, bool isMonster, bool selectedByEnemy)
+    {
+        foreach (int index in indices)
+        {
+            if(isMonster)
+            {
+                enemyMonsterField[index].GetComponent<EnemyFieldCardScript>().SetEnemySelection(selectedByEnemy);
+            } else
+            {
+                enemySpellField[index].GetComponent<EnemyFieldCardScript>().SetEnemySelection(selectedByEnemy);
+            }
+        }
+    }
+
+    public void DeselectAllFieldCards()
+    {
+        EnemyFieldCardScript script;
+        for (int index = 0; index < enemyMonsterField.Count; index++)
+        {
+            script = enemyMonsterField[index].GetComponent<EnemyFieldCardScript>();
+            script.SetEnemySelection(false);
+            script.UnhighlightObject();
+        }
+        for (int index = 0; index < enemySpellField.Count; index++)
+        {
+            script = enemySpellField[index].GetComponent<EnemyFieldCardScript>();
+            script.SetEnemySelection(false);
+            script.UnhighlightObject();
         }
     }
 }

@@ -72,6 +72,32 @@ public class DiskScript : MonoBehaviour {
         return true;
     }
 
+    public void SwitchEnemySelectionForIndex(int index, bool isMonster, bool selectedByEnemy)
+    {
+        DiskCardScript script;
+        if(isMonster)
+        {
+            script = monstersOnDisk[index].GetComponent<DiskCardScript>();
+        } else
+        {
+            script = spellsOnDisk[index].GetComponent<DiskCardScript>();
+        }
+        
+        script.SetEnemySelection(selectedByEnemy);
+    }
+
+    public void DeselectAllDiskCards()
+    {
+        for(int index = 0; index < monstersOnDisk.Count; index++)
+        {
+            SwitchEnemySelectionForIndex(index, true, false);
+        }
+        for (int index = 0; index < spellsOnDisk.Count; index++)
+        {
+            SwitchEnemySelectionForIndex(index, false, false);
+        }
+    }
+
     public void RefreshVariablesForIndex(int index)
     {
         monstersOnDisk[index].GetComponent<DiskCardScript>().RefreshTurnRestrictions();
