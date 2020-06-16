@@ -44,12 +44,12 @@ public class DeckConstructionCanvas : MonoBehaviour
                     if ((i * DeckMaxWidth + j) < monsterCardsCount)
                     {
                         texture = Utils.LoadTexture(cards[i * DeckMaxWidth + j].GetCardNumber(), Enums.CardType.Monster);
-                        crtCard.name = "" + deckNumber + "_1_" + cards[i * DeckMaxWidth + j].GetCardNumber();
+                        crtCard.name = "" + deckNumber + "_0_" + cards[i * DeckMaxWidth + j].GetCardNumber();
                     }
                     else
                     {
                         texture = Utils.LoadTexture(cards[i * DeckMaxWidth + j].GetCardNumber(), Enums.CardType.Spell);
-                        crtCard.name = "" + deckNumber + "_2_" + cards[i * DeckMaxWidth + j].GetCardNumber();
+                        crtCard.name = "" + deckNumber + "_1_" + cards[i * DeckMaxWidth + j].GetCardNumber();
                     }
 
                     if (texture != null)
