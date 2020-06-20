@@ -13,6 +13,7 @@ public class DeckConstructionManager : MonoBehaviour
     public List<GameObject> _boards;
     public List<Text> numberOfSelectedCards;
     public List<Image> saveDecksButtons;
+    public List<Image> defaultDecksIcons;
 
     Dictionary<int, Monster> _Monster_Cards;
     Dictionary<int, NonMonster> _Magic_Cards;
@@ -72,6 +73,20 @@ public class DeckConstructionManager : MonoBehaviour
         LoadConfig();
         LoadAllCards();
         LoadScore();
+        SetDefaultDecksIconsInactive();
+
+        int defaultDeck;
+
+        if (PlayerPrefs.HasKey("Default_Deck"))
+        {
+            defaultDeck = PlayerPrefs.GetInt("Default_Deck");
+        }
+        else
+        {
+            defaultDeck = 1;
+        }
+
+        defaultDecksIcons[defaultDeck - 1].gameObject.SetActive(true);
     }
 
     void LoadConfig()
@@ -549,6 +564,14 @@ public class DeckConstructionManager : MonoBehaviour
     public void ReturnToMainMenu()
     {
         SceneManager.LoadScene("mainMenu");
+    }
+
+    public void SetDefaultDecksIconsInactive()
+    {
+        for (int i = 0; i < defaultDecksIcons.Count; i++)
+        {
+            defaultDecksIcons[i].gameObject.SetActive(false);
+        }
     }
 
 }
