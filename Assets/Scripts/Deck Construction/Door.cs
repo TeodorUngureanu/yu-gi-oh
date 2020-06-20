@@ -18,14 +18,14 @@ public class Door : MonoBehaviour {
 
 	void OnTriggerEnter (Collider other)
 	{
-		if (other.tag == "Player") {
+		if (other.tag == "Player" && this.transform.gameObject.tag != "Room_Exit") {
 			PlayerInCollider = true;
 		}
 	}
 
 	void OnTriggerExit (Collider other)
 	{
-		if (other.tag == "Player") {
+		if (other.tag == "Player" && this.transform.gameObject.tag != "Room_Exit") {
 			PlayerInCollider = false;
 		}
 	}

@@ -10,6 +10,11 @@ TagManager:
   - Room_4
   - Room_5
   - Room_Exit
+  - Deck_1
+  - Deck_2
+  - Deck_3
+  - Deck_4
+  - Deck_5
   layers:
   - Default
   - TransparentFX

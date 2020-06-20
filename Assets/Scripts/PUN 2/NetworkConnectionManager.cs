@@ -70,5 +70,4 @@ public class NetworkConnectionManager : MonoBehaviourPunCallbacks
     {
         Debug.Log("Room Joined Failed " + returnCode + ", Message " + message);
     }
-
 }

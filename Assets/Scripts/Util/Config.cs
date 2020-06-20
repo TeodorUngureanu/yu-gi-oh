@@ -36,6 +36,11 @@ public class Config
 
     public void Load()
     {
+        if (_User_Config.Count > 0)
+        {
+            return;
+        }
+
         // Open the db connection.
         using (var connection = new SqliteConnection(dbName))
         {
@@ -1037,13 +1042,6 @@ public class Config
 
     public void SaveDeck(int deckNumber, Dictionary<string, int> deck)
     {
-        Debug.Log("1");
-
-        foreach (KeyValuePair<string, int> damn in deck)
-        {
-            Debug.Log(damn.Key + ", " + damn.Value);
-        }
-
         // Open the db connection.
         using (var connection = new SqliteConnection(dbName))
         {
