@@ -48,7 +48,19 @@ public class PlayerScript : MonoBehaviour {
     
     void Start()
     {
-        deckScript.LoadDeck(1); // YUGI
+        int defaultDeck = 1;
+
+        if (PlayerPrefs.HasKey("Default_Deck"))
+        {
+            defaultDeck = PlayerPrefs.GetInt("Default_Deck");
+        }
+        else
+        { 
+            // YUGI
+            PlayerPrefs.SetInt("Default_Deck", 1);
+        }
+
+        deckScript.LoadDeck(defaultDeck);
         ShuffleDeck();
         deck.SetActive(false);
 
