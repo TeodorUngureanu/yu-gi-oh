@@ -130,15 +130,15 @@ public class DiskScript : MonoBehaviour {
         }
     }
 
-    public void SwitchSelectionModeForIndex(int index, bool isMonster)
+    public void SwitchSelectionModeForIndex(int index, bool isMonster, bool shouldShow)
     {
         if (isMonster)
         {
-            monstersOnDisk[index].GetComponent<DiskCardScript>().SwitchSelectionMode(true);
+            monstersOnDisk[index].GetComponent<DiskCardScript>().SwitchSelectionMode(shouldShow);
         }
         else
         {
-            spellsOnDisk[index].GetComponent<DiskCardScript>().SwitchSelectionMode(true);
+            spellsOnDisk[index].GetComponent<DiskCardScript>().SwitchSelectionMode(shouldShow);
         }
     }
 

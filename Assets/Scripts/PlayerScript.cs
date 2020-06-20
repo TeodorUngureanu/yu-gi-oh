@@ -133,9 +133,9 @@ public class PlayerScript : MonoBehaviour {
         {
             InitDuel();
         }
-        
-        //if (turn.getCurrentPhase() == Turn.Phase.Hold && hasDrawnHand && isMyTurn)
-        if (turn.getCurrentPhase() == Turn.Phase.Hold && hasDrawnHand)
+
+        if (turn.getCurrentPhase() == Turn.Phase.Hold && hasDrawnHand && isMyTurn)
+        //if (turn.getCurrentPhase() == Turn.Phase.Hold && hasDrawnHand)
         {
             //TODO: apply any needed effects or restrictions, then proceed to draw phase
             canPlayMonster = true;
@@ -461,7 +461,7 @@ public class PlayerScript : MonoBehaviour {
                     followsConstraints = false;
                 }
 
-                diskScript.SwitchSelectionModeForIndex(index, true);
+                diskScript.SwitchSelectionModeForIndex(index, true, highlight);
                 if (highlight && followsConstraints)
                 {
                     diskScript.HighlightMonster(index);
@@ -484,7 +484,7 @@ public class PlayerScript : MonoBehaviour {
                 NonMonster spellInfo = (NonMonster) spellsOnDisk[index];
                 bool followsConstraints = spellInfo.GetSpellType() == type;
 
-                diskScript.SwitchSelectionModeForIndex(index, false);
+                diskScript.SwitchSelectionModeForIndex(index, false, highlight);
                 if (highlight && followsConstraints)
                 {
                     diskScript.HighlightSpell(index);
