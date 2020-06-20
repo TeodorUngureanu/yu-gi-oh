@@ -13,6 +13,11 @@ public class NetworkConnectionManager : MonoBehaviourPunCallbacks
     public InputField createRoomTF;
     public InputField joinRoomTF;
 
+    private void Awake()
+    {
+        OnClick_ConnectBtn();
+    }
+
     public void OnClick_ConnectBtn()
     {
         PhotonNetwork.OfflineMode = false;
