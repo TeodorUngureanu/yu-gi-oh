@@ -12,7 +12,6 @@ public class PlayerScript : MonoBehaviour {
     private int turnCount;
     private bool isReadyForDuel, hasDrawnHand;
     private bool canPlayMonster;
-    private bool canOpponentActivateCards;
     private bool isMyTurn = true; //only set for testing
     private bool hasDuelEnded;
     private bool askingForQuickActivation, askingForEffectActivation;
@@ -34,7 +33,6 @@ public class PlayerScript : MonoBehaviour {
         isReadyForDuel = false;
         hasDrawnHand = false;
         canPlayMonster = true;
-        canOpponentActivateCards = false;
         hasDuelEnded = false;
         askingForQuickActivation = false;
 
@@ -100,7 +98,7 @@ public class PlayerScript : MonoBehaviour {
 
     void Update()
     {
-        if(paused || hasDuelEnded)
+        if(hasDuelEnded)
         {
             return;
         }
@@ -135,6 +133,11 @@ public class PlayerScript : MonoBehaviour {
             return;
         }
 
+        if (paused)
+        {
+            return;
+        }
+
         if (isReadyForDuel && !hasDrawnHand && Input.GetKeyDown(KeyCode.Space))
         {
             for (int index = 0; index < Constants.INITIAL_HAND_SIZE; index++)
@@ -149,9 +152,9 @@ public class PlayerScript : MonoBehaviour {
         {
             InitDuel();
         }
-        
-        //if (turn.getCurrentPhase() == Turn.Phase.Hold && hasDrawnHand && isMyTurn)
-        if (turn.getCurrentPhase() == Turn.Phase.Hold && hasDrawnHand)
+
+        if (turn.getCurrentPhase() == Turn.Phase.Hold && hasDrawnHand && isMyTurn)
+        //if (turn.getCurrentPhase() == Turn.Phase.Hold && hasDrawnHand)
         {
             //TODO: apply any needed effects or restrictions, then proceed to draw phase
             canPlayMonster = true;
@@ -477,7 +480,7 @@ public class PlayerScript : MonoBehaviour {
                     followsConstraints = false;
                 }
 
-                diskScript.SwitchSelectionModeForIndex(index, true);
+                diskScript.SwitchSelectionModeForIndex(index, true, highlight);
                 if (highlight && followsConstraints)
                 {
                     diskScript.HighlightMonster(index);
@@ -500,7 +503,7 @@ public class PlayerScript : MonoBehaviour {
                 NonMonster spellInfo = (NonMonster) spellsOnDisk[index];
                 bool followsConstraints = spellInfo.GetSpellType() == type;
 
-                diskScript.SwitchSelectionModeForIndex(index, false);
+                diskScript.SwitchSelectionModeForIndex(index, false, highlight);
                 if (highlight && followsConstraints)
                 {
                     diskScript.HighlightSpell(index);
