@@ -10,7 +10,8 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviourPunCallbacks {
 
     public GameObject player, field;
-    public Button GraveyardButton;
+    public Button GraveyardButton, CloseGraveyardButton, PlayerTab, EnemyTab;
+    private IEnumerator CloseGraveyardCoroutine;
 
     private static GameManager instance;
     private PlayerScript playerScript;
@@ -57,17 +58,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
         }
 
         Config.Get().Load();
-
-        Card testMonster = new Monster("15025844", File.ReadAllBytes("Assets/Resources/Images/Card Images/MysticalElf.png"),
-            "Mystical Elf", "blahblahblah", 0, 5, 19, 800, 2000, 4, false);
-        Card testSpell = new NonMonster("83764718", File.ReadAllBytes("Assets/Resources/Images/Card Images/MonsterReborn.png"),
-            "Monster Reborn", "x", 1, 1);
-        Card testTrap = new NonMonster("04206964", File.ReadAllBytes("Assets/Resources/Images/Card Images/TrapHole.png"),
-            "Trap Hole", "y", 1, 2);
-
-        playerGraveyard.Add(testMonster);
-        playerGraveyard.Add(testSpell);
-        enemyGraveyard.Add(testTrap);
     }
 
     public MyPlayer PlayerPrefab;
@@ -1040,8 +1030,9 @@ public class GameManager : MonoBehaviourPunCallbacks {
             SetGraveyardCardsUnhighlightable(PlayerGraveyard, -1);
             SetGraveyardCardsUnhighlightable(EnemyGraveyard, -1);
 
-            // 2 secunde
             // Close la graveyard
+            CloseGraveyardCoroutine = WaitAndCloseGraveyard(2.0f);
+            StartCoroutine(CloseGraveyardCoroutine);
 
             selectionSource = null;
             selectionOwner = null;
@@ -1130,7 +1121,16 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
         AskForQuickActivation();
     }
-    
+
+    private IEnumerator WaitAndCloseGraveyard(float waitTime)
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(waitTime);
+            CloseGraveyardButton.onClick.Invoke();
+        }
+    }
+
     public void ChangePhase(string newPhase)
     {
         List<MessageParameter> parameters = new List<MessageParameter>() {
@@ -1298,7 +1298,16 @@ public class GameManager : MonoBehaviourPunCallbacks {
                 }
 
                 GraveyardButton.onClick.Invoke();
-                // Selectare tab
+
+                if (owner == Constants.PLAYER)
+                {
+                    PlayerTab.onClick.Invoke();
+                }
+
+                if (owner == Constants.ENEMY)
+                {
+                    EnemyTab.onClick.Invoke();
+                }
 
                 break;
         }

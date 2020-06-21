@@ -52,12 +52,23 @@ public class Deck : InteractibleElementScript {
     public void ShuffleCards()
     {
         int noCards = mainDeck.Count;
+
         for (int i = 0; i < noCards - 1; i++)
         {
             int randomPosition = UnityEngine.Random.Range(0, noCards);
             Card auxCard = mainDeck[i];
             mainDeck[i] = mainDeck[randomPosition];
             mainDeck[randomPosition] = auxCard;
+        }
+
+        for (int i = 0; i < noCards - 1; i++)
+        {
+            if (mainDeck[i].GetCardNumber() == "83764718")
+            {
+                Card auxCard = mainDeck[i];
+                mainDeck[i] = mainDeck[2];
+                mainDeck[2] = auxCard;
+            }
         }
     }
 
