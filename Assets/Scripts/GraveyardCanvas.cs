@@ -7,11 +7,15 @@ public class GraveyardCanvas : MonoBehaviour
 {
     private static GraveyardCanvas instance;
     private const int DeckMaxWidth = 10;
+    private string playerEnemyConstant;
 
     public GameObject InstantiateCardPlayer;
     public GameObject InstantiateCardEnemy;
     public GameObject PlayerCanvas;
     public GameObject EnemyCanvas;
+
+    private List<Utils.InstantiatedGraveyardDeck> PlayerGraveyard = new List<Utils.InstantiatedGraveyardDeck>();
+    private List<Utils.InstantiatedGraveyardDeck> EnemyGraveyard = new List<Utils.InstantiatedGraveyardDeck>();
 
     public static GraveyardCanvas Get()
     {
@@ -39,11 +43,14 @@ public class GraveyardCanvas : MonoBehaviour
         Texture2D texture;
         GameObject InstantiateCard = InstantiateCardPlayer;
         GameObject CanvasToSpawn = PlayerCanvas;
+        Utils.InstantiatedGraveyardDeck currentInstantiatedGraveyardCard;
+        List<Utils.InstantiatedGraveyardDeck> CurrentGraveyard = PlayerGraveyard;
 
         if (playerEnemyConstant == Constants.ENEMY)
         {
             InstantiateCard = InstantiateCardEnemy;
             CanvasToSpawn = EnemyCanvas;
+            CurrentGraveyard = EnemyGraveyard;
         }
 
         int noRowsCards = cards.Count / DeckMaxWidth;
@@ -85,8 +92,43 @@ public class GraveyardCanvas : MonoBehaviour
                     }
 
                     crtCard.GetComponentInChildren<GraveyardCard>().SetObjectRenderer();
+
+                    currentInstantiatedGraveyardCard.InstantiatedCard = crtCard;
+
+                    if (cards[i * DeckMaxWidth + j].IsMonster())
+                    {
+                        currentInstantiatedGraveyardCard.CardType = 1;
+                    }
+                    else
+                    {
+                        currentInstantiatedGraveyardCard.CardType = 2;
+                    }
+
+                    crtCard.GetComponentInChildren<GraveyardCard>().SetGraveyardIndex(CurrentGraveyard.Count);
+
+                    CurrentGraveyard.Add(currentInstantiatedGraveyardCard);
                 }
             }
         }
+    }
+
+    public List<Utils.InstantiatedGraveyardDeck> GetPlayerGraveyard ()
+    {
+        return PlayerGraveyard;
+    }
+
+    public List<Utils.InstantiatedGraveyardDeck> GetEnemyGraveyard()
+    {
+        return EnemyGraveyard;
+    }
+
+    public void SetPlayerEnemyConstant(string vPlayerEnemyConstant)
+    {
+        playerEnemyConstant = vPlayerEnemyConstant;
+    }
+
+    public string GetPlayerEnemyConstant()
+    {
+        return playerEnemyConstant;
     }
 }
