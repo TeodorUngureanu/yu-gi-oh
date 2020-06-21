@@ -97,4 +97,10 @@ public class Utils
     {
         return JsonUtility.FromJson<Message>(messageAsString);
     }
+
+    public struct InstantiatedGraveyardDeck
+    {
+        public GameObject InstantiatedCard;
+        public int CardType; // 1 - Monster, 2 - Non-monster
+    }
 }

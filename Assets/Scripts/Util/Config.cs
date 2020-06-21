@@ -36,9 +36,6 @@ public class Config
 
     public void Load()
     {
-
-        Debug.Log(path);
-
         if (_User_Config.Count > 0)
         {
             return;

@@ -9,7 +9,9 @@ public class GraveyardCard : InteractibleAbstractCard
     public GameObject frontImagePlange;
     public GameObject previewImage;
 
+    private int graveyardIndex;
     private string cardNumber;
+    private Enums.CardPosition position;
 
     public override void ChangeText()
     {
@@ -18,6 +20,14 @@ public class GraveyardCard : InteractibleAbstractCard
 
     public override void InteractWithElement()
     {
+        base.HighlightObject();
+
+        GameManager.Get().SetGraveyardSelectionIndex(graveyardIndex, position, GraveyardCanvas.Get().GetPlayerEnemyConstant());
+    }
+
+    public void SetGraveyardIndex(int index)
+    {
+        graveyardIndex = index;
     }
 
     protected override void Awake()
@@ -41,12 +51,12 @@ public class GraveyardCard : InteractibleAbstractCard
 
     void OnMouseEnter()
     {
-        HighlightObject();
+        // HighlightObject();
     }
 
     void OnMouseExit()
     {
-        UnhighlightObject();
+        // UnhighlightObject();
     }
 
     void OnMouseOver()
@@ -54,6 +64,13 @@ public class GraveyardCard : InteractibleAbstractCard
         if (Input.GetMouseButtonDown(0))
         {
             InteractWithElement();
+            position = Enums.CardPosition.Atk;
+        }
+
+        if (Input.GetMouseButtonDown(1))
+        {
+            InteractWithElement();
+            position = Enums.CardPosition.Def;
         }
 
         if (Input.GetMouseButtonDown(2))

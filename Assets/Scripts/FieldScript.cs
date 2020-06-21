@@ -88,6 +88,23 @@ public class FieldScript : MonoBehaviour {
         crtMonster.SetActive(true);
     }
 
+    public void SetMonsterFromGraveyard(int index, string cardNumber, Enums.CardPosition position)
+    {
+        Debug.Log("Setting monster on field on position " + index);
+
+        GameObject crtMonster = monsterField[index];
+        crtMonster.GetComponent<PlayerFieldCardScript>().SetCardInformation(Config.Get().GetCardInfoByNumber(cardNumber, true));
+
+        Vector3 crtRotation = crtMonster.transform.localEulerAngles;
+
+        crtRotation += new Vector3(180, (position == Enums.CardPosition.Def ? -90 : 0), 0);
+
+        crtMonster.transform.localEulerAngles = crtRotation;
+        crtMonster.SetActive(true);
+
+        ApplyTexture(crtMonster, cardNumber, Enums.CardType.Monster);
+    }
+
     public void FlipMonster(int index, bool isEnemy)
     {
         GameObject crtMonster;
@@ -196,6 +213,8 @@ public class FieldScript : MonoBehaviour {
                 enemyMonsterField[fieldIndices[index]].SetActive(false);
                 enemyMonsterField[fieldIndices[index]].transform.localEulerAngles = new Vector3(0, 0, 0);
                 attackableMonsters.Remove(fieldIndices[index]);
+
+                GameManager.Get().AddCardToEnemyGraveyard(enemyMonsterField[fieldIndices[index]].GetComponent<EnemyFieldCardScript>().GetCardInfo());
             }
             else
             {
@@ -213,6 +232,8 @@ public class FieldScript : MonoBehaviour {
             {
                 enemySpellField[fieldIndices[index]].SetActive(false);
                 enemySpellField[fieldIndices[index]].transform.localEulerAngles = new Vector3(0, 0, 0);
+
+                GameManager.Get().AddCardToEnemyGraveyard(enemySpellField[fieldIndices[index]].GetComponent<EnemyFieldCardScript>().GetCardInfo());
             }
             else
             {

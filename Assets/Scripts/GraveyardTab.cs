@@ -32,6 +32,8 @@ public class GraveyardTab : MonoBehaviour
         EnemyGraveyardTab.colors = cb;
 
         PreviewImage.SetActive(false);
+
+        GraveyardCanvas.Get().SetPlayerEnemyConstant(Constants.PLAYER);
     }
 
     public void ActivateEnemyGraveyardTab()
@@ -48,6 +50,8 @@ public class GraveyardTab : MonoBehaviour
         EnemyGraveyardTab.colors = cb;
 
         PreviewImage.SetActive(false);
+
+        GraveyardCanvas.Get().SetPlayerEnemyConstant(Constants.ENEMY);
     }
 
     public void CancelGraveyard()
