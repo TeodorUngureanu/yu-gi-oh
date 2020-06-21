@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -172,8 +171,6 @@ public class FieldScript : MonoBehaviour {
             fieldCard.transform.position + new Vector3(0, 0.2f, 0),
             Quaternion.Euler(fieldCard.transform.localEulerAngles + new Vector3(90, 0, 90)),
             fieldCard.transform);
-        
-        //newTributeCircle.transform.SetParent(fieldCard.transform);
 
         tributeCircleInstances.Add(newTributeCircle);
     }
@@ -315,10 +312,8 @@ public class FieldScript : MonoBehaviour {
         attackSwordInstance = Instantiate<GameObject>(
             attackSword,
             fieldCard.transform.position + new Vector3(0, 0.2f, 0),
-            Quaternion.Euler(fieldCard.transform.localEulerAngles + new Vector3(90, 0, 90)),
+            Quaternion.Euler(fieldCard.transform.localEulerAngles + new Vector3(90, 0, (isEnemy ? 2 : 1) * 90)),
             fieldCard.transform);
-
-        //attackSwordInstance.transform.SetParent(fieldCard.transform);
     }
 
     public void DestroySword()

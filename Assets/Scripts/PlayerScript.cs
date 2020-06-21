@@ -11,7 +11,6 @@ public class PlayerScript : MonoBehaviour {
     private int turnCount;
     private bool isReadyForDuel, hasDrawnHand;
     private bool canPlayMonster;
-    private bool canOpponentActivateCards;
     private bool isMyTurn = true; //only set for testing
     private bool hasDuelEnded;
     private bool askingForQuickActivation, askingForEffectActivation;
@@ -33,7 +32,6 @@ public class PlayerScript : MonoBehaviour {
         isReadyForDuel = false;
         hasDrawnHand = false;
         canPlayMonster = true;
-        canOpponentActivateCards = false;
         hasDuelEnded = false;
         askingForQuickActivation = false;
 
@@ -96,7 +94,7 @@ public class PlayerScript : MonoBehaviour {
 
     void Update()
     {
-        if(paused || hasDuelEnded)
+        if(hasDuelEnded)
         {
             return;
         }
@@ -128,6 +126,11 @@ public class PlayerScript : MonoBehaviour {
                 GameManager.Get().StopQuickActivation();
                 GameManager.Get().SendQuickActivationEndMessage();
             }
+            return;
+        }
+
+        if (paused)
+        {
             return;
         }
 

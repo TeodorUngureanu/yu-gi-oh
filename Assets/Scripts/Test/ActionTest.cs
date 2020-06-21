@@ -74,7 +74,7 @@ public class ActionTest : MonoBehaviour
         {
             new MessageParameter(Constants.SELECT_NO_KEY, "1"),
             new MessageParameter(Constants.SELECT_INDICES_KEY, Utils.SerializeList(indices)),
-            new MessageParameter(Constants.SELECT_OWNER_KEY, Constants.PLAYER),
+            new MessageParameter(Constants.SELECT_OWNER_KEY, Constants.ENEMY),
             new MessageParameter(Constants.SELECT_SOURCE_KEY, Constants.FIELD),
             new MessageParameter(Constants.TYPE_KEY, Constants.MONSTER)
         };

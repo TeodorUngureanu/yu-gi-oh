@@ -14,7 +14,7 @@ public class Message
     public Message(string vAction, int vCardIndex, List<MessageParameter> vParameters)
     {
         action = vAction;
-        vCardIndex = cardIndex;
+        cardIndex = vCardIndex;
         parameters = vParameters;
     }
 

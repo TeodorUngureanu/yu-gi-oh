@@ -3,7 +3,6 @@ using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class GameManager : MonoBehaviourPunCallbacks {
@@ -45,6 +44,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
             playerScript = player.GetComponent<PlayerScript>();
             fieldScript = field.GetComponent<FieldScript>();
             actionBacklog = new List<Message>();
+            actionsToBeDone = null;
         }
         else
         {
@@ -197,6 +197,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
         List<MessageParameter> parameters = new List<MessageParameter>()
         {
+            new MessageParameter(Constants.TYPE_KEY, Constants.MONSTER),
             new MessageParameter(Constants.CARD_NO_KEY, cardNumberToSend),
             new MessageParameter(Constants.TRIBUTE_NO_KEY, tributeIndices.Count.ToString()),
             new MessageParameter(Constants.TRIBUTE_INDICES_KEY, tributeIndicesString)
@@ -212,6 +213,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
         List<MessageParameter> parameters = new List<MessageParameter>()
         {
+            new MessageParameter(Constants.TYPE_KEY, Constants.MONSTER),
             new MessageParameter(Constants.CARD_NO_KEY, info.GetCardNumber()),
             new MessageParameter(Constants.FACE_KEY, oldFace.ToString()),
             new MessageParameter(Constants.FLIPPABLE_KEY, info.IsFlippable().ToString())
@@ -240,6 +242,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
     private void FlipMonsterAction()
     {
         Message currentMessage = PopActionFromBacklog();
+        actionsToBeDone -= FlipMonsterAction;
 
         int monsterIndex = currentMessage.GetCardIndex();
         string cardNumber;
@@ -255,9 +258,9 @@ public class GameManager : MonoBehaviourPunCallbacks {
         fieldScript.DestroyFieldMonsters(false, indices);
     }
 
-    public void UseSpell(int index, NonMonster cardInfo, Enums.CardFace face)
+    public void UseSpell(int handIndex, NonMonster cardInfo, Enums.CardFace face)
     {
-        int diskIndex = playerScript.SetSpellOnDisk(index, cardInfo, face);
+        int diskIndex = playerScript.SetSpellOnDisk(handIndex, cardInfo, face);
         fieldScript.SetSpell(diskIndex, cardInfo, face);
         if(face == Enums.CardFace.Up)
         {
@@ -266,11 +269,12 @@ public class GameManager : MonoBehaviourPunCallbacks {
         {
             List<MessageParameter> parameters = new List<MessageParameter>()
             {
+                new MessageParameter(Constants.TYPE_KEY, Constants.SPELL),
                 new MessageParameter(Constants.ORIGIN_KEY, Constants.HAND),
                 new MessageParameter(Constants.CARD_NO_KEY, cardInfo.GetCardNumber())
             };
 
-            SendInformation(Constants.SETTING_TEXT, index, parameters);
+            SendInformation(Constants.SETTING_TEXT, diskIndex, parameters);
             UIManager.Get().SetInfoTextOnInfoPanel(Constants.QUICK_PLAY_INFO, true);
             PauseCurrentPhase();
         }
@@ -286,6 +290,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
     {
         List<MessageParameter> parameters = new List<MessageParameter>()
         {
+            new MessageParameter(Constants.TYPE_KEY, Constants.SPELL),
             new MessageParameter(Constants.ORIGIN_KEY, cardOrigin),
             new MessageParameter(Constants.CARD_NO_KEY, cardInfo.GetCardNumber())
         };
@@ -311,6 +316,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
     private void ActivateSpellAction()
     {
         Message currentMessage = PopActionFromBacklog();
+        actionsToBeDone -= ActivateSpellAction;
 
         int spellIndex = currentMessage.GetCardIndex();
         string cardNumber;
@@ -395,6 +401,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
     private void PostBattleAction()
     {
         Message currentMessage = PopActionFromBacklog();
+        actionsToBeDone -= PostBattleAction;
         Dictionary<string, string> parameters = currentMessage.ExtractParamDictionary();
 
         bool isEnemy = currentMessage.IsEnemyAction();
@@ -460,9 +467,21 @@ public class GameManager : MonoBehaviourPunCallbacks {
         else
         {
             //attack life points directly
-            Monster attackingMonster = (Monster)playerScript.GetCardInfoForIndex(monsterIndex, true);
-            DecreaseLifePoints(attackingMonster.GetAttackPoints(), true);
-            AfterAttack();
+            Monster attackingMonster;
+            if(isEnemy)
+            {
+                attackingMonster = (Monster) fieldScript.GetEnemyCardInfo(monsterIndex, true);
+            } else
+            {
+                attackingMonster = (Monster) playerScript.GetCardInfoForIndex(monsterIndex, true);
+            }
+            
+            DecreaseLifePoints(attackingMonster.GetAttackPoints(), !isEnemy);
+
+            if(!isEnemy)
+            {
+                AfterAttack();
+            }
         }
     }
 
@@ -471,15 +490,18 @@ public class GameManager : MonoBehaviourPunCallbacks {
         if(actionsToBeDone != null)
         {
             actionsToBeDone();
+            actionsToBeDone = null;
         }
     }
 
     private void DamageCalculationAction()
     {
         Message currentMessage = PopActionFromBacklog();
+        actionsToBeDone -= DamageCalculationAction;
         Dictionary<string, string> parameters = currentMessage.ExtractParamDictionary();
 
         int monsterIndex = currentMessage.GetCardIndex();
+        bool isEnemy = currentMessage.IsEnemyAction();
         string targetIndexParam, targetPositionParam, targetFaceParam;
 
         parameters.TryGetValue(Constants.TARGET_INDEX_KEY, out targetIndexParam);
@@ -490,38 +512,67 @@ public class GameManager : MonoBehaviourPunCallbacks {
         Enums.CardFace targetFace = (Enums.CardFace)Enum.Parse(typeof(Enums.CardFace), targetFaceParam);
         int targetIndex = Int32.Parse(targetIndexParam);
 
-        Monster attackingMonster = (Monster) playerScript.GetCardInfoForIndex(attackingMonsterIndex, true);
-        Monster targetMonster = (Monster)fieldScript.GetEnemyCardInfo(targetIndex, true);
+        Monster attackingMonster, targetMonster;
+        if(isEnemy)
+        {
+            attackingMonster = (Monster) fieldScript.GetEnemyCardInfo(monsterIndex, true);
+            targetMonster = (Monster) playerScript.GetCardInfoForIndex(targetIndex, true);
+        } else
+        {
+            attackingMonster = (Monster) playerScript.GetCardInfoForIndex(monsterIndex, true);
+            targetMonster = (Monster) fieldScript.GetEnemyCardInfo(targetIndex, true);
+        }
 
-        int enemyMonsterRelevantPoints = targetPosition == Enums.CardPosition.Atk ?
+        int targetMonsterRelevantPoints = targetPosition == Enums.CardPosition.Atk ?
                 targetMonster.GetAttackPoints() : targetMonster.GetDefensePoints();
-        int diff = attackingMonster.GetAttackPoints() - enemyMonsterRelevantPoints;
+        int diff = attackingMonster.GetAttackPoints() - targetMonsterRelevantPoints;
 
         if (diff > 0)
         {
-            fieldScript.DestroyFieldMonsters(true, new List<int>() { targetIndex });
+            if(isEnemy)
+            {
+                DestroyOwnMonsters(new List<int>() { targetIndex });
+            } else
+            {
+                fieldScript.DestroyFieldMonsters(true, new List<int>() { targetIndex });
+            }
             if (targetPosition == Enums.CardPosition.Atk)
             {
-                DecreaseLifePoints(diff, true);
+                DecreaseLifePoints(diff, !isEnemy);
             }
         }
 
         if (diff < 0)
         {
-            DecreaseLifePoints(-diff, false);
+            DecreaseLifePoints(-diff, isEnemy);
             if (targetPosition == Enums.CardPosition.Atk)
             {
-                DestroyOwnMonsters(new List<int>() { attackingMonsterIndex });
+                if(isEnemy)
+                {
+                    fieldScript.DestroyFieldMonsters(true, new List<int>() { monsterIndex });
+
+                } else
+                {
+                    DestroyOwnMonsters(new List<int>() { monsterIndex });
+                }
+                
             }
         }
 
         if (diff == 0 && targetPosition == Enums.CardPosition.Atk)
         {
-            DestroyOwnMonsters(new List<int>() { attackingMonsterIndex });
-            fieldScript.DestroyFieldMonsters(true, new List<int>() { targetIndex });
+            DestroyOwnMonsters(new List<int>() { (isEnemy) ? targetIndex : monsterIndex });
+            fieldScript.DestroyFieldMonsters(true, new List<int>() { (isEnemy) ? monsterIndex :  targetIndex });
         }
 
-        AfterAttack();
+        if(!isEnemy)
+        {
+            AfterAttack();
+        }
+        else
+        {
+            StartCoroutine(PostAttackOperationsCoroutine(true));
+        }
     }
  
     public void CancelAttack()
@@ -538,13 +589,13 @@ public class GameManager : MonoBehaviourPunCallbacks {
         SetAttacking(false);
         playerScript.ApplyRestrictionsForAttackingMonster(attackingMonsterIndex);
         fieldScript.ProcessAttackableMonsters(false);
-        StartCoroutine(PostAttackOperationsCoroutine());
+        StartCoroutine(PostAttackOperationsCoroutine(false));
     }
 
-    private void DecreaseLifePoints(int points, bool isEnemy)
+    private void DecreaseLifePoints(int points, bool isTargetEnemy)
     {
         bool hasDuelEnded = false;
-        if (isEnemy)
+        if (isTargetEnemy)
         {
             enemyLifePoints -= points;
             if(enemyLifePoints < 0)
@@ -565,7 +616,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
         }
         if(hasDuelEnded)
         {
-            UIManager.Get().ShowDuelEnd(!isEnemy);
+            UIManager.Get().ShowDuelEnd(!isTargetEnemy);
         }
     }
 
@@ -588,13 +639,17 @@ public class GameManager : MonoBehaviourPunCallbacks {
         actionsToBeDone = PostBattleAction + actionsToBeDone;
     }
 
-    private IEnumerator PostAttackOperationsCoroutine()
+    private IEnumerator PostAttackOperationsCoroutine(bool isEnemy)
     {
         yield return new WaitForSeconds(2);
 
         fieldScript.DestroySword();
-        playerScript.HighlightPlayerCards();
-        playerScript.PauseSwitch(false);
+        if(!isEnemy)
+        {
+            playerScript.HighlightPlayerCards();
+            playerScript.PauseSwitch(false);
+
+        }
     }
 
     public void StopFlipEffectChoicePhase(bool shouldActivate)
@@ -641,6 +696,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
     private void ActivateCardEffect()
     {
         Message currentMessage = PopActionFromBacklog();
+        actionsToBeDone -= ActivateCardEffect;
         Dictionary<string, string> parameters = currentMessage.ExtractParamDictionary();
 
         int cardIndex = currentMessage.GetCardIndex();
@@ -815,12 +871,14 @@ public class GameManager : MonoBehaviourPunCallbacks {
     {
         Dictionary<string, string> parameters = message.ExtractParamDictionary();
         string targetIndexString;
-        parameters.TryGetValue(Constants.TARGET_INDEX_KEY, out targetIndexString);
 
         fieldScript.AddAttackSword(true, message.GetCardIndex());
 
-        //TODO: show somehow which monster is going to be attacked - highlight it (red or green)
-        int targetIndex = Int32.Parse(targetIndexString);
+        if (parameters.TryGetValue(Constants.TARGET_INDEX_KEY, out targetIndexString))
+        {
+            //TODO: show somehow which monster is going to be attacked - highlight it (red or green)
+            int targetIndex = Int32.Parse(targetIndexString);
+        }
 
         message.SetEnemyAction(true);
         actionBacklog.Insert(0, message);
@@ -869,49 +927,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
         
         actionParams.TryGetValue(Constants.TYPE_KEY, out cardType);
 
-        if(cardType == Constants.MONSTER)
-        {
-            Card cardInfo = (action == Constants.SETTING_TEXT) ? null : Config.Get().GetCardInfoByNumber(cardNumber, true);
-            Enums.CardFace face = (action == Constants.SETTING_TEXT) ? Enums.CardFace.Down : Enums.CardFace.Up;
-
-            if (action == Constants.SUMMONING_TEXT)
-            {
-                string tributeNumberParam;
-                actionParams.TryGetValue(Constants.TRIBUTE_NO_KEY, out tributeNumberParam);
-
-                int noTributes = Int32.Parse(tributeNumberParam);
-                if (noTributes > 0)
-                {
-                    string tributes;
-                    actionParams.TryGetValue(Constants.TRIBUTE_INDICES_KEY, out tributes);
-
-                    List<int> tributeIndices = Utils.DeserializeList(tributes);
-                    fieldScript.DestroyFieldMonsters(true, tributeIndices);
-                }
-                fieldScript.SetEnemyMonster(cardIndex, cardInfo, face);
-            }
-
-            if(action == Constants.FLIPPING_TEXT && ((Monster)cardInfo).IsFlippable())
-            {
-                fieldScript.SetEnemyMonster(cardIndex, cardInfo, face);
-                actionBacklog.Insert(0, message);
-                actionsToBeDone = FlipMonsterAction + actionsToBeDone;
-            }
-        }
-        else
-        {
-            Card cardInfo = (action == Constants.ACTIVATING_TEXT) ? Config.Get().GetCardInfoByNumber(cardNumber, false) : null;
-            Enums.CardFace face = (action == Constants.ACTIVATING_TEXT) ? Enums.CardFace.Up : Enums.CardFace.Down;
-
-            fieldScript.SetEnemySpell(cardIndex, cardInfo, face);
-            
-            /*if(action == Constants.ACTIVATING_TEXT)
-            {
-                actionBacklog.Insert(0, message);
-                actionsToBeDone = ActivateSpellAction + actionsToBeDone;
-            }*/
-        }
-
         if (action == Constants.SELECTION_TEXT)
         {
             string selCount;
@@ -927,6 +942,52 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
                 List<int> selectionIndices = Utils.DeserializeList(selIndices);
                 HighlightSelectedCards(selectionIndices, selSource, selOwner, cardType);
+            }
+        }
+        else
+        {
+
+            if (cardType == Constants.MONSTER)
+            {
+                Card cardInfo = (action == Constants.SETTING_TEXT) ? null : Config.Get().GetCardInfoByNumber(cardNumber, true);
+                Enums.CardFace face = (action == Constants.SETTING_TEXT) ? Enums.CardFace.Down : Enums.CardFace.Up;
+
+                if (action == Constants.SUMMONING_TEXT || action == Constants.SETTING_TEXT)
+                {
+                    string tributeNumberParam;
+                    actionParams.TryGetValue(Constants.TRIBUTE_NO_KEY, out tributeNumberParam);
+
+                    int noTributes = Int32.Parse(tributeNumberParam);
+                    if (noTributes > 0)
+                    {
+                        string tributes;
+                        actionParams.TryGetValue(Constants.TRIBUTE_INDICES_KEY, out tributes);
+
+                        List<int> tributeIndices = Utils.DeserializeList(tributes);
+                        fieldScript.DestroyFieldMonsters(true, tributeIndices);
+                    }
+                    fieldScript.SetEnemyMonster(cardIndex, cardInfo, face);
+                }
+
+                if (action == Constants.FLIPPING_TEXT && ((Monster)cardInfo).IsFlippable())
+                {
+                    fieldScript.SetEnemyMonster(cardIndex, cardInfo, face);
+                    actionBacklog.Insert(0, message);
+                    actionsToBeDone = FlipMonsterAction + actionsToBeDone;
+                }
+            }
+            else
+            {
+                Card cardInfo = (action == Constants.ACTIVATING_TEXT) ? Config.Get().GetCardInfoByNumber(cardNumber, false) : null;
+                Enums.CardFace face = (action == Constants.ACTIVATING_TEXT) ? Enums.CardFace.Up : Enums.CardFace.Down;
+
+                fieldScript.SetEnemySpell(cardIndex, cardInfo, face);
+
+                /*if(action == Constants.ACTIVATING_TEXT)
+                {
+                    actionBacklog.Insert(0, message);
+                    actionsToBeDone = ActivateSpellAction + actionsToBeDone;
+                }*/
             }
         }
 
