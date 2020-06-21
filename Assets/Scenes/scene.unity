@@ -7412,6 +7412,8 @@ MonoBehaviour:
   duelInfoCanvas: {fileID: 1294815709}
   PlayerName: {fileID: 1967134734}
   EnemyName: {fileID: 335366339}
+  PlayerGraveyardCount: {fileID: 0}
+  EnemyGraveyardCount: {fileID: 0}
 --- !u!114 &1360528754
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7828,7 +7830,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!81 &1480818862
 AudioListener:
   m_ObjectHideFlags: 0
@@ -9817,7 +9819,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!81 &1767782434
 AudioListener:
   m_ObjectHideFlags: 0
