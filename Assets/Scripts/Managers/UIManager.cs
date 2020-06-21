@@ -1,12 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
     public GameObject uiCardInformation;
     public GameObject diskInformation;
     public GameObject duelInfoCanvas;
+    public Text PlayerName;
+    public Text EnemyName;
+    public Text PlayerGraveyardCount;
+    public Text EnemyGraveyardCount;
 
     private static UIManager instance;
     private CardInfoScript cardInfoScript;
@@ -31,6 +36,11 @@ public class UIManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    private void Start()
+    {
+        PlayerName.text = PlayerPrefs.GetString("PlayerName");
     }
 
     public void HideInformation()
@@ -91,4 +101,15 @@ public class UIManager : MonoBehaviour
     {
         infoScreenScript.ShowEndGameScreen(isEnemyWinner);
     }
+
+    public void UpdatePlayerGraveyardCount(int count)
+    {
+        PlayerGraveyardCount.text = "" + count;
+}
+
+    public void UpdateEnemyGraveyardCount(int count)
+    {
+        EnemyGraveyardCount.text = "" + count;
+    }
+
 }

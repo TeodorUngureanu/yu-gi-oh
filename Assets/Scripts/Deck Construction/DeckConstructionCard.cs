@@ -37,6 +37,7 @@ public class DeckConstructionCard : InteractibleAbstractCard
             DeckConstructionManager.Get().AddCardToDeck(cardNumber, deckNumber);
         }
     }
+
     protected override void Awake()
     {
         base.Awake();

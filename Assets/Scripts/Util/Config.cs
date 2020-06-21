@@ -34,6 +34,9 @@ public class Config
 
     public void Load()
     {
+
+        Debug.Log(path);
+
         if (_User_Config.Count > 0)
         {
             return;
@@ -95,14 +98,15 @@ public class Config
                     command.ExecuteNonQuery();
 
                     command.CommandText = "CREATE TABLE Monster_Cards (" +
-                        "ID INTEGER PRIMARY KEY AUTOINCREMENT, CardNumber VARCHAR(50) NOT NULL, Image BLOB NULL, Name VARCHAR(50) NOT NULL, Description VARCHAR(250) NULL, Effect_Key VARCHAR(50) NULL, " +
-                        "Attribute INTEGER NOT NULL, Type INTEGER NOT NULL, ATK INTEGER NOT NULL, DEF INTEGER NOT NULL, Rarity INTEGER NOT NULL, IsFusion INTEGER NULL " +
+                        "ID INTEGER PRIMARY KEY AUTOINCREMENT, CardNumber VARCHAR(50) NOT NULL, Image BLOB NULL, Name VARCHAR(50) NOT NULL, Description VARCHAR(250) NULL, " +
+                        "Effect_Key VARCHAR(50) NULL, Attribute INTEGER NOT NULL, Type INTEGER NOT NULL, ATK INTEGER NOT NULL, DEF INTEGER NOT NULL, Rarity INTEGER NOT NULL, " +
+                        "IsFusion INTEGER NULL, IsFlippable INTEGER NULL, ContinuousEffect INTEGER NULL, QuickEffect INTEGER NULL " +
                         ");";
                     command.ExecuteNonQuery();
 
                     command.CommandText = "CREATE TABLE Magic_Cards (" +
                         "ID INTEGER PRIMARY KEY AUTOINCREMENT, CardNumber VARCHAR(50) NOT NULL, Image BLOB NULL, Name VARCHAR(50) NOT NULL, Description VARCHAR(250) NULL, " +
-                        "Effect_Key VARCHAR(50) NULL, Magic_Card_Type INTEGER NOT NULL" +
+                        "Effect_Key VARCHAR(50) NULL, Magic_Card_Type INTEGER NOT NULL, IsContinuous INTEGER NULL, DestroyedAfterNTurns INTEGER NULL, QuickPlay INTEGER NULL" +
                         ");";
                     command.ExecuteNonQuery();
                 }
@@ -173,182 +177,188 @@ public class Config
                     List<byte[]> monsterBlob = new List<byte[]>();
                     byte[] photo;
 
-                    photo = File.ReadAllBytes(path + "Monster/AncientElf.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/AncientElf.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/Ansatsu.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/Ansatsu.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/BaronOfTheFiendSword.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/BaronOfTheFiendSword.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/BattleOx.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/BattleOx.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/BeaverWarrior.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/BeaverWarrior.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/BlueEyesWhiteDragon.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/BlueEyesWhiteDragon.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/CelticGuardian.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/CelticGuardian.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/ClawReacher.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/ClawReacher.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/CurseOfDragon.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/CurseOfDragon.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/DarkAssailant.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/DarkAssailant.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/DarkMagician.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/DarkMagician.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/DarkTitanOfTerror.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/DarkTitanOfTerror.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/DestroyerGolem.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/DestroyerGolem.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/DHuman.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/DHuman.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/DomaTheAngelOfSilence.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/DomaTheAngelOfSilence.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/DragonZombie.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/DragonZombie.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/FeralImp.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/FeralImp.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/GaiaTheFierceKnight.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/GaiaTheFierceKnight.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/GiantSoldierOfStone.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/GiantSoldierOfStone.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/GreatWhite.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/GreatWhite.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/GyakutennoMegami.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/GyakutennoMegami.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/HaneHane.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/HaneHane.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/HitotsuMeGiant.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/HitotsuMeGiant.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/JudgeMan.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/JudgeMan.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/Kojikocy.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/Kojikocy.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/KoumoriDragon.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/KoumoriDragon.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/LaJinnTheMysticalGenieOfTheLamp.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/LaJinnTheMysticalGenieOfTheLamp.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/LordOfD.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/LordOfD.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/MagicalGhost.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/MagicalGhost.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/MammothGraveyard.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/MammothGraveyard.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/ManEaterBug.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/ManEaterBug.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/ManEatingTreasureChest.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/ManEatingTreasureChest.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/MasterAndExpert.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/MasterAndExpert.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/MysteriousPuppeteer.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/MysteriousPuppeteer.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/MysticalElf.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/MysticalElf.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/MysticClown.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/MysticClown.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/MysticHorseman.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/MysticHorseman.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/NeoTheMagicSwordsman.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/NeoTheMagicSwordsman.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/OgreOfTheBlackShadow.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/OgreOfTheBlackShadow.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/PaleBeast.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/PaleBeast.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/RogueDoll.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/RogueDoll.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/RudeKaiser.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/RudeKaiser.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/RyuKishin.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/RyuKishin.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/RyuKishinPowered.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/RyuKishinPowered.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/SilverFang.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/SilverFang.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/SkullRedBird.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/SkullRedBird.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/SorcererOfTheDoomed.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/SorcererOfTheDoomed.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/SummonedSkull.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/SummonedSkull.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/Swordstalker.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/Swordstalker.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/TerraTheTerrible.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/TerraTheTerrible.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/TheSternMystic.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/TheSternMystic.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/TheWickedWormBeast.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/TheWickedWormBeast.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/TrapMaster.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/TrapMaster.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/UnknownWarriorOfFiend.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/UnknownWarriorOfFiend.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/Uraby.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/Uraby.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/WallOfIllusion.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/WallOfIllusion.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/WingedDragonGuardianOfTheFortress.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/WingedDragonGuardianOfTheFortress.png");
                     monsterBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Monster/WittyPhantom.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/WittyPhantom.png");
                     monsterBlob.Add(photo);
 
-                    command.CommandText = " INSERT INTO Monster_Cards (CardNumber, Image, Name, Description, Effect_Key, Attribute, Type, ATK, DEF, Rarity, IsFusion) VALUES " +
-                        " ('93221206', @image_1, 'Ancient Elf', 'This elf is rumored to have lived for thousands of years. He leads an army of spirits against his enemies.', NULL, 5, 19, 1450, 1200, 4, NULL), " +
-                        " ('48365709', @image_2, 'Ansatsu', 'A silent and deadly warrior specializing in assassinations.', NULL, 3, 21, 1700, 1200, 5, NULL), " +
-                        " ('86325596', @image_3, 'Baron of the Fiend Sword', 'An aristocrat who wields a sword possessed by a malicious spirit that preys on the weak.', NULL, 1, 9, 1550, 800, 4, NULL), " +
-                        " ('05053103', @image_4, 'Battle Ox', 'A monster with tremendous power, it destroys enemies with a swing of its axe.', NULL, 3, 3, 1700, 1000, 4, NULL), " +
-                        " ('32452818', @image_5, 'Beaver Warrior', 'What this creature lacks in size it makes up for in defense when battling in the prairie.', NULL, 3, 3, 1200, 1500, 4, NULL), " +
-                        " ('89631139', @image_6, 'Blue-Eyes White Dragon', 'This legendary dragon is a powerful engine of destruction. Virtually invincible, very few have faced this awesome creature and lived to tell the tale.', NULL, 5, 7, 3000, 2500, 8, NULL), " +
-                        " ('91152256', @image_7, 'Celtic Guardian', 'An elf who learned to wield a sword, he baffles enemies with lightning-swift attacks.', NULL, 3, 21, 1400, 1200, 4, NULL), " +
-                        " ('41218256', @image_8, 'Claw Reacher', 'Stretching arms and razor-sharp claws make this monster a formidable opponent.', NULL, 1, 9, 1000, 800, 3, NULL), " +
-                        " ('28279543', @image_9, 'Curse of Dragon', 'A wicked dragon that taps into dark forces to execute a powerful attack.', NULL, 1, 7, 2000, 1500, 5, NULL), " +
-                        " ('41949033', @image_10, 'Dark Assailant', 'Armed with the Psycho Sword, this sinister assassin rules the bad land.', NULL, 1, 24, 1200, 1200, 4, NULL), " +
-                        " ('46986414', @image_11, 'Dark Magician', 'The ultimate wizard in terms of attack and defense.', NULL, 1, 19, 2500, 2100, 7, NULL), " +
-                        " ('89494469', @image_12, 'Dark Titan of Terror', 'A fiend said to dwell in the world of dreams, it attacks enemies in their sleep.', NULL, 1, 9, 1300, 1100, 4, NULL), " +
-                        " ('73481154', @image_13, 'Destroyer Golem', 'A golem with a massive right hand for crushing its victims.', NULL, 3, 17, 1500, 1000, 4, NULL), " +
-                        " ('81057959', @image_14, 'D. Human', 'Gifted with the power of dragons, this warrior wields a sword created from a dragon`s fang.', NULL, 3, 21, 1300, 1100, 4, NULL), " +
-                        " ('16972957', @image_15, 'Doma The Angel of Silence', 'This fairy rules over the end of existence.', NULL, 1, 8, 1600, 1400, 5, NULL), " +
-                        " ('66672569', @image_16, 'Dragon Zombie', 'A dragon revived by sorcery. Its breath is highlycorrosive.', NULL, 1, 24, 1600, 0, 3, NULL), " +
-                        " ('41392891', @image_17, 'Feral Imp', 'A playful little fiend that lurks in the dark, waiting to attack an unwary enemy.', NULL, 1, 9, 1300, 1400, 4, NULL), " +
-                        " ('06368038', @image_18, 'Gaia The Fierce Knight', 'A knight whose horse travels faster than the wind. His battle-charge is a force to be reckoned with.', NULL, 3, 21, 2300, 2100, 7, NULL), " +
-                        " ('13039848', @image_19, 'Giant Soldier of Stone', 'A giant warrior made of stone. A punch from this creature has earth-shaking results.', NULL, 3, 17, 1300, 2000, 3, NULL), " +
-                        " ('13429800', @image_20, 'Great White', 'A giant white shark with razor-sharp teeth.', NULL, 6, 10, 1600, 800, 4, NULL), " +
-                        " ('31122090', @image_21, 'Gyakutenno Megami', 'This fairy uses her mystical power to protect the weak and provide spiritual support.', NULL, 5, 8, 1800, 2000, 6, NULL), " +
-                        " ('07089711', @image_22, 'Hane-Hane', 'FLIP: Return 1 monster on the field to its owner`s hand.', 1, 3, 2, 450, 500, 2, NULL), " +
-                        " ('76184692', @image_23, 'Hitotsu-Me Giant', 'A one-eyed behemoth with thick, powerful arms made for delivering punishing blows.', NULL, 3, 3, 1200, 1000, 4, NULL), " +
-                        " ('30113682', @image_24, 'Judge Man', 'This club-wielding warrior battles to the end and will never surrender.', NULL, 3, 21, 2200, 1500, 6, NULL), " +
-                        " ('01184620', @image_25, 'Kojikocy', 'A man-hunter with powerful arms that can crush boulders.', NULL, 3, 21, 1500, 1200, 4, NULL), " +
-                        " ('67724379', @image_26, 'Koumori Dragon', 'A vicious, fire-breathing dragon whose wicked flame corrupts the souls of its victims.', NULL, 1, 7, 1500, 1200, 4, NULL), " +
-                        " ('97590747', @image_27, 'La Jinn the Mystical Genie of the Lamp', 'A genie of the lamp that`s at the beck and call of its master.', NULL, 1, 9, 1800, 1000, 4, NULL), " +
-                        " ('17985575', @image_28, 'Lord of D.', 'All Dragon-Type monsters cannot be targeted by Magic Cards, Trap Cards, or other effects that specifically designate a target while this card is face-up on the field.', 2, 1, 19, 1200, 1100, 4, NULL), " +
-                        " ('46474915', @image_29, 'Magical Ghost', 'This creature casts a spell of terror and confusion just before attacking its enemies.', NULL, 1, 24, 1300, 1400, 4, NULL), " +
-                        " ('40374923', @image_30, 'Mammoth Graveyard', 'A mammoth that protects the graves of its pack and is absolutely merciless when facing grave-robbers.', NULL, 3, 5, 1200, 800, 3, NULL), " +
-                        " ('54652250', @image_31, 'Man-Eater Bug', 'FLIP: Destroys 1 monster on the field (regardless of position).', 3, 3, 11, 450, 600, 2, NULL), " +
-                        " ('13723605', @image_32, 'Man-Eating Treasure Chest', 'A monster disguised as a treasure chest that is known to attack the unwary adventurer.', NULL, 1, 9, 1600, 1000, 4, NULL), " +
-                        " ('75499502', @image_33, 'Master & Expert', 'A deadly duo consisting of a beast master and its loyal servant.', NULL, 3, 2, 1200, 1000, 4, NULL), " +
-                        " ('54098121', @image_34, 'Mysterious Puppeteer', 'As long as this card remains face-up on the field, the Life Points of this card`s controller increase by 500 points for each additional monster summoned (excluding Special Summon, but including your opponent`s monsters).', 4, 3, 21, 1000, 1500, 4, NULL), " +
-                        " ('15025844', @image_35, 'Mystical Elf', 'A delicate elf that lacks offense, but has a terrific defense backed by mystical power.', NULL, 5, 19, 800, 2000, 4, NULL), " +
-                        " ('47060154', @image_36, 'Mystic Clown', 'Nothing can stop the mad attack of this powerful creature.', NULL, 1, 9, 1500, 1000, 4, NULL), " +
-                        " ('68516705', @image_37, 'Mystic Horseman', 'Half man and half horse, this monster is knows for its extreme speed.', NULL, 3, 2, 1300, 1550, 4, NULL), " +
-                        " ('50930991', @image_38, 'Neo the Magic Swordsman', 'A dimensional drifter who not only practices sorcery, but is also a sword and martial arts master.', NULL, 5, 19, 1700, 1000, 4, NULL), " +
-                        " ('45121025', @image_39, 'Ogre of the Black Shadow', 'An ogre possessed by the powers of the dark. Few can withstand its rapid chage.', NULL, 3, 3, 1200, 1400, 4, NULL), " +
-                        " ('21263083', @image_40, 'Pale Beast', 'With skin tinged a bluish-white, this strange creature is a fearsome sight to behold.', NULL, 3, 2, 1500, 1200, 4, NULL), " +
-                        " ('91939608', @image_41, 'Rogue Doll', 'A deadly doll gited with mystical power, it is particularly powerful when attacking against dark forces.', NULL, 5, 19, 1600, 1000, 4, NULL), " +
-                        " ('26378150', @image_42, 'Rude Kaiser', 'With an axe in each hand, this monster delivers heavy damage.', NULL, 3, 3, 1800, 1600, 5, NULL), " +
-                        " ('15303296', @image_43, 'Ryu-Kishin', 'A very elusive creature that looks like a harmless statue until it attacks.', NULL, 1, 9, 1000, 500, 3, NULL), " +
-                        " ('24611934', @image_44, 'Ryu-Kishin Powered', 'A gargoyle enhanced by the powers of darkness. Very sharp talons make it a worthy opponent.', NULL, 1, 9, 1600, 1200, 4, NULL), " +
-                        " ('90357090', @image_45, 'Silver Fang', 'A snow wolf that`s beautiful to the eye, but absolutely vicious in battle.', NULL, 3, 2, 1200, 800, 4, NULL), " +
-                        " ('10202894', @image_46, 'Skull Red Bird', 'This monster swoops down and attacks with a rain of knives stores in its wings.', NULL, 7, 22, 1550, 1200, 4, NULL), " +
-                        " ('49218300', @image_47, 'Sorcerer of the Doomed', 'A slave of the dark arts, this sorcerer is a monster of life-extinguishing spells.', NULL, 1, 19, 1450, 1200, 4, NULL), " +
-                        " ('70781052', @image_48, 'Summoned Skull', 'A fiend with dark powers for confusing the enemy. Among the Field-Type monsters, this monster boasts considerable force.', NULL, 1, 9, 2500, 1200, 6, NULL), " +
-                        " ('50005633', @image_49, 'Swordstalker', 'A monster formed by the vengeful souls of those who passed away in battle.', NULL, 1, 21, 2000, 1600, 6, NULL), " +
-                        " ('63308047', @image_50, 'Terra the Terrible', 'Known as a swamp dweller, this creature is a minion of dark forces.', NULL, 1, 9, 1200, 1300, 4, NULL), " +
-                        " ('87557188', @image_51, 'The Stern Mystic', 'FLIP: All face-down cards on the field are turned face-up, and then returned to their original positions. No card effects are activated when cards are turned face-up.', 5, 5, 19, 1500, 1200, 4, NULL), " +
-                        " ('06285791', @image_52, 'The Wicked Worm Beast', 'This card is returned to your hand at the end of your turn.', 6, 3, 2, 1400, 700, 3, NULL), " +
-                        " ('46461247', @image_53, 'Trap Master', 'FLIP: Destroys 1 Trap Card on the field. If this card`s target is face-down, flip it face-up. If the card is a Trap Card, it is destroyed. If not, it is returned to its face-down position. The flipped card is not activated.', 7, 3, 21, 500, 1100, 3, NULL), " +
-                        " ('97360116', @image_54, 'Unknown Warrior of Fiend', 'The speed of this warrior creates an intense vacuum that can slice through a monster`s hide.', NULL, 1, 21, 1000, 500, 3, NULL), " +
-                        " ('01784619', @image_55, 'Uraby', 'Fast on its feet, this dinosaur rips enemies to shreds with its sharp claws.', NULL, 3, 5, 1500, 800, 4, NULL), " +
-                        " ('13945283', @image_56, 'Wall of Illusion', 'The monster attacking this creature is returned to its owner`s hand. Any damage resulting from the attack is calculated normally.', 8, 1, 9, 1000, 1850, 4, NULL), " +
-                        " ('87796900', @image_57, 'Winger Dragon, Guardian of the Fortress #1', 'A dragon commonly found guarding mountain fortresses. Its signature attack is a sweeping dive from out of the blue.', NULL, 7, 7, 1400, 1200, 4, NULL), " +
-                        " ('36304921', @image_58, 'Witty Phantom', 'Dressed in a night-black tuxedo, this creature presides over the darkness.', NULL, 1, 9, 1400, 1300, 4, NULL); ";
+                    command.CommandText = "CREATE TABLE Monster_Cards (" +
+                        "ID INTEGER PRIMARY KEY AUTOINCREMENT, CardNumber VARCHAR(50) NOT NULL, Image BLOB NULL, Name VARCHAR(50) NOT NULL, Description VARCHAR(250) NULL, " +
+                        "Effect_Key VARCHAR(50) NULL, Attribute INTEGER NOT NULL, Type INTEGER NOT NULL, ATK INTEGER NOT NULL, DEF INTEGER NOT NULL, Rarity INTEGER NOT NULL, " +
+                        "IsFusion INTEGER NULL, IsFlippable INTEGER NULL, ContinuousEffect INTEGER NULL, QuickEffect INTEGER NULL " +
+                        ");";
+
+                    command.CommandText = " INSERT INTO Monster_Cards (CardNumber, Image, Name, Description, Effect_Key, Attribute, Type, ATK, DEF, Rarity, IsFusion, IsFlippable, ContinuousEffect, QuickEffect) VALUES " +
+                        " ('93221206', @image_1, 'Ancient Elf', 'This elf is rumored to have lived for thousands of years. He leads an army of spirits against his enemies.', NULL, 5, 19, 1450, 1200, 4, NULL, 0, 0, 0), " +
+                        " ('48365709', @image_2, 'Ansatsu', 'A silent and deadly warrior specializing in assassinations.', NULL, 3, 21, 1700, 1200, 5, NULL, 0, 0, 0), " +
+                        " ('86325596', @image_3, 'Baron of the Fiend Sword', 'An aristocrat who wields a sword possessed by a malicious spirit that preys on the weak.', NULL, 1, 9, 1550, 800, 4, NULL, 0, 0, 0), " +
+                        " ('05053103', @image_4, 'Battle Ox', 'A monster with tremendous power, it destroys enemies with a swing of its axe.', NULL, 3, 3, 1700, 1000, 4, NULL, 0, 0, 0), " +
+                        " ('32452818', @image_5, 'Beaver Warrior', 'What this creature lacks in size it makes up for in defense when battling in the prairie.', NULL, 3, 3, 1200, 1500, 4, NULL, 0, 0, 0), " +
+                        " ('89631139', @image_6, 'Blue-Eyes White Dragon', 'This legendary dragon is a powerful engine of destruction. Virtually invincible, very few have faced this awesome creature and lived to tell the tale.', NULL, 5, 7, 3000, 2500, 8, NULL, 0, 0, 0), " +
+                        " ('91152256', @image_7, 'Celtic Guardian', 'An elf who learned to wield a sword, he baffles enemies with lightning-swift attacks.', NULL, 3, 21, 1400, 1200, 4, NULL, 0, 0, 0), " +
+                        " ('41218256', @image_8, 'Claw Reacher', 'Stretching arms and razor-sharp claws make this monster a formidable opponent.', NULL, 1, 9, 1000, 800, 3, NULL, 0, 0, 0), " +
+                        " ('28279543', @image_9, 'Curse of Dragon', 'A wicked dragon that taps into dark forces to execute a powerful attack.', NULL, 1, 7, 2000, 1500, 5, NULL, 0, 0, 0), " +
+                        " ('41949033', @image_10, 'Dark Assailant', 'Armed with the Psycho Sword, this sinister assassin rules the bad land.', NULL, 1, 24, 1200, 1200, 4, NULL, 0, 0, 0), " +
+                        " ('46986414', @image_11, 'Dark Magician', 'The ultimate wizard in terms of attack and defense.', NULL, 1, 19, 2500, 2100, 7, NULL, 0, 0, 0), " +
+                        " ('89494469', @image_12, 'Dark Titan of Terror', 'A fiend said to dwell in the world of dreams, it attacks enemies in their sleep.', NULL, 1, 9, 1300, 1100, 4, NULL, 0, 0, 0), " +
+                        " ('73481154', @image_13, 'Destroyer Golem', 'A golem with a massive right hand for crushing its victims.', NULL, 3, 17, 1500, 1000, 4, NULL, 0, 0, 0), " +
+                        " ('81057959', @image_14, 'D. Human', 'Gifted with the power of dragons, this warrior wields a sword created from a dragon`s fang.', NULL, 3, 21, 1300, 1100, 4, NULL, 0, 0, 0), " +
+                        " ('16972957', @image_15, 'Doma The Angel of Silence', 'This fairy rules over the end of existence.', NULL, 1, 8, 1600, 1400, 5, NULL, 0, 0, 0), " +
+                        " ('66672569', @image_16, 'Dragon Zombie', 'A dragon revived by sorcery. Its breath is highlycorrosive.', NULL, 1, 24, 1600, 0, 3, NULL, 0, 0, 0), " +
+                        " ('41392891', @image_17, 'Feral Imp', 'A playful little fiend that lurks in the dark, waiting to attack an unwary enemy.', NULL, 1, 9, 1300, 1400, 4, NULL, 0, 0, 0), " +
+                        " ('06368038', @image_18, 'Gaia The Fierce Knight', 'A knight whose horse travels faster than the wind. His battle-charge is a force to be reckoned with.', NULL, 3, 21, 2300, 2100, 7, NULL, 0, 0, 0), " +
+                        " ('13039848', @image_19, 'Giant Soldier of Stone', 'A giant warrior made of stone. A punch from this creature has earth-shaking results.', NULL, 3, 17, 1300, 2000, 3, NULL, 0, 0, 0), " +
+                        " ('13429800', @image_20, 'Great White', 'A giant white shark with razor-sharp teeth.', NULL, 6, 10, 1600, 800, 4, NULL, 0, 0, 0), " +
+                        " ('31122090', @image_21, 'Gyakutenno Megami', 'This fairy uses her mystical power to protect the weak and provide spiritual support.', NULL, 5, 8, 1800, 2000, 6, NULL, 0, 0, 0), " +
+                        " ('07089711', @image_22, 'Hane-Hane', 'FLIP: Return 1 monster on the field to its owner`s hand.', 1, 3, 2, 450, 500, 2, NULL, 0, 0, 0), " +
+                        " ('76184692', @image_23, 'Hitotsu-Me Giant', 'A one-eyed behemoth with thick, powerful arms made for delivering punishing blows.', NULL, 3, 3, 1200, 1000, 4, NULL, 0, 0, 0), " +
+                        " ('30113682', @image_24, 'Judge Man', 'This club-wielding warrior battles to the end and will never surrender.', NULL, 3, 21, 2200, 1500, 6, NULL, 0, 0, 0), " +
+                        " ('01184620', @image_25, 'Kojikocy', 'A man-hunter with powerful arms that can crush boulders.', NULL, 3, 21, 1500, 1200, 4, NULL, 0, 0, 0), " +
+                        " ('67724379', @image_26, 'Koumori Dragon', 'A vicious, fire-breathing dragon whose wicked flame corrupts the souls of its victims.', NULL, 1, 7, 1500, 1200, 4, NULL, 0, 0, 0), " +
+                        " ('97590747', @image_27, 'La Jinn the Mystical Genie of the Lamp', 'A genie of the lamp that`s at the beck and call of its master.', NULL, 1, 9, 1800, 1000, 4, NULL, 0, 0, 0), " +
+                        " ('17985575', @image_28, 'Lord of D.', 'All Dragon-Type monsters cannot be targeted by Magic Cards, Trap Cards, or other effects that specifically designate a target while this card is face-up on the field.', 2, 1, 19, 1200, 1100, 4, NULL, 0, 0, 0), " +
+                        " ('46474915', @image_29, 'Magical Ghost', 'This creature casts a spell of terror and confusion just before attacking its enemies.', NULL, 1, 24, 1300, 1400, 4, NULL, 0, 0, 0), " +
+                        " ('40374923', @image_30, 'Mammoth Graveyard', 'A mammoth that protects the graves of its pack and is absolutely merciless when facing grave-robbers.', NULL, 3, 5, 1200, 800, 3, NULL, 0, 0, 0), " +
+                        " ('54652250', @image_31, 'Man-Eater Bug', 'FLIP: Destroys 1 monster on the field (regardless of position).', 3, 3, 11, 450, 600, 2, NULL, 0, 0, 0), " +
+                        " ('13723605', @image_32, 'Man-Eating Treasure Chest', 'A monster disguised as a treasure chest that is known to attack the unwary adventurer.', NULL, 1, 9, 1600, 1000, 4, NULL, 0, 0, 0), " +
+                        " ('75499502', @image_33, 'Master & Expert', 'A deadly duo consisting of a beast master and its loyal servant.', NULL, 3, 2, 1200, 1000, 4, NULL, 0, 0, 0), " +
+                        " ('54098121', @image_34, 'Mysterious Puppeteer', 'As long as this card remains face-up on the field, the Life Points of this card`s controller increase by 500 points for each additional monster summoned (excluding Special Summon, but including your opponent`s monsters).', 4, 3, 21, 1000, 1500, 4, NULL, 0, 0, 0), " +
+                        " ('15025844', @image_35, 'Mystical Elf', 'A delicate elf that lacks offense, but has a terrific defense backed by mystical power.', NULL, 5, 19, 800, 2000, 4, NULL, 0, 0, 0), " +
+                        " ('47060154', @image_36, 'Mystic Clown', 'Nothing can stop the mad attack of this powerful creature.', NULL, 1, 9, 1500, 1000, 4, NULL, 0, 0, 0), " +
+                        " ('68516705', @image_37, 'Mystic Horseman', 'Half man and half horse, this monster is knows for its extreme speed.', NULL, 3, 2, 1300, 1550, 4, NULL, 0, 0, 0), " +
+                        " ('50930991', @image_38, 'Neo the Magic Swordsman', 'A dimensional drifter who not only practices sorcery, but is also a sword and martial arts master.', NULL, 5, 19, 1700, 1000, 4, NULL, 0, 0, 0), " +
+                        " ('45121025', @image_39, 'Ogre of the Black Shadow', 'An ogre possessed by the powers of the dark. Few can withstand its rapid chage.', NULL, 3, 3, 1200, 1400, 4, NULL, 0, 0, 0), " +
+                        " ('21263083', @image_40, 'Pale Beast', 'With skin tinged a bluish-white, this strange creature is a fearsome sight to behold.', NULL, 3, 2, 1500, 1200, 4, NULL, 0, 0, 0), " +
+                        " ('91939608', @image_41, 'Rogue Doll', 'A deadly doll gited with mystical power, it is particularly powerful when attacking against dark forces.', NULL, 5, 19, 1600, 1000, 4, NULL, 0, 0, 0), " +
+                        " ('26378150', @image_42, 'Rude Kaiser', 'With an axe in each hand, this monster delivers heavy damage.', NULL, 3, 3, 1800, 1600, 5, NULL, 0, 0, 0), " +
+                        " ('15303296', @image_43, 'Ryu-Kishin', 'A very elusive creature that looks like a harmless statue until it attacks.', NULL, 1, 9, 1000, 500, 3, NULL, 0, 0, 0), " +
+                        " ('24611934', @image_44, 'Ryu-Kishin Powered', 'A gargoyle enhanced by the powers of darkness. Very sharp talons make it a worthy opponent.', NULL, 1, 9, 1600, 1200, 4, NULL, 0, 0, 0), " +
+                        " ('90357090', @image_45, 'Silver Fang', 'A snow wolf that`s beautiful to the eye, but absolutely vicious in battle.', NULL, 3, 2, 1200, 800, 4, NULL, 0, 0, 0), " +
+                        " ('10202894', @image_46, 'Skull Red Bird', 'This monster swoops down and attacks with a rain of knives stores in its wings.', NULL, 7, 22, 1550, 1200, 4, NULL, 0, 0, 0), " +
+                        " ('49218300', @image_47, 'Sorcerer of the Doomed', 'A slave of the dark arts, this sorcerer is a monster of life-extinguishing spells.', NULL, 1, 19, 1450, 1200, 4, NULL, 0, 0, 0), " +
+                        " ('70781052', @image_48, 'Summoned Skull', 'A fiend with dark powers for confusing the enemy. Among the Field-Type monsters, this monster boasts considerable force.', NULL, 1, 9, 2500, 1200, 6, NULL, 0, 0, 0), " +
+                        " ('50005633', @image_49, 'Swordstalker', 'A monster formed by the vengeful souls of those who passed away in battle.', NULL, 1, 21, 2000, 1600, 6, NULL, 0, 0, 0), " +
+                        " ('63308047', @image_50, 'Terra the Terrible', 'Known as a swamp dweller, this creature is a minion of dark forces.', NULL, 1, 9, 1200, 1300, 4, NULL, 0, 0, 0), " +
+                        " ('87557188', @image_51, 'The Stern Mystic', 'FLIP: All face-down cards on the field are turned face-up, and then returned to their original positions. No card effects are activated when cards are turned face-up.', 5, 5, 19, 1500, 1200, 4, NULL, 0, 0, 0), " +
+                        " ('06285791', @image_52, 'The Wicked Worm Beast', 'This card is returned to your hand at the end of your turn.', 6, 3, 2, 1400, 700, 3, NULL, 0, 0, 0), " +
+                        " ('46461247', @image_53, 'Trap Master', 'FLIP: Destroys 1 Trap Card on the field. If this card`s target is face-down, flip it face-up. If the card is a Trap Card, it is destroyed. If not, it is returned to its face-down position. The flipped card is not activated.', 7, 3, 21, 500, 1100, 3, NULL, 0, 0, 0), " +
+                        " ('97360116', @image_54, 'Unknown Warrior of Fiend', 'The speed of this warrior creates an intense vacuum that can slice through a monster`s hide.', NULL, 1, 21, 1000, 500, 3, NULL, 0, 0, 0), " +
+                        " ('01784619', @image_55, 'Uraby', 'Fast on its feet, this dinosaur rips enemies to shreds with its sharp claws.', NULL, 3, 5, 1500, 800, 4, NULL, 0, 0, 0), " +
+                        " ('13945283', @image_56, 'Wall of Illusion', 'The monster attacking this creature is returned to its owner`s hand. Any damage resulting from the attack is calculated normally.', 8, 1, 9, 1000, 1850, 4, NULL, 0, 0, 0), " +
+                        " ('87796900', @image_57, 'Winger Dragon, Guardian of the Fortress #1', 'A dragon commonly found guarding mountain fortresses. Its signature attack is a sweeping dive from out of the blue.', NULL, 7, 7, 1400, 1200, 4, NULL, 0, 0, 0), " +
+                        " ('36304921', @image_58, 'Witty Phantom', 'Dressed in a night-black tuxedo, this creature presides over the darkness.', NULL, 1, 9, 1400, 1300, 4, NULL, 0, 0, 0); ";
 
                     DbParameter param;
 
@@ -376,95 +386,95 @@ public class Config
                     List<byte[]> magicBlob = new List<byte[]>();
                     byte[] photo;
 
-                    photo = File.ReadAllBytes(path + "Magic/AncientTelescope.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/AncientTelescope.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/BookOfSecretArts.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/BookOfSecretArts.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/CardDestruction.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/CardDestruction.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/CastleWalls.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/CastleWalls.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/ChangeOfHeart.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/ChangeOfHeart.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/DarkEnergy.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/DarkEnergy.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/DarkHole.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/DarkHole.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/DeSpell.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/DeSpell.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/DianKetoTheCureMaster.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/DianKetoTheCureMaster.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/DragonCaptureJar.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/DragonCaptureJar.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/Fissure.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/Fissure.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/Invigoration.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/Invigoration.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/JustDesserts.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/JustDesserts.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/LastWill.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/LastWill.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/MonsterReborn.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/MonsterReborn.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/Ookazi.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/Ookazi.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/Reinforcements.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/Reinforcements.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/RemoveTrap.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/RemoveTrap.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/ReverseTrap.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/ReverseTrap.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/Sogen.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/Sogen.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/SoulExchange.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/SoulExchange.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/SwordOfDarkDestruction.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/SwordOfDarkDestruction.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/TheFluteOfSummoningDragon.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/TheFluteOfSummoningDragon.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/TheInexperiencedSpy.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/TheInexperiencedSpy.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/TrapHole.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/TrapHole.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/TwoProngedAttack.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/TwoProngedAttack.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/UltimateOffering.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/UltimateOffering.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/Waboku.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/Waboku.png");
                     magicBlob.Add(photo);
-                    photo = File.ReadAllBytes(path + "Magic/Yami.png");
+                    photo = File.ReadAllBytes(path + "/Resources/Images/Card Images/Yami.png");
                     magicBlob.Add(photo);
 
-                    command.CommandText = "INSERT INTO Magic_Cards (CardNumber, Image, Name, Description, Effect_Key, Magic_Card_Type) VALUES " +
-                        " ('17092736', @image_1, 'Ancient Telescope', 'See the top 5 cards of your opponent`s Deck. Return the cards to the Deck in the same order.', 9, 1), " +
-                        " ('91595718', @image_2, 'Book of Secret Arts', 'A Spellcaster-Type monster equipped with this card increases its ATK and DEF by 300 points.', 10, 1), " +
-                        " ('72892473', @image_3, 'Card Destruction', 'Both players must discard their entire hands and draw the same number of cards that they discarded from their respective Decks.', 11, 1), " +
-                        " ('44209392', @image_4, 'Castle Walls', 'Increase a selected monster`s DEF by 500 points during the turn this card is activated.', 12, 2), " +
-                        " ('04031928', @image_5, 'Change of Heart', 'Select and control 1 opposing monster (regardless of position) on the field until the end of your turn.', 13, 1), " +
-                        " ('04614116', @image_6, 'Dark Energy', 'A Fiend-Type monster equipped with this card increases its ATK and DEF by 300 points.', 14, 1), " +
-                        " ('53129443', @image_7, 'Dark Hole', 'Destroys all monsters on the field.', 15, 1), " +
-                        " ('19159413', @image_8, 'De-Spell', 'Destroys 1 Magic Card on the field. If this card`s target is face-down flip it face-up. If the card is a Magic Card, it is destroyed. If not, it is returned to its face-down position The flipped card is not activated.', 16, 1), " +
-                        " ('84257639', @image_9, 'Dian Keto the Cure Master', 'Increases your Life Points by 1000 points.', 17, 1), " +
-                        " ('50045299', @image_10, 'Dragon Capture Jar', 'All dragon-Type monsters on the field are switched to Defense Position and remain in this position as long as this card is active.', 18, 2), " +
-                        " ('66788016', @image_11, 'Fissure', 'Destroys 1 opponent`s face-up monster with the lowest ATK.', 19, 1), " +
-                        " ('98374133', @image_12, 'Invigoration', 'An EARTH monster equipped with this card increases its ATK by 400 points and decreases its DEF by 200 points.', 20, 1), " +
-                        " ('24068492', @image_13, 'Just Desserts', 'Inflict 500 points of Direct Damage to your opponent`s Life Points for each monster your opponent has on the field.', 21, 2), " +
-                        " ('85602018', @image_14, 'Last Will', 'If a monster of yours is sent from the field to Graveyard during the turn that you`ve played this card, you can select a monster with an ATK of 1500 points or less from your Deck and play it as a Special Summon. Shuffle the Deck after playing the card. This card is active for 1 turn only.', 22, 1), " +
-                        " ('83764718', @image_15, 'Monster Reborn', 'Select 1 Monster Card from either your opponent`s or your own Graveyard and place it on the field under your control in Attack or Defense Position (face-up). This is considered a Special Summon.', 23, 1), " +
-                        " ('19523799', @image_16, 'Ookazi', 'Inflict 800 damage to your opponent.', 24, 1), " +
-                        " ('17814387', @image_17, 'Reinforcements', 'Increase 1 selected monster`s ATK by 500 points during the turn this card is activated.', 25, 2), " +
-                        " ('51482758', @image_18, 'Remove Trap', 'Destroys 1 face-up Trap Card on the field.', 26, 1), " +
-                        " ('77622396', @image_19, 'Reverse Trap', 'All increases and decreases to ATK and DEF are reversed for the turn in which this card is activated.', 27, 2), " +
-                        " ('86318356', @image_20, 'Sogen', 'Increases the ATK and DEF of all Beast-Warrior and Warrior-Type monsters by 200 points.', 28, 1), " +
-                        " ('68005187', @image_21, 'Soul Exchange', 'Select 1 monster on your opponent`s side of the field. This turn, if you would Tribute a monster on your side of the field, Tribute the selected monster instead. You cannot conduct your Battle Phase duing the turn that you activate this card.', 29, 1), " +
-                        " ('37120512', @image_22, 'Sword of Dark Destruction', 'A DARK monster equipped with this card increases its ATK by 400 points and decreases its DEF by 200 points.', 30, 1), " +
-                        " ('43973174', @image_23, 'The Flute of Summoning Dragon', 'Playing this card when you have a Lord of D. card face-up on the field allows you to play up to 2 Dragon-Type cards from your hand as a Special Summon.', 31, 1), " +
-                        " ('81820689', @image_24, 'The Inexperienced Spy', 'Select and see 1 card in your opponent`s hand.', 32, 1), " +
-                        " ('04206964', @image_25, 'Trap Hole', 'If the ATK of a monster summoned by your opponent (excluding Special Summon) is 1000 points or more, the monster is destroyed.', 33, 2), " +
-                        " ('83887306', @image_26, 'Two-Pronged Attack', 'Select and destroy 2 of your monsters and 1 of your opponent`s monters.', 34, 2), " +
-                        " ('80604091', @image_27, 'Ultimate Offering', 'At the cost of 500 Life Points per monster, a player is allowed an extra Normal Summon or Set.', 35, 2), " +
-                        " ('12607053', @image_28, 'Waboku', 'Any damage inflicted by an opponent`s monster is decreased to 0 during the turn this card is activated.', 36, 2), " +
-                        " ('59197169', @image_29, 'Yami', 'Increases the ATK and DEF of all Fiend and Spellcaster-Type monsters by 200 points. Also decreases the ATK and DEF of all Fairly-Type monsters by 200 points.', 37, 1); ";
+                    command.CommandText = "INSERT INTO Magic_Cards (CardNumber, Image, Name, Description, Effect_Key, Magic_Card_Type, IsContinuous, DestroyedAfterNTurns, QuickPlay) VALUES " +
+                        " ('17092736', @image_1, 'Ancient Telescope', 'See the top 5 cards of your opponent`s Deck. Return the cards to the Deck in the same order.', 9, 1, 0, -1, 0), " +
+                        " ('91595718', @image_2, 'Book of Secret Arts', 'A Spellcaster-Type monster equipped with this card increases its ATK and DEF by 300 points.', 10, 1, 0, -1, 0), " +
+                        " ('72892473', @image_3, 'Card Destruction', 'Both players must discard their entire hands and draw the same number of cards that they discarded from their respective Decks.', 11, 1, 0, -1, 0), " +
+                        " ('44209392', @image_4, 'Castle Walls', 'Increase a selected monster`s DEF by 500 points during the turn this card is activated.', 12, 2, 0, -1, 0), " +
+                        " ('04031928', @image_5, 'Change of Heart', 'Select and control 1 opposing monster (regardless of position) on the field until the end of your turn.', 13, 1, 0, -1, 0), " +
+                        " ('04614116', @image_6, 'Dark Energy', 'A Fiend-Type monster equipped with this card increases its ATK and DEF by 300 points.', 14, 1, 0, -1, 0), " +
+                        " ('53129443', @image_7, 'Dark Hole', 'Destroys all monsters on the field.', 15, 1, 0, -1, 0), " +
+                        " ('19159413', @image_8, 'De-Spell', 'Destroys 1 Magic Card on the field. If this card`s target is face-down flip it face-up. If the card is a Magic Card, it is destroyed. If not, it is returned to its face-down position The flipped card is not activated.', 16, 1, 0, -1, 0), " +
+                        " ('84257639', @image_9, 'Dian Keto the Cure Master', 'Increases your Life Points by 1000 points.', 17, 1, 0, -1, 0), " +
+                        " ('50045299', @image_10, 'Dragon Capture Jar', 'All dragon-Type monsters on the field are switched to Defense Position and remain in this position as long as this card is active.', 18, 2, 0, -1, 0), " +
+                        " ('66788016', @image_11, 'Fissure', 'Destroys 1 opponent`s face-up monster with the lowest ATK.', 19, 1, 0, -1, 0), " +
+                        " ('98374133', @image_12, 'Invigoration', 'An EARTH monster equipped with this card increases its ATK by 400 points and decreases its DEF by 200 points.', 20, 1, 0, -1, 0), " +
+                        " ('24068492', @image_13, 'Just Desserts', 'Inflict 500 points of Direct Damage to your opponent`s Life Points for each monster your opponent has on the field.', 21, 2, 0, -1, 0), " +
+                        " ('85602018', @image_14, 'Last Will', 'If a monster of yours is sent from the field to Graveyard during the turn that you`ve played this card, you can select a monster with an ATK of 1500 points or less from your Deck and play it as a Special Summon. Shuffle the Deck after playing the card. This card is active for 1 turn only.', 22, 1, 0, -1, 0), " +
+                        " ('83764718', @image_15, 'Monster Reborn', 'Select 1 Monster Card from either your opponent`s or your own Graveyard and place it on the field under your control in Attack or Defense Position (face-up). This is considered a Special Summon.', 23, 1, 0, -1, 0), " +
+                        " ('19523799', @image_16, 'Ookazi', 'Inflict 800 damage to your opponent.', 24, 1, 0, -1, 0), " +
+                        " ('17814387', @image_17, 'Reinforcements', 'Increase 1 selected monster`s ATK by 500 points during the turn this card is activated.', 25, 2, 0, -1, 0), " +
+                        " ('51482758', @image_18, 'Remove Trap', 'Destroys 1 face-up Trap Card on the field.', 26, 1, 0, -1, 0), " +
+                        " ('77622396', @image_19, 'Reverse Trap', 'All increases and decreases to ATK and DEF are reversed for the turn in which this card is activated.', 27, 2, 0, -1, 0), " +
+                        " ('86318356', @image_20, 'Sogen', 'Increases the ATK and DEF of all Beast-Warrior and Warrior-Type monsters by 200 points.', 28, 1, 0, -1, 0), " +
+                        " ('68005187', @image_21, 'Soul Exchange', 'Select 1 monster on your opponent`s side of the field. This turn, if you would Tribute a monster on your side of the field, Tribute the selected monster instead. You cannot conduct your Battle Phase duing the turn that you activate this card.', 29, 1, 0, -1, 0), " +
+                        " ('37120512', @image_22, 'Sword of Dark Destruction', 'A DARK monster equipped with this card increases its ATK by 400 points and decreases its DEF by 200 points.', 30, 1, 0, -1, 0), " +
+                        " ('43973174', @image_23, 'The Flute of Summoning Dragon', 'Playing this card when you have a Lord of D. card face-up on the field allows you to play up to 2 Dragon-Type cards from your hand as a Special Summon.', 31, 1, 0, -1, 0), " +
+                        " ('81820689', @image_24, 'The Inexperienced Spy', 'Select and see 1 card in your opponent`s hand.', 32, 1, 0, -1, 0), " +
+                        " ('04206964', @image_25, 'Trap Hole', 'If the ATK of a monster summoned by your opponent (excluding Special Summon) is 1000 points or more, the monster is destroyed.', 33, 2, 0, -1, 0), " +
+                        " ('83887306', @image_26, 'Two-Pronged Attack', 'Select and destroy 2 of your monsters and 1 of your opponent`s monters.', 34, 2, 0, -1, 0), " +
+                        " ('80604091', @image_27, 'Ultimate Offering', 'At the cost of 500 Life Points per monster, a player is allowed an extra Normal Summon or Set.', 35, 2, 0, -1, 0), " +
+                        " ('12607053', @image_28, 'Waboku', 'Any damage inflicted by an opponent`s monster is decreased to 0 during the turn this card is activated.', 36, 2, 0, -1, 0), " +
+                        " ('59197169', @image_29, 'Yami', 'Increases the ATK and DEF of all Fiend and Spellcaster-Type monsters by 200 points. Also decreases the ATK and DEF of all Fairly-Type monsters by 200 points.', 37, 1, 0, -1, 0); ";
 
                     DbParameter param;
 

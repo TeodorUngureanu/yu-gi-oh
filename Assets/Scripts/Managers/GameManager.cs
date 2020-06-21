@@ -5,13 +5,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// TEO
+using System.IO;
+
 public class GameManager : MonoBehaviourPunCallbacks {
 
     public GameObject player, field;
 
     private static GameManager instance;
     private PlayerScript playerScript;
-    private Graveyard playerGraveyard, enemyGraveyard;
+    private List<Card> playerGraveyard = new List<Card>();
+    private List<Card> enemyGraveyard = new List<Card>();
     private FieldScript fieldScript;
 
     private int enemyLifePoints = Constants.STARTING_LIFE_POINTS;
@@ -52,6 +56,17 @@ public class GameManager : MonoBehaviourPunCallbacks {
         }
 
         Config.Get().Load();
+
+        Card testMonster = new Monster("15025844", File.ReadAllBytes("Assets/Resources/Images/Card Images/MysticalElf.png"),
+            "Mystical Elf", "blahblahblah", 0, 5, 19, 800, 2000, 4, false);
+        Card testSpell = new NonMonster("83764718", File.ReadAllBytes("Assets/Resources/Images/Card Images/MonsterReborn.png"),
+            "Monster Reborn", "x", 1, 1);
+        Card testTrap = new NonMonster("04206964", File.ReadAllBytes("Assets/Resources/Images/Card Images/TrapHole.png"),
+            "Trap Hole", "y", 1, 2);
+
+        playerGraveyard.Add(testMonster);
+        playerGraveyard.Add(testSpell);
+        enemyGraveyard.Add(testTrap);
     }
 
     public MyPlayer PlayerPrefab;
@@ -78,13 +93,37 @@ public class GameManager : MonoBehaviourPunCallbacks {
         }
     }
 
-    public Graveyard GetGraveyard(string key)
+    public List<Card> GetGraveyard(string key)
     {
-        if (key.Equals("ENEMY"))
+        if (key.Equals(Constants.ENEMY))
         {
             return enemyGraveyard;
         }
         return playerGraveyard;
+    }
+
+    public void AddCardToPlayerGraveyard(Card card)
+    {
+        playerGraveyard.Add(card);
+        UIManager.Get().UpdatePlayerGraveyardCount(playerGraveyard.Count);
+    }
+
+    public void AddCardToEnemyGraveyard(Card card)
+    {
+        enemyGraveyard.Add(card);
+        UIManager.Get().UpdateEnemyGraveyardCount(playerGraveyard.Count);
+    }
+
+    public void PopCardToPlayerGraveyard(Card card)
+    {
+        playerGraveyard.Remove(card);
+        UIManager.Get().UpdatePlayerGraveyardCount(playerGraveyard.Count);
+    }
+
+    public void PopCardToEnemyGraveyard(Card card)
+    {
+        enemyGraveyard.Remove(card);
+        UIManager.Get().UpdateEnemyGraveyardCount(playerGraveyard.Count);
     }
 
     public int GetFieldEffectValue(string monsterType)

@@ -6,6 +6,7 @@ using UnityEngine;
 public class PlayerScript : MonoBehaviour {
 
     public GameObject disk, deck, hand;
+    public Canvas GraveyardButtonCanvas;
 
     private long lifePoints;
     private int turnCount;
@@ -42,6 +43,8 @@ public class PlayerScript : MonoBehaviour {
         spellsOnDisk = new List<Card> { null, null, null, null, null };
         quickPlayCards = new HashSet<string>();
         turn = new Turn();
+
+        GraveyardButtonCanvas.gameObject.SetActive(false);
     }
     
     void Start()
@@ -78,6 +81,7 @@ public class PlayerScript : MonoBehaviour {
     {
         yield return new WaitForSeconds(2);
 
+        GraveyardButtonCanvas.gameObject.SetActive(true);
         deck.SetActive(true);
         isReadyForDuel = true;
         UIManager.Get().UpdateDeckSizeOnDisk(deckScript.CardsLeft());
