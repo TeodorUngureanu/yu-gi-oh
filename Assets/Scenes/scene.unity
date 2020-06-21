@@ -7378,6 +7378,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 128871576}
   field: {fileID: 520488287}
+  GraveyardButton: {fileID: 1684535954}
+  CloseGraveyardButton: {fileID: 190330980}
+  PlayerTab: {fileID: 2019968769}
+  EnemyTab: {fileID: 109605908}
   PlayerPrefab: {fileID: 4452822233404719736, guid: df7688f0849aec145b823fedfa53a8a3,
     type: 3}
   LocalPlayer: {fileID: 0}
@@ -7412,8 +7416,8 @@ MonoBehaviour:
   duelInfoCanvas: {fileID: 1294815709}
   PlayerName: {fileID: 1967134734}
   EnemyName: {fileID: 335366339}
-  PlayerGraveyardCount: {fileID: 0}
-  EnemyGraveyardCount: {fileID: 0}
+  PlayerGraveyardCount: {fileID: 254896258}
+  EnemyGraveyardCount: {fileID: 1410947714}
 --- !u!114 &1360528754
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9885,13 +9889,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1767782433}
-  m_LocalRotation: {x: 0.07346595, y: -0, z: -0, w: 0.99729776}
-  m_LocalPosition: {x: -0.31, y: 13.84, z: -30.24}
+  m_LocalRotation: {x: 0.15276356, y: -0, z: -0, w: 0.9882628}
+  m_LocalPosition: {x: -0.31, y: 13.91, z: -30.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 11
-  m_LocalEulerAnglesHint: {x: 8.426001, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 17.574001, y: 0, z: 0}
 --- !u!1 &1780565523
 GameObject:
   m_ObjectHideFlags: 0
