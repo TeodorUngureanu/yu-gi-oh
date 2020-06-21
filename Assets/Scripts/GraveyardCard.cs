@@ -4,15 +4,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DeckConstructionCard : InteractibleAbstractCard
+public class GraveyardCard : InteractibleAbstractCard
 {
     public GameObject frontImagePlange;
     public GameObject previewImage;
-    public Canvas canvas;
-    public Text text;
 
-    private int multiplier = 0;
-    private int deckNumber;
     private string cardNumber;
 
     public override void ChangeText()
@@ -22,20 +18,6 @@ public class DeckConstructionCard : InteractibleAbstractCard
 
     public override void InteractWithElement()
     {
-        multiplier = int.Parse(text.text);
-
-        canvas.gameObject.SetActive(true);
-
-        if (multiplier == 3)
-        {
-            Debug.Log("Warning message > 3");
-        }
-        else
-        {
-            multiplier++;
-            text.text = "" + multiplier;
-            DeckConstructionManager.Get().AddCardToDeck(cardNumber, deckNumber);
-        }
     }
 
     protected override void Awake()
@@ -46,12 +28,10 @@ public class DeckConstructionCard : InteractibleAbstractCard
 
     private void Start()
     {
-        if (gameObject.name.Length > 11) {
-            string[] monsterMagic_cardNumber = gameObject.name.Split('_');
-            deckNumber = int.Parse(monsterMagic_cardNumber[0]);
-            cardType = (Enums.CardType)int.Parse(monsterMagic_cardNumber[1]);
-            cardNumber = monsterMagic_cardNumber[2];
-        }
+        string[] monsterMagic_cardNumber = gameObject.name.Split('_');
+
+        cardNumber = monsterMagic_cardNumber[0];
+        cardType = (Enums.CardType)int.Parse(monsterMagic_cardNumber[1]);
     }
 
     public void SetObjectRenderer()
@@ -76,31 +56,9 @@ public class DeckConstructionCard : InteractibleAbstractCard
             InteractWithElement();
         }
 
-        if (Input.GetMouseButtonDown(1))
-        {
-            DecreaseCard();
-        }
-
         if (Input.GetMouseButtonDown(2))
         {
             PreviewImage();
-        }
-    }
-
-    void DecreaseCard()
-    {
-        multiplier = int.Parse(text.text);
-
-        if (multiplier > 0)
-        {
-            multiplier--;
-            text.text = "" + multiplier;
-            DeckConstructionManager.Get().RemoveCardFromDeck(cardNumber, deckNumber);
-
-            if (multiplier == 0)
-            {
-                canvas.gameObject.SetActive(false);
-            }
         }
     }
 
@@ -135,6 +93,11 @@ public class DeckConstructionCard : InteractibleAbstractCard
                     break;
                 }
             }
+        }
+
+        if ( ! previewImage.activeSelf)
+        {
+            previewImage.SetActive(true);
         }
 
         // Apply this texure as per requirement on image or material
