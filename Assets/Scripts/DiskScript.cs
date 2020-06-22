@@ -37,6 +37,10 @@ public class DiskScript : MonoBehaviour {
         monstersOnDisk[index].SetActive(true);
     }
 
+    public void FlipMonster(int index)
+    {
+        monstersOnDisk[index].GetComponent<DiskCardScript>().Flip();
+
     public void SwitchMonsterPosition(int index)
     {
         monstersOnDisk[index].GetComponent<DiskCardScript>().SwitchPosition();
