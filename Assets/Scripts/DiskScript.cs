@@ -37,6 +37,11 @@ public class DiskScript : MonoBehaviour {
         monstersOnDisk[index].SetActive(true);
     }
 
+    public void FlipMonster(int index)
+    {
+        monstersOnDisk[index].GetComponent<DiskCardScript>().Flip();
+    }
+
     public void SetSpell(int index, NonMonster cardInfo, Enums.CardType spellType, Enums.CardFace face)
     {
         spellsOnDisk[index].GetComponent<DiskCardScript>().SetData(index, spellType, face, cardInfo);

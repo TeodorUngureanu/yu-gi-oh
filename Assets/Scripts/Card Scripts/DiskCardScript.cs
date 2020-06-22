@@ -43,13 +43,13 @@ public class DiskCardScript : InteractibleAbstractCard {
         SetFace(vFace);
         if (IsMonster() && face == Enums.CardFace.Down) {
             SetPosition(Enums.CardPosition.Def);
-            RotateCard();
+            RotateCard(false);
             TweakCardTransform(DEF_COEFF);
         }
         if (!IsMonster())
         {
             if(face == Enums.CardFace.Down) {
-                RotateCard();
+                RotateCard(false);
             }
             if(face == Enums.CardFace.Up || cardType == Enums.CardType.Trap)
             {
@@ -60,11 +60,16 @@ public class DiskCardScript : InteractibleAbstractCard {
         hasChangedPositionThisTurn = true;
     }
 
+    public void Flip()
+    {
+        RotateCard(true);
+    }
+
     public void ResetData()
     {
         if (face == Enums.CardFace.Down)
         {
-            RotateCard();
+            RotateCard(false);
         }
         if(position == Enums.CardPosition.Def)
         {
@@ -104,10 +109,10 @@ public class DiskCardScript : InteractibleAbstractCard {
         }
     }
 
-    private void RotateCard()
+    private void RotateCard(bool reverse)
     {
         Vector3 crtRotation = this.gameObject.transform.localEulerAngles;
-        crtRotation.x += 180;
+        crtRotation.x += (reverse ? -1 : 1) * 180;
         this.gameObject.transform.localEulerAngles = crtRotation;
     }
 
@@ -242,7 +247,7 @@ public class DiskCardScript : InteractibleAbstractCard {
         if(face == Enums.CardFace.Down)
         {
             SetFace(Enums.CardFace.Up);
-            RotateCard();
+            RotateCard(false);
         }
 
         TweakCardTransform(coefficient);
@@ -287,10 +292,12 @@ public class DiskCardScript : InteractibleAbstractCard {
 
             if ((currentPhase == Turn.Phase.Main1 || currentPhase == Turn.Phase.Main2) && !hasChangedPositionThisTurn)
             {
-                GameManager.Get().SwitchMonsterPosition(cardIndex, face, position, (Monster) cardInfo);
+                Enums.CardFace oldFace = face;
+                Enums.CardPosition oldPos = position;
 
                 SwitchPosition();
                 hasChangedPositionThisTurn = true;
+                GameManager.Get().SwitchMonsterPosition(cardIndex, oldFace, oldPos, (Monster) cardInfo);
             }
         }
         else
@@ -298,7 +305,7 @@ public class DiskCardScript : InteractibleAbstractCard {
             UnhighlightObject();
             highlightable = false;
             SetFace(Enums.CardFace.Up);
-            RotateCard();
+            RotateCard(false);
             GameManager.Get().FlipSpell(cardIndex, false);
 
             if (GameManager.Get().IsQuickActivation())

@@ -262,7 +262,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
         if (oldFace == Enums.CardFace.Up)
         {
-            action = (oldPosition == Enums.CardPosition.Atk) ? Constants.ATK_CHANGE_TEXT : Constants.DEF_CHANGE_TEXT;
+            action = (oldPosition == Enums.CardPosition.Atk) ? Constants.DEF_CHANGE_TEXT : Constants.ATK_CHANGE_TEXT;
         }
 
         SendInformation(action, index, parameters);
@@ -476,9 +476,11 @@ public class GameManager : MonoBehaviourPunCallbacks {
                 if(isEnemy)
                 {
                     playerScript.FlipMonster(targetIndex);
+                    fieldScript.FlipMonster(targetIndex, false);
                     List<MessageParameter> sendParameters = new List<MessageParameter>()
                     {
-                        new MessageParameter(Constants.CARD_NO_KEY, targetMonster.GetCardNumber())
+                        new MessageParameter(Constants.CARD_NO_KEY, targetMonster.GetCardNumber()),
+                        new MessageParameter(Constants.TYPE_KEY, Constants.MONSTER)
                     };
                     
                     GameManager.Get().SendInformation(Constants.FLIPPING_TEXT, targetIndex, sendParameters);
@@ -493,6 +495,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
                     }
                 } else
                 {
+                    fieldScript.FlipMonster(targetIndex, true);
                     if (targetMonster.IsFlippable())
                     {
                         UIManager.Get().SetInfoTextOnInfoPanel(Constants.QUICK_PLAY_INFO, true);
@@ -687,7 +690,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
         {
             playerScript.HighlightPlayerCards();
             playerScript.PauseSwitch(false);
-
         }
     }
 
@@ -917,6 +919,15 @@ public class GameManager : MonoBehaviourPunCallbacks {
         {
             //TODO: show somehow which monster is going to be attacked - highlight it (red or green)
             int targetIndex = Int32.Parse(targetIndexString);
+            if(playerScript.GetCardFaceForIndex(targetIndex, true) == Enums.CardFace.Down)
+            {
+                SendInformation(Constants.REVEAL_CARD_KEY, targetIndex, new List<MessageParameter>()
+                {
+                    new MessageParameter(Constants.TYPE_KEY, Constants.MONSTER),
+                    new MessageParameter(Constants.CARD_NO_KEY, playerScript.GetCardInfoForIndex(targetIndex, true).GetCardNumber())
+                });
+            }
+            
         }
 
         message.SetEnemyAction(true);
@@ -937,6 +948,13 @@ public class GameManager : MonoBehaviourPunCallbacks {
         string cardNumber, cardType;
 
         actionParams.TryGetValue(Constants.CARD_NO_KEY, out cardNumber);
+        actionParams.TryGetValue(Constants.TYPE_KEY, out cardType);
+
+        if (action == Constants.REVEAL_CARD_KEY)
+        {
+            fieldScript.SetEnemyCardInfo(cardIndex, Config.Get().GetCardInfoByNumber(cardNumber, cardType == Constants.MONSTER));
+            return;
+        }
 
         if(action == Constants.DESELECT)
         {
@@ -957,14 +975,12 @@ public class GameManager : MonoBehaviourPunCallbacks {
             actionParams.TryGetValue(Constants.FACE_KEY, out faceParam);
 
             Enums.CardFace face = (Enums.CardFace)Enum.Parse(typeof(Enums.CardFace), faceParam);
-            Enums.CardPosition oldPosition = (action == Constants.ATK_CHANGE_TEXT) ? Enums.CardPosition.Atk : Enums.CardPosition.Def;
-            fieldScript.SwitchEnemyMonsterPosition(cardIndex, cardNumber, face, oldPosition);
+            Enums.CardPosition newPosition = (action == Constants.ATK_CHANGE_TEXT) ? Enums.CardPosition.Atk : Enums.CardPosition.Def;
+            fieldScript.SwitchEnemyMonsterPosition(cardIndex, cardNumber, face, newPosition);
 
             AskForQuickActivation();
             return;
         }
-        
-        actionParams.TryGetValue(Constants.TYPE_KEY, out cardType);
 
         if (action == Constants.SELECTION_TEXT)
         {
