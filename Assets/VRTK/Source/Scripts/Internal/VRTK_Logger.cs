@@ -157,10 +157,10 @@
                 case LogLevels.Trace:
                 case LogLevels.Debug:
                 case LogLevels.Info:
-                    UnityEngine.Debug.Log(message);
+                    //UnityEngine.Debug.Log(message);
                     break;
                 case LogLevels.Warn:
-                    UnityEngine.Debug.LogWarning(message);
+                    //UnityEngine.Debug.LogWarning(message);
                     break;
                 case LogLevels.Error:
                 case LogLevels.Fatal:

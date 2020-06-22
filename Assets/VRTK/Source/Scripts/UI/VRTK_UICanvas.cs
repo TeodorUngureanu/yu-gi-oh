@@ -25,13 +25,14 @@ namespace VRTK
     public class VRTK_UICanvas : MonoBehaviour
     {
         [Tooltip("Determines if a UI Click action should happen when a UI Pointer game object collides with this canvas.")]
-        public bool clickOnPointerCollision = false;
+        public bool clickOnPointerCollision = true;
         [Tooltip("Determines if a UI Pointer will be auto activated if a UI Pointer game object comes within the given distance of this canvas. If a value of `0` is given then no auto activation will occur.")]
         public float autoActivateWithinDistance = 0f;
 
         protected BoxCollider canvasBoxCollider;
         protected Rigidbody canvasRigidBody;
         protected Coroutine draggablePanelCreation;
+        private bool canDrawCard;
         protected const string CANVAS_DRAGGABLE_PANEL = "VRTK_UICANVAS_DRAGGABLE_PANEL";
         protected const string ACTIVATOR_FRONT_TRIGGER_GAMEOBJECT = "VRTK_UICANVAS_ACTIVATOR_FRONT_TRIGGER";
 
@@ -50,13 +51,26 @@ namespace VRTK
             RemoveCanvas();
         }
 
+        private void Update()
+        {
+            if (Input.GetMouseButtonDown(0) && canDrawCard)
+            {
+                GameManager.Get().DrawCard();
+                canDrawCard = false;
+            }
+        }
+
         protected virtual void OnTriggerEnter(Collider collider)
         {
-            VRTK_PlayerObject colliderCheck = collider.GetComponentInParent<VRTK_PlayerObject>();
-            VRTK_UIPointer pointerCheck = collider.GetComponentInParent<VRTK_UIPointer>();
-            if (pointerCheck != null && colliderCheck != null && colliderCheck.objectType == VRTK_PlayerObject.ObjectTypes.Collider)
+            //VRTK_PlayerObject colliderCheck = collider.GetComponentInParent<VRTK_PlayerObject>();
+            //VRTK_UIPointer pointerCheck = collider.GetComponentInParent<VRTK_UIPointer>();
+            //if (pointerCheck != null && colliderCheck != null && colliderCheck.objectType == VRTK_PlayerObject.ObjectTypes.Collider)
+            //{
+            //    pointerCheck.collisionClick = clickOnPointerCollision;
+            //}
+            if(gameObject.name == "DeckPlaceholder")
             {
-                pointerCheck.collisionClick = clickOnPointerCollision;
+                canDrawCard = true;
             }
         }
 
@@ -67,6 +81,7 @@ namespace VRTK
             {
                 pointerCheck.collisionClick = false;
             }
+            canDrawCard = false;
         }
 
         protected virtual void SetupCanvas()
