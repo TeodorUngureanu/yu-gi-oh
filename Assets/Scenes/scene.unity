@@ -1871,6 +1871,7 @@ GameObject:
   - component: {fileID: 371160708}
   - component: {fileID: 371160707}
   - component: {fileID: 371160710}
+  - component: {fileID: 371160711}
   m_Layer: 0
   m_Name: Canvas
   m_TagString: Untagged
@@ -1979,6 +1980,43 @@ MonoBehaviour:
   EnemyCanvas: {fileID: 176823294}
   PreviewImage: {fileID: 1761935488}
   GraveyardInformation: {fileID: 2024283880}
+--- !u!23 &371160711
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 371160705}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
 --- !u!1 &384924110
 GameObject:
   m_ObjectHideFlags: 0
@@ -7378,6 +7416,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 128871576}
   field: {fileID: 520488287}
+  GraveyardButton: {fileID: 1684535954}
+  CloseGraveyardButton: {fileID: 190330980}
+  PlayerTab: {fileID: 2019968769}
+  EnemyTab: {fileID: 109605908}
   PlayerPrefab: {fileID: 4452822233404719736, guid: df7688f0849aec145b823fedfa53a8a3,
     type: 3}
   LocalPlayer: {fileID: 0}
@@ -7412,8 +7454,8 @@ MonoBehaviour:
   duelInfoCanvas: {fileID: 1294815709}
   PlayerName: {fileID: 1967134734}
   EnemyName: {fileID: 335366339}
-  PlayerGraveyardCount: {fileID: 0}
-  EnemyGraveyardCount: {fileID: 0}
+  PlayerGraveyardCount: {fileID: 254896258}
+  EnemyGraveyardCount: {fileID: 1410947714}
 --- !u!114 &1360528754
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9885,13 +9927,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1767782433}
-  m_LocalRotation: {x: 0.07346595, y: -0, z: -0, w: 0.99729776}
-  m_LocalPosition: {x: -0.31, y: 13.84, z: -30.24}
+  m_LocalRotation: {x: 0.15276356, y: -0, z: -0, w: 0.9882628}
+  m_LocalPosition: {x: 1.51, y: 13.91, z: -30.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 11
-  m_LocalEulerAnglesHint: {x: 8.426001, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 17.574001, y: 0, z: 0}
 --- !u!1 &1780565523
 GameObject:
   m_ObjectHideFlags: 0
@@ -11461,6 +11503,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2024283882}
   - component: {fileID: 2024283881}
+  - component: {fileID: 2024283883}
   m_Layer: 0
   m_Name: GraveyardInformation
   m_TagString: Untagged
@@ -11499,6 +11542,43 @@ Transform:
   m_Father: {fileID: 1517193459}
   m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 25}
+--- !u!23 &2024283883
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2024283880}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
 --- !u!1001 &2035381571
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -12,16 +12,21 @@ public class GraveyardTab : MonoBehaviour
     public GameObject EnemyCanvas;
     public GameObject PreviewImage;
     public GameObject GraveyardInformation;
-    
+
+    float positionZ;
+
     private void Awake()
     {
         PlayerGraveyardTab.GetComponentInChildren<Text>().text = PlayerPrefs.GetString("PlayerName");
+        positionZ = PlayerCanvas.transform.position.z;
     }
 
     public void ActivatePlayerGraveyardTab()
     {
-        PlayerCanvas.SetActive(true);
-        EnemyCanvas.SetActive(false);
+        // PlayerCanvas.SetActive(true);
+        // EnemyCanvas.SetActive(false);
+        PlayerCanvas.transform.position = new Vector3(PlayerCanvas.transform.position.x, PlayerCanvas.transform.position.y, positionZ - 0.2f);
+        EnemyCanvas.transform.position = new Vector3(EnemyCanvas.transform.position.x, EnemyCanvas.transform.position.y, positionZ + 0.2f);
 
         ColorBlock cb = PlayerGraveyardTab.colors;
         cb.normalColor = new Color(0.1254902f, 0.2980392f, 0.3803922f, 1f);
@@ -32,12 +37,16 @@ public class GraveyardTab : MonoBehaviour
         EnemyGraveyardTab.colors = cb;
 
         PreviewImage.SetActive(false);
+
+        GraveyardCanvas.Get().SetPlayerEnemyConstant(Constants.PLAYER);
     }
 
     public void ActivateEnemyGraveyardTab()
     {
-        PlayerCanvas.SetActive(false);
-        EnemyCanvas.SetActive(true);
+        // PlayerCanvas.SetActive(false);
+        // EnemyCanvas.SetActive(true);
+        PlayerCanvas.transform.position = new Vector3(PlayerCanvas.transform.position.x, PlayerCanvas.transform.position.y, positionZ + 0.2f);
+        EnemyCanvas.transform.position = new Vector3(EnemyCanvas.transform.position.x, EnemyCanvas.transform.position.y, positionZ - 0.2f);
 
         ColorBlock cb = PlayerGraveyardTab.colors;
         cb.normalColor = new Color(0.1254902f, 0.2980392f, 0.3803922f, 0f);
@@ -48,12 +57,14 @@ public class GraveyardTab : MonoBehaviour
         EnemyGraveyardTab.colors = cb;
 
         PreviewImage.SetActive(false);
+
+        GraveyardCanvas.Get().SetPlayerEnemyConstant(Constants.ENEMY);
     }
 
     public void CancelGraveyard()
     {
-        PlayerCanvas.SetActive(false);
-        EnemyCanvas.SetActive(false);
+        // PlayerCanvas.SetActive(false);
+        // EnemyCanvas.SetActive(false);
         PreviewImage.SetActive(false);
 
         ColorBlock cb = PlayerGraveyardTab.colors;

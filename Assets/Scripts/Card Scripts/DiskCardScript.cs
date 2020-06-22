@@ -239,7 +239,7 @@ public class DiskCardScript : InteractibleAbstractCard {
         this.gameObject.transform.localEulerAngles = crtRotation + coefficient * rotTransitionVector;
     }
 
-    private void SwitchPosition()
+    public void SwitchPosition()
     {
         SetPosition((position == Enums.CardPosition.Atk) ? Enums.CardPosition.Def : Enums.CardPosition.Atk);
         int coefficient = (position == Enums.CardPosition.Def) ? DEF_COEFF : ATK_COEFF;

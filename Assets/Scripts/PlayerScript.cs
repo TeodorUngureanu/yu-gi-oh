@@ -578,6 +578,22 @@ public class PlayerScript : MonoBehaviour {
         return diskIndex;
     }
 
+    public int SetMonsterFromGraveyardOnDisk(Monster cardInfo, Enums.CardPosition position)
+    {
+        int diskIndex = monstersOnDisk.IndexOf(null);
+        cardInfo.SetTurnPlayed(turnCount);
+
+        monstersOnDisk[diskIndex] = cardInfo;
+        diskScript.SetMonster(diskIndex, Enums.CardFace.Up, cardInfo);
+
+        if (position == Enums.CardPosition.Def)
+        {
+            diskScript.SwitchMonsterPosition(diskIndex);
+        }
+
+        return diskIndex;
+    }
+
     public int SetSpellOnDisk(int handIndex, NonMonster cardInfo, Enums.CardFace face)
     {
         int diskIndex = spellsOnDisk.IndexOf(null);
@@ -616,6 +632,9 @@ public class PlayerScript : MonoBehaviour {
         {
             RemoveQuickPlayCard("MONSTER_", index);
             diskScript.DestroyMonster(diskIndices[index]);
+
+            GameManager.Get().AddCardToPlayerGraveyard(monstersOnDisk[diskIndices[index]]);
+
             monstersOnDisk[diskIndices[index]] = null;
         }
     }
@@ -626,6 +645,9 @@ public class PlayerScript : MonoBehaviour {
         {
             RemoveQuickPlayCard("SPELL_", index);
             diskScript.DestroySpell(diskIndices[index]);
+
+            GameManager.Get().AddCardToPlayerGraveyard(spellsOnDisk[diskIndices[index]]);
+
             spellsOnDisk[diskIndices[index]] = null;
         }
     }
@@ -713,5 +735,10 @@ public class PlayerScript : MonoBehaviour {
         lifePoints += points;
         UIManager.Get().UpdateLPOnDisk(lifePoints);
         return lifePoints;
+    }
+    
+    public Card GetHandCardInfoForIndex (int index)
+    {
+        return handScript.GetCardInfoForIndex(index);
     }
 }

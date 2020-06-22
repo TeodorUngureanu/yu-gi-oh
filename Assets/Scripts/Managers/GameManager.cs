@@ -4,13 +4,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-// TEO
 using System.IO;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviourPunCallbacks {
 
     public GameObject player, field;
+    public Button GraveyardButton, CloseGraveyardButton, PlayerTab, EnemyTab;
 
     private static GameManager instance;
     private PlayerScript playerScript;
@@ -19,8 +19,9 @@ public class GameManager : MonoBehaviourPunCallbacks {
     private FieldScript fieldScript;
 
     private int enemyLifePoints = Constants.STARTING_LIFE_POINTS;
+
     private int enemyHand = 0;
-    private int enemyDeck = 50; //TODO: remove this initialization when we get this info at the beginning of the duel
+    private int enemyDeck = 50; // TODO: remove this initialization when we get this info at the beginning of the duel
     private Tribute tribute;
     private int attackingMonsterIndex = 100, flippableMonsterIndex = 100;
     private bool playerDiscarding = false, sacrificing = false, attacking = false, quickActivation = false;
@@ -56,17 +57,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
         }
 
         Config.Get().Load();
-
-        Card testMonster = new Monster("15025844", File.ReadAllBytes("Assets/Resources/Images/Card Images/MysticalElf.png"),
-            "Mystical Elf", "blahblahblah", 0, 5, 19, 800, 2000, 4, false);
-        Card testSpell = new NonMonster("83764718", File.ReadAllBytes("Assets/Resources/Images/Card Images/MonsterReborn.png"),
-            "Monster Reborn", "x", 1, 1);
-        Card testTrap = new NonMonster("04206964", File.ReadAllBytes("Assets/Resources/Images/Card Images/TrapHole.png"),
-            "Trap Hole", "y", 1, 2);
-
-        playerGraveyard.Add(testMonster);
-        playerGraveyard.Add(testSpell);
-        enemyGraveyard.Add(testTrap);
     }
 
     public MyPlayer PlayerPrefab;
@@ -111,19 +101,19 @@ public class GameManager : MonoBehaviourPunCallbacks {
     public void AddCardToEnemyGraveyard(Card card)
     {
         enemyGraveyard.Add(card);
-        UIManager.Get().UpdateEnemyGraveyardCount(playerGraveyard.Count);
+        UIManager.Get().UpdateEnemyGraveyardCount(enemyGraveyard.Count);
     }
 
-    public void PopCardToPlayerGraveyard(Card card)
+    public void PopCardFromPlayerGraveyard(int index)
     {
-        playerGraveyard.Remove(card);
+        playerGraveyard.RemoveAt(index);
         UIManager.Get().UpdatePlayerGraveyardCount(playerGraveyard.Count);
     }
 
-    public void PopCardToEnemyGraveyard(Card card)
+    public void PopCardFromEnemyGraveyard(int index)
     {
-        enemyGraveyard.Remove(card);
-        UIManager.Get().UpdateEnemyGraveyardCount(playerGraveyard.Count);
+        enemyGraveyard.RemoveAt(index);
+        UIManager.Get().UpdateEnemyGraveyardCount(enemyGraveyard.Count);
     }
 
     public int GetFieldEffectValue(string monsterType)
@@ -246,6 +236,56 @@ public class GameManager : MonoBehaviourPunCallbacks {
         PauseCurrentPhase();
     }
 
+    private void SetMonsterFromGraveyardAction()
+    {
+        Message message = PopActionFromBacklog();
+        actionsToBeDone -= SetMonsterFromGraveyardAction;
+
+        Monster cardInfo;
+        Dictionary<string, string> actionParams = message.ExtractParamDictionary();
+
+        int graveyardIndex = message.GetCardIndex();
+        Enums.CardPosition position;
+        string playerEnemyConstant, positionString;
+
+        actionParams.TryGetValue(Constants.TARGET_POS_KEY, out positionString);
+        actionParams.TryGetValue(Constants.SELECT_OWNER_KEY, out playerEnemyConstant);
+
+        position = (Enums.CardPosition)Enum.Parse(typeof(Enums.CardPosition), positionString);
+
+        if (playerEnemyConstant == Constants.PLAYER)
+        {
+            cardInfo = (Monster)playerGraveyard[graveyardIndex];
+        }
+        else
+        {
+            cardInfo = (Monster)enemyGraveyard[graveyardIndex];
+        }
+
+        int diskIndex = playerScript.SetMonsterFromGraveyardOnDisk(cardInfo, position);
+        string cardNumber = cardInfo.GetCardNumber();
+        fieldScript.SetMonsterFromGraveyard(diskIndex, cardNumber, position);
+
+        if (playerEnemyConstant == Constants.PLAYER)
+        {
+            PopCardFromPlayerGraveyard(graveyardIndex);
+        }
+        else
+        {
+            PopCardFromEnemyGraveyard(graveyardIndex);
+        }
+
+        List<MessageParameter> parameters = new List<MessageParameter>()
+        {
+            new MessageParameter(Constants.CARD_NO_KEY, cardInfo.GetCardNumber()),
+            new MessageParameter(Constants.TARGET_POS_KEY, position.ToString()),
+            new MessageParameter(Constants.GRAVEYARD_INDEX_KEY, graveyardIndex.ToString()),
+            new MessageParameter(Constants.SELECT_OWNER_KEY, playerEnemyConstant)
+        };
+
+        SendInformation(Constants.GRAVEYARD_SUMMON, diskIndex, parameters);
+    }
+
     public void SwitchMonsterPosition(int index, Enums.CardFace oldFace, Enums.CardPosition oldPosition, Monster info)
     {
         fieldScript.SwitchMonsterPosition(false, index, oldFace, oldPosition);
@@ -364,7 +404,13 @@ public class GameManager : MonoBehaviourPunCallbacks {
         NonMonster cardInfo = (NonMonster) Config.Get().GetCardInfoByNumber(cardNumber, false);
         bool isEnemyAction = currentMessage.IsEnemyAction();
 
-        //TODO: apply spell effect
+        // TODO: apply spell effect
+        // TODO: activate the effect (will need some more information in the message)
+        if (cardNumber == "83764718")
+        {
+            // Monster Reborn
+            TriggerMonsterSelection(1, 0, 0, Constants.BOTH, Constants.GRAVEYARD, 0);
+        }
 
         if (!cardInfo.IsContinuous())
         {
@@ -388,10 +434,13 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
     public void DiscardCard(int index)
     {
+        Card cardToSendToGraveyard = playerScript.GetHandCardInfoForIndex(index);
+
         playerScript.RemoveCardFromHand(index);
         UIManager.Get().SetInfoTextOnInfoPanel("", false);
 
         // Send card to Graveyard
+        AddCardToPlayerGraveyard(cardToSendToGraveyard);
     }
 
     private void PauseCurrentPhase()
@@ -764,8 +813,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
         {
             card = fieldScript.GetEnemyCardInfo(cardIndex, isMonster);
         }
-
-        //TODO: activate the effect (will need some more information in the message)
     }
 
     private bool CanQuickPlayCards()
@@ -956,17 +1003,60 @@ public class GameManager : MonoBehaviourPunCallbacks {
             return;
         }
 
+        if (action == Constants.GRAVEYARD_SUMMON)
+        {
+            string graveyardIndexString, positionString, playerEnemyConstant;
+            int graveyardIndex;
+            Enums.CardPosition position;
+
+            actionParams.TryGetValue(Constants.GRAVEYARD_INDEX_KEY, out graveyardIndexString);
+            actionParams.TryGetValue(Constants.TARGET_POS_KEY, out positionString);
+            actionParams.TryGetValue(Constants.SELECT_OWNER_KEY, out playerEnemyConstant);
+
+            graveyardIndex = Int32.Parse(graveyardIndexString);
+            position = (Enums.CardPosition)Enum.Parse(typeof(Enums.CardPosition), positionString);
+
+            fieldScript.SetEnemyMonster(cardIndex, Config.Get().GetCardInfoByNumber(cardNumber, true), Enums.CardFace.Up);
+            fieldScript.SwitchEnemyMonsterPosition(cardIndex, cardNumber, Enums.CardFace.Down, (position == Enums.CardPosition.Atk ? Enums.CardPosition.Def : Enums.CardPosition.Atk));
+
+            playerEnemyConstant = Utils.SwitchOwner(playerEnemyConstant);
+
+            if (playerEnemyConstant == Constants.PLAYER)
+            {
+                PopCardFromPlayerGraveyard(graveyardIndex);
+            }
+            else
+            {
+                PopCardFromEnemyGraveyard(graveyardIndex);
+            }
+
+            return;
+        }
+
         if(action == Constants.DESELECT)
         {
             playerScript.DeselectDiskCards();
             fieldScript.DeselectAllFieldCards();
-            //TODO: also deselect the deck/graveyard cards (if any) - maybe these should be stored
-            //  and here we can check if there is any card selected
+            // TODO: also deselect the deck/graveyard cards (if any) - maybe these should be stored
+            // and here we can check if there is any card selected
+
+            // Set Unhighlightable
+
+            GraveyardButton.onClick.Invoke();
+
+            List<Utils.InstantiatedGraveyardDeck> PlayerGraveyard = GraveyardCanvas.Get().GetPlayerGraveyard();
+            List<Utils.InstantiatedGraveyardDeck> EnemyGraveyard = GraveyardCanvas.Get().GetEnemyGraveyard();
+
+            SetGraveyardCardsUnhighlightable(PlayerGraveyard, -1);
+            SetGraveyardCardsUnhighlightable(EnemyGraveyard, -1);
 
             selectionSource = null;
             selectionOwner = null;
             selectionCardType = null;
             selectedCards.Clear();
+
+            // Close la graveyard
+            StartCoroutine(CloseGraveyardCoroutine());
         }
 
         if (action == Constants.ATK_CHANGE_TEXT || action == Constants.DEF_CHANGE_TEXT)
@@ -1047,8 +1137,20 @@ public class GameManager : MonoBehaviourPunCallbacks {
         }
 
         AskForQuickActivation();
+
+        if (action == Constants.DESELECT)
+        {
+            // Close la graveyard
+            // StartCoroutine(CloseGraveyardCoroutine());
+        }
     }
-    
+
+    private IEnumerator CloseGraveyardCoroutine()
+    {
+        yield return new WaitForSeconds(2.0f);
+        CloseGraveyardButton.onClick.Invoke();
+    }
+
     public void ChangePhase(string newPhase)
     {
         List<MessageParameter> parameters = new List<MessageParameter>() {
@@ -1089,12 +1191,56 @@ public class GameManager : MonoBehaviourPunCallbacks {
                 }
                 break;
             case Constants.DECK:
-                //TODO: implement selection from deck (only your own)
+                // TODO: implement selection from deck (only your own)
                 break;
             case Constants.GRAVEYARD:
-                //TODO: after graveyard is in place, implement selection from it - disable the other graveyard if the effect
-                //  forces you to pick only from a certain player's graveyard
+                // Set Highlightable true doar pentru monstri
+
+                GraveyardButton.onClick.Invoke();
+
+                List<Utils.InstantiatedGraveyardDeck> PlayerGraveyard = GraveyardCanvas.Get().GetPlayerGraveyard();
+                List<Utils.InstantiatedGraveyardDeck> EnemyGraveyard = GraveyardCanvas.Get().GetEnemyGraveyard();
+
+                SetGraveyardCardsHighlightable(PlayerGraveyard);
+                SetGraveyardCardsHighlightable(EnemyGraveyard);
+
                 break;
+        }
+    }
+
+    public void SetGraveyardCardsHighlightable (List<Utils.InstantiatedGraveyardDeck> Graveyard)
+    {
+        for (int i = 0; i < Graveyard.Count; i++)
+        {
+            if (Graveyard[i].CardType == 1)
+            {
+                Graveyard[i].InstantiatedCard.GetComponent<GraveyardCard>().SetHighlightable(true);
+            }
+            else
+            {
+                Graveyard[i].InstantiatedCard.GetComponent<GraveyardCard>().SetHighlightable(false);
+            }
+        }
+    }
+
+    public void SetGraveyardCardsUnhighlightable(List<Utils.InstantiatedGraveyardDeck> Graveyard, int exception)
+    {
+        for (int i = 0; i < Graveyard.Count; i++)
+        {
+            Graveyard[i].InstantiatedCard.GetComponent<GraveyardCard>().SetHighlightable(false);
+
+            if (i != exception)
+            {
+                Graveyard[i].InstantiatedCard.GetComponent<GraveyardCard>().UnhighlightObject();
+            }
+        }
+    }
+
+    public void SetGraveyardCardsSelected(List<int> indices, List<Utils.InstantiatedGraveyardDeck> Graveyard)
+    {
+        foreach (int index in indices)
+        {
+            Graveyard[index].InstantiatedCard.GetComponent<GraveyardCard>().SetEnemySelection(true);
         }
     }
 
@@ -1158,7 +1304,33 @@ public class GameManager : MonoBehaviourPunCallbacks {
                 //TODO: show the selected card somewhere (just if the effect says so - have a new param for this)
                 break;
             case Constants.GRAVEYARD:
-                //TODO: show the selection from the graveyard (disable switching from to the other player's graveyard maybe)
+                // TODO: show the selection from the graveyard (disable switching from to the other player's graveyard maybe)
+
+                GraveyardButton.onClick.Invoke();
+
+                List<Utils.InstantiatedGraveyardDeck> PlayerGraveyard = GraveyardCanvas.Get().GetPlayerGraveyard();
+                List<Utils.InstantiatedGraveyardDeck> EnemyGraveyard = GraveyardCanvas.Get().GetEnemyGraveyard();
+
+                if (owner == Constants.PLAYER || owner == Constants.BOTH)
+                {
+                    SetGraveyardCardsSelected(indices, PlayerGraveyard);
+                }
+
+                if (owner == Constants.ENEMY || owner == Constants.BOTH)
+                {
+                    SetGraveyardCardsSelected(indices, EnemyGraveyard);
+                }
+
+                if (owner == Constants.PLAYER)
+                {
+                    PlayerTab.onClick.Invoke();
+                }
+
+                if (owner == Constants.ENEMY)
+                {
+                    EnemyTab.onClick.Invoke();
+                }
+
                 break;
         }
     }
@@ -1166,5 +1338,40 @@ public class GameManager : MonoBehaviourPunCallbacks {
     private void TriggerSelectionUnhighlight()
     {
         SendInformation(Constants.DESELECT, 0, new List<MessageParameter>());
+    }
+
+    public void SetGraveyardSelectionIndex(int graveyardIndex, Enums.CardPosition position, string vPlayerEnemyConstant)
+    {
+        List<Utils.InstantiatedGraveyardDeck> PlayerGraveyard = GraveyardCanvas.Get().GetPlayerGraveyard();
+        List<Utils.InstantiatedGraveyardDeck> EnemyGraveyard = GraveyardCanvas.Get().GetEnemyGraveyard();
+
+        if (vPlayerEnemyConstant == Constants.PLAYER)
+        {
+            SetGraveyardCardsUnhighlightable(PlayerGraveyard, graveyardIndex);
+            SetGraveyardCardsUnhighlightable(EnemyGraveyard, -1);
+        }
+        else if (vPlayerEnemyConstant == Constants.ENEMY)
+        {
+            SetGraveyardCardsUnhighlightable(PlayerGraveyard, -1);
+            SetGraveyardCardsUnhighlightable(EnemyGraveyard, graveyardIndex);
+        }
+
+        // Send message to the enemy with the selection
+        string indices = Utils.SerializeList(new List<int>() { graveyardIndex });
+
+        List<MessageParameter> parameters = new List<MessageParameter>() {
+                new MessageParameter(Constants.SELECT_NO_KEY, "1"),
+                new MessageParameter(Constants.SELECT_INDICES_KEY, indices),
+                new MessageParameter(Constants.SELECT_SOURCE_KEY, Constants.GRAVEYARD),
+                new MessageParameter(Constants.SELECT_OWNER_KEY, vPlayerEnemyConstant),
+                new MessageParameter(Constants.TARGET_POS_KEY, position.ToString()),
+                new MessageParameter(Constants.TYPE_KEY, Constants.MONSTER)
+            };
+
+        Message message = new Message(Constants.SELECTION_TEXT, 0, parameters);
+        actionBacklog.Add(message);
+        actionsToBeDone = SetMonsterFromGraveyardAction + actionsToBeDone;
+
+        SendInformation(Constants.SELECTION_TEXT, 0, parameters);
     }
 }

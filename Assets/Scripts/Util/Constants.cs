@@ -58,6 +58,8 @@ public static class Constants
     public const string SELECT_SOURCE_KEY = "selectSource";
     public const string SELECT_OWNER_KEY = "selectOwner";
     public const string REVEAL_CARD_KEY = "Reveal";
+    public const string GRAVEYARD_SUMMON = "graveyardSummon";
+    public const string GRAVEYARD_INDEX_KEY = "graveyardIndex";
 
     //used only for showing information on screen
     public const string DUELIST_PLACEHOLDER = "{duelistName}";

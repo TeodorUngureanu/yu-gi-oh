@@ -30,4 +30,3 @@ public class GraveyardButton : MonoBehaviour
         GraveyardCanvas.Get().LoadBoardCards(enemyGraveyard, Constants.ENEMY);
     }
 }
- 
