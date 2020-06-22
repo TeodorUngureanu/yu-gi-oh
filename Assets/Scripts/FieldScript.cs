@@ -111,14 +111,13 @@ public class FieldScript : MonoBehaviour {
         if(isEnemy)
         {
             crtMonster = enemyMonsterField[index];
+            crtMonster.GetComponent<EnemyFieldCardScript>().SetFace(Enums.CardFace.Up);
         }
         else
         {
             crtMonster = monsterField[index];
         }
-
         crtMonster.transform.localEulerAngles += new Vector3(180, 0, 0);
-        crtMonster.GetComponent<EnemyFieldCardScript>().SetFace(Enums.CardFace.Up);
     }
 
     public void SetSpell(int index, NonMonster cardInfo, Enums.CardFace face)
@@ -253,6 +252,16 @@ public class FieldScript : MonoBehaviour {
         attackableMonsters.Add(index);
     }
 
+    public void SetEnemyCardInfo(int index, Card cardInfo)
+    {
+        GameObject crtMonster = enemyMonsterField[index];
+        crtMonster.GetComponent<EnemyFieldCardScript>().SetCardInfo(cardInfo);
+        if (cardInfo != null)
+        {
+            ApplyTexture(crtMonster, cardInfo.GetCardNumber(), Enums.CardType.Monster);
+        }
+    }
+
     public void SetEnemySpell(int index, Card cardInfo, Enums.CardFace face)
     {
         GameObject crtSpell = enemySpellField[index];
@@ -265,7 +274,7 @@ public class FieldScript : MonoBehaviour {
         }
     }
 
-    public void SwitchMonsterPosition(bool isEnemy, int index, Enums.CardFace oldFace, Enums.CardPosition oldPosition)
+    public void SwitchMonsterPosition(bool isEnemy, int index, Enums.CardFace oldFace, Enums.CardPosition newPosition)
     {
         Vector3 crtRotation;
         if (isEnemy)
@@ -275,7 +284,7 @@ public class FieldScript : MonoBehaviour {
             {
                 crtRotation.x += 180;
             }
-            int coeff = (oldPosition == Enums.CardPosition.Atk) ? -1 : 1;
+            int coeff = (newPosition == Enums.CardPosition.Def) ? -1 : 1;
             crtRotation.y += coeff * 90;
             enemyMonsterField[index].transform.localEulerAngles = crtRotation;
         }
@@ -286,23 +295,22 @@ public class FieldScript : MonoBehaviour {
             {
                 crtRotation.x += 180;
             }
-            int coeff = (oldPosition == Enums.CardPosition.Atk) ? -1 : 1;
+            int coeff = (newPosition == Enums.CardPosition.Def) ? -1 : 1;
             crtRotation.y += coeff * 90;
             monsterField[index].transform.localEulerAngles = crtRotation;
         }
     }
 
-    public void SwitchEnemyMonsterPosition(int index, string cardNumber, Enums.CardFace oldFace, Enums.CardPosition oldPos)
+    public void SwitchEnemyMonsterPosition(int index, string cardNumber, Enums.CardFace oldFace, Enums.CardPosition newPos)
     {
         GameObject crtMonster = enemyMonsterField[index];
-        if(crtMonster.GetComponent<EnemyFieldCardScript>().GetCardInfo() == null)
-        {
+        //if(crtMonster.GetComponent<EnemyFieldCardScript>().GetCardInfo() == null)
+        //{
             Card cardInfo = Config.Get().GetCardInfoByNumber(cardNumber, true);
-            Enums.CardFace newFace = oldFace == Enums.CardFace.Up ? Enums.CardFace.Down : Enums.CardFace.Up;
-            crtMonster.GetComponent<EnemyFieldCardScript>().SetCardProperties(index, cardInfo, newFace);
-        }
+            crtMonster.GetComponent<EnemyFieldCardScript>().SwitchPosition(cardInfo, Enums.CardFace.Up, newPos);
+        //}
 
-        SwitchMonsterPosition(true, index, oldFace, oldPos);
+        SwitchMonsterPosition(true, index, oldFace, newPos);
     }
 
     public int GetNoAttackableMonsters()

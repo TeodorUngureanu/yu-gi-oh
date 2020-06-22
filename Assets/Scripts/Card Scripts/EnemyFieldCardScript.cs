@@ -5,8 +5,8 @@ public class EnemyFieldCardScript : InteractibleAbstractCard
     private Card cardInfo;
     public Canvas canvas;
 
-    private Enums.CardFace face;
-    private Enums.CardPosition position;
+    public Enums.CardFace face;
+    public Enums.CardPosition position;
 
     protected override void Awake()
     {
@@ -35,6 +35,18 @@ public class EnemyFieldCardScript : InteractibleAbstractCard
         cardInfo = vCardInfo;
         face = vFace;
         position = (face == Enums.CardFace.Up) ? Enums.CardPosition.Atk : Enums.CardPosition.Def;
+    }
+
+    public void SwitchPosition(Card vCardInfo, Enums.CardFace vFace, Enums.CardPosition vPosition)
+    {
+        cardInfo = vCardInfo;
+        face = vFace;
+        position = vPosition;
+    }
+
+    public void SetCardInfo(Card vCardInfo)
+    {
+        cardInfo = vCardInfo;
     }
 
     void OnMouseEnter()
@@ -81,6 +93,8 @@ public class EnemyFieldCardScript : InteractibleAbstractCard
 
     public override void InteractWithElement()
     {
+        highlightable = false;
+        UnhighlightObject();
         GameManager.Get().AttackTarget(cardIndex, position, face);
     }
 }

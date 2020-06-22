@@ -616,6 +616,7 @@ public class PlayerScript : MonoBehaviour {
 
     public bool FlipMonster(int index)
     {
+        diskScript.FlipMonster(index);
         bool hasFlipEffect;
         if (hasFlipEffect = ((Monster)monstersOnDisk[index]).IsFlippable())
         {
@@ -689,6 +690,11 @@ public class PlayerScript : MonoBehaviour {
         {
             return spellsOnDisk[index];
         }
+    }
+
+    public Enums.CardFace GetCardFaceForIndex(int index, bool isMonster)
+    {
+        return diskScript.GetFaceForIndex(index);
     }
     
     public Turn.Phase GetCurrentPhase()
