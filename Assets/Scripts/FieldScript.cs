@@ -247,6 +247,7 @@ public class FieldScript : MonoBehaviour {
                 monsterField[fieldIndices[index]].transform.localEulerAngles = new Vector3(0, 90, 0);
             }
         }
+        UIManager.Get().HideInformation();
     }
 
     public void DestroyFieldSpells(bool isEnemy, List<int> fieldIndices)
@@ -266,6 +267,7 @@ public class FieldScript : MonoBehaviour {
                 spellField[fieldIndices[index]].transform.localEulerAngles = new Vector3(0, 90, 0);
             }
         }
+        UIManager.Get().HideInformation();
     }
 
     public void SetEnemyMonster(int index, Card cardInfo, Enums.CardFace face)

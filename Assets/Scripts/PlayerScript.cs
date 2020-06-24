@@ -2,10 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using VRTK.Examples;
 
 public class PlayerScript : MonoBehaviour {
 
-    public GameObject disk, deck, hand;
+    public GameObject disk, deck, hand, rightController;
     public Canvas GraveyardButtonCanvas;
 
     private long lifePoints;
@@ -424,6 +425,8 @@ public class PlayerScript : MonoBehaviour {
 
     private void ProcessBattleReadyMonsters(bool highlight)
     {
+        rightController.GetComponent<VRTKExample_PointerObjectHighlighterActivator>().hoverColor = 
+            highlight? Color.red : Color.yellow;
         for (int index = 0; index < monstersOnDisk.Count; index++)
         {
             if (monstersOnDisk[index] != null)
@@ -707,6 +710,7 @@ public class PlayerScript : MonoBehaviour {
     {
         handScript.RemoveCard(index);
         UIManager.Get().SetHandSizeOnInfoPanel(handScript.GetNoOfCards().ToString(), false);
+        UIManager.Get().HideInformation();
     }
 
     public Card GetCardInfoForIndex(int index, bool isMonster)

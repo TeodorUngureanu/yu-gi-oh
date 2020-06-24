@@ -4,7 +4,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.IO;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviourPunCallbacks {
@@ -1176,6 +1175,11 @@ public class GameManager : MonoBehaviourPunCallbacks {
     public void ShuffleDeck()
     {
         playerScript.ShuffleDeck();
+    }
+
+    public bool IsInGraveyardSelMode()
+    {
+        return selectionSource == Constants.GRAVEYARD;
     }
 
     public void TriggerMonsterSelection(int noMonsters, int attribute, int type, string owner, string source, int superiorAtkLimit)

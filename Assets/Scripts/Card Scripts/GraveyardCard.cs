@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class GraveyardCard : InteractibleAbstractCard
 {
@@ -59,7 +56,7 @@ public class GraveyardCard : InteractibleAbstractCard
         // UnhighlightObject();
     }
 
-    void OnMouseOver()
+    void OnPointerOver()
     {
         if (Input.GetMouseButtonDown(0))
         {
@@ -79,7 +76,7 @@ public class GraveyardCard : InteractibleAbstractCard
         }
     }
 
-    void PreviewImage()
+    public void PreviewImage()
     {
         // Texture size does not matter - the size of the texture will be replaced by image size
         Texture2D texture = new Texture2D(2, 2);

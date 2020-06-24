@@ -34,7 +34,9 @@ namespace VRTK
         protected const string CANVAS_DRAGGABLE_PANEL = "VRTK_UICANVAS_DRAGGABLE_PANEL";
         protected const string ACTIVATOR_FRONT_TRIGGER_GAMEOBJECT = "VRTK_UICANVAS_ACTIVATOR_FRONT_TRIGGER";
 
-        private bool canDrawCard, canPlayHandCard, canUseDiskCard, canSelectEnemyCard;
+        private bool canDrawCard, canPlayHandCard, canUseDiskCard;
+        private bool canSelectEnemyCard, canOpenGraveyard, canCloseGraveyard;
+        private bool canShowPlayerGraveyard, canShowEnemyGraveyard, canInteractWithGraveyardCard;
 
         private void Update()
         {
@@ -68,7 +70,45 @@ namespace VRTK
                 canSelectEnemyCard = false;
                 gameObject.GetComponent<EnemyFieldCardScript>().HandleClick();
             }
-         }
+
+            if(canOpenGraveyard && Input.GetMouseButtonDown(0))
+            {
+                canOpenGraveyard = false;
+                gameObject.GetComponentInChildren<GraveyardButton>().TaskOnClick();
+            }
+
+            if (canCloseGraveyard && Input.GetMouseButtonDown(0))
+            {
+                canCloseGraveyard = false;
+                transform.parent.GetComponentInParent<GraveyardTab>().CancelGraveyard();
+            }
+
+            if(canShowPlayerGraveyard && Input.GetMouseButtonDown(0))
+            {
+                canShowPlayerGraveyard = false;
+                transform.parent.GetComponentInParent<GraveyardTab>().ActivatePlayerGraveyardTab();
+            }
+
+            if (canShowEnemyGraveyard && Input.GetMouseButtonDown(0))
+            {
+                canShowEnemyGraveyard = false;
+                transform.parent.GetComponentInParent<GraveyardTab>().ActivateEnemyGraveyardTab();
+            }
+
+            if(canInteractWithGraveyardCard)
+            {
+                canInteractWithGraveyardCard = false;
+                if(Input.GetMouseButtonDown(0) && GameManager.Get().IsInGraveyardSelMode())
+                {
+                    gameObject.GetComponent<GraveyardCard>().InteractWithElement();
+                }
+
+                if(Input.GetMouseButtonDown(2))
+                {
+                    gameObject.GetComponent<GraveyardCard>().PreviewImage();
+                }
+            }
+        }
 
         protected virtual void OnTriggerEnter(Collider collider)
         {
@@ -119,6 +159,21 @@ namespace VRTK
                         canSelectEnemyCard = true;
                     }
                     break;
+                case "GraveyardButtonCanvas":
+                    canOpenGraveyard = true;
+                    break;
+                case "CancelGraveyard":
+                    canCloseGraveyard = true;
+                    break;
+                case "PlayerTab":
+                    canShowPlayerGraveyard = true;
+                    break;
+                case "EnemyTab":
+                    canShowEnemyGraveyard = true;
+                    break;
+                case "Card":
+                    canInteractWithGraveyardCard = true;
+                    break;
             }
         }
 
@@ -154,6 +209,21 @@ namespace VRTK
                 case "EnemyFieldCard5":
                     gameObject.GetComponent<EnemyFieldCardScript>().OnPointerExit();
                     canSelectEnemyCard = false;
+                    break;
+                case "GraveyardButtonCanvas":
+                    canOpenGraveyard = false;
+                    break;
+                case "CancelGraveyard":
+                    canCloseGraveyard = false;
+                    break;
+                case "PlayerTab":
+                    canShowPlayerGraveyard = false;
+                    break;
+                case "EnemyTab":
+                    canShowEnemyGraveyard = false;
+                    break;
+                case "Card":
+                    canInteractWithGraveyardCard = false;
                     break;
             }
         }

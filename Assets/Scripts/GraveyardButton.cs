@@ -18,7 +18,7 @@ public class GraveyardButton : MonoBehaviour
         gameObject.GetComponent<Button>().onClick.AddListener(TaskOnClick);
     }
 
-    void TaskOnClick()
+    public void TaskOnClick()
     {
         List<Card> playerGraveyard = GameManager.Get().GetGraveyard(Constants.PLAYER);
         List<Card> enemyGraveyard = GameManager.Get().GetGraveyard(Constants.ENEMY);

@@ -161,12 +161,14 @@ public class DiskScript : MonoBehaviour {
     {
         monstersOnDisk[index].SetActive(false);
         monstersOnDisk[index].GetComponent<DiskCardScript>().ResetData();
+        UIManager.Get().HideInformation();
     }
 
     public void DestroySpell(int index)
     {
         spellsOnDisk[index].SetActive(false);
         spellsOnDisk[index].GetComponent<DiskCardScript>().ResetData();
+        UIManager.Get().HideInformation();
     }
 
     public int GetDiskMonstersCount()
