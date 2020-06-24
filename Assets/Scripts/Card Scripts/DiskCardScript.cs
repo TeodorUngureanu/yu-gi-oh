@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using VRTK.Highlighters;
 
 public class DiskCardScript : InteractibleAbstractCard {
     
@@ -109,6 +110,11 @@ public class DiskCardScript : InteractibleAbstractCard {
         }
     }
 
+    public void SetVRHighlightable(bool highlightable)
+    {
+        gameObject.GetComponentInChildren<VRTK_OutlineObjectCopyHighlighter>().active = highlightable;
+    }
+
     private void RotateCard(bool reverse)
     {
         Vector3 crtRotation = this.gameObject.transform.localEulerAngles;
@@ -169,7 +175,7 @@ public class DiskCardScript : InteractibleAbstractCard {
         }
     }
 
-    void OnMouseEnter()
+    public void OnMouseEnter()
     {
         UIManager.Get().ShowInformation(cardInfo.GetCardNumber(), cardInfo.IsMonster() ? Enums.CardType.Monster : Enums.CardType.Spell);
         if (highlightable)
@@ -179,7 +185,7 @@ public class DiskCardScript : InteractibleAbstractCard {
         }
     }
 
-    void OnMouseExit()
+    public void OnMouseExit()
     {
         UIManager.Get().HideInformation();
         if (highlightable)
@@ -193,29 +199,34 @@ public class DiskCardScript : InteractibleAbstractCard {
     {
         if (highlightable && Input.GetMouseButtonDown(0))
         {
-            bool cardWasSelected = selectionMode;
-            if (IsMonster())
-            {
-                ChangeText();
-                if (GameManager.Get().GetAttackingMonsterIndex() == cardIndex)
-                {
-                    GameManager.Get().CancelAttack();
-                    return;
-                }
-                
-                InteractWithElement();
+            HandleClick();
+        }
+    }
 
-                if (!cardWasSelected)
-                {
-
-                    HighlightObject();
-                    highlightable = true;
-                }
-            } else
+    public void HandleClick()
+    {
+        bool cardWasSelected = selectionMode;
+        if (IsMonster())
+        {
+            ChangeText();
+            if (GameManager.Get().GetAttackingMonsterIndex() == cardIndex)
             {
-                canvas.enabled = false;
-                InteractWithElement();
+                GameManager.Get().CancelAttack();
+                return;
             }
+
+            InteractWithElement();
+
+            if (!cardWasSelected)
+            {
+                //HighlightObject();
+                highlightable = true;
+            }
+        }
+        else
+        {
+            canvas.enabled = false;
+            InteractWithElement();
         }
     }
 

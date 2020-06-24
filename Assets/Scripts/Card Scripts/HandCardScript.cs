@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.UI;
+using VRTK.Highlighters;
 
 public class HandCardScript : InteractibleAbstractCard
 {
@@ -10,7 +11,7 @@ public class HandCardScript : InteractibleAbstractCard
     private Enums.CardFace summoningFace;
     private Card cardInfo;
     private float originalY, maxYmovement = 0.15f;
-    private bool isMovingUp = false, isMovingDown = false;
+    private bool isMovingUp = false, isMovingDown = false, isHover = false;
 
     protected override void Awake()
     {
@@ -32,10 +33,15 @@ public class HandCardScript : InteractibleAbstractCard
                 transform.position = defaultPos;
 
                 isMovingUp = false;
+                if(!isHover && !isMovingDown)
+                {
+                    isMovingDown = true;
+                }
                 return;
             }
             transform.Translate(Vector3.up * Time.deltaTime, Camera.main.transform);
-        } else
+        }
+        else
         if (isMovingDown)
         {
             float currentY = transform.position.y;
@@ -142,44 +148,57 @@ public class HandCardScript : InteractibleAbstractCard
         }
     }
 
-    void OnMouseEnter()
+    public void OnPointerEnter()
     {
-        isMovingUp = true;
+        isHover = true;
+        if(!isMovingDown)
+            isMovingUp = true;
         UIManager.Get().ShowInformation(cardInfo.GetCardNumber(), cardInfo.IsMonster() ? Enums.CardType.Monster : Enums.CardType.Spell);
         if (highlightable)
         {
-            HighlightObject();
+            //HighlightObject();
             canvas.enabled = true;
         }
     }
 
-    void OnMouseExit()
+    public void OnPointerExit()
     {
-        isMovingDown = true;
+        isHover = false;
+        if (!isMovingUp)
+            isMovingDown = true;
         UIManager.Get().HideInformation();
         if (highlightable)
         {
-            UnhighlightObject();
+            //UnhighlightObject();
             SetDefaultFace();
             canvas.enabled = false;
         }
     }
 
-    void OnMouseOver()
+    void OnPointerOver()
     {
         if (highlightable)
         {
-            if (Input.GetMouseButtonDown(0))
-            {
-                canvas.enabled = false;
-                InteractWithElement();
-            }
-
-            if (Input.GetMouseButtonDown(1) && !GameManager.Get().IsPlayerDiscarding())
-            {
-                SwitchFace();
-            }
+            HandleClick(Input.GetMouseButtonDown(0));
         }
+    }
+
+    public void HandleClick(bool isLeft)
+    {
+        if(isLeft)
+        {
+            canvas.enabled = false;
+            InteractWithElement();
+        }
+        if(!isLeft && !GameManager.Get().IsPlayerDiscarding())
+        {
+            SwitchFace();
+        }
+    }
+
+    public void SetVRHighlightable(bool highlightable)
+    {
+        gameObject.GetComponentInChildren<VRTK_OutlineObjectCopyHighlighter>().active = highlightable;
     }
 
     public override void InteractWithElement()

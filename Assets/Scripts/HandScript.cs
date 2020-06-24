@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using VRTK.Highlighters;
 
 public class HandScript : MonoBehaviour {
 
@@ -31,6 +32,7 @@ public class HandScript : MonoBehaviour {
         crtCard.GetComponent<HandCardScript>().SetData(GetNoOfCards(), nextCard);
 
         cardsInHand.Add(crtCard);
+        SetCardUnhighlightable(cardsInHand.Count - 1);
     }
 
     public void RemoveCard(int lowestIndex)
@@ -50,12 +52,18 @@ public class HandScript : MonoBehaviour {
 
     public void SetCardHighlightable(int index)
     {
-        cardsInHand[index].GetComponent<HandCardScript>().SetHighlightable(true);
+        HandCardScript script = cardsInHand[index].GetComponent<HandCardScript>();
+        
+        script.SetHighlightable(true);
+        script.SetVRHighlightable(true);
     }
 
     public void SetCardUnhighlightable(int index)
     {
-        cardsInHand[index].GetComponent<HandCardScript>().SetHighlightable(false);
+        HandCardScript script = cardsInHand[index].GetComponent<HandCardScript>();
+
+        script.SetHighlightable(false);
+        script.SetVRHighlightable(false);
     }
 
     public void ChangeTextForIndex(int index)

@@ -151,6 +151,8 @@ GameObject:
   - component: {fileID: 23142014917707920}
   - component: {fileID: 65238071344849214}
   - component: {fileID: 9135021815529765792}
+  - component: {fileID: 4178954971326375628}
+  - component: {fileID: 2915650397257890882}
   m_Layer: 0
   m_Name: HandCard
   m_TagString: Untagged
@@ -230,8 +232,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.0103214625, y: 0.04256744, z: 0.010325568}
-  m_Center: {x: -0.00055308134, y: -0.0015451451, z: -0.00004912861}
+  m_Size: {x: 0.01108077, y: 0.04256744, z: 0.011057608}
+  m_Center: {x: -0.0005306077, y: -0.0015451445, z: -0.000049125247}
 --- !u!114 &9135021815529765792
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -246,6 +248,36 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   frontImagePlane: {fileID: 1733790695741064}
   canvas: {fileID: 223718622886997938}
+--- !u!54 &4178954971326375628
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1440128886404242}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &2915650397257890882
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1440128886404242}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1518a5e598c7da244bc4850d3ae63354, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clickOnPointerCollision: 1
+  autoActivateWithinDistance: 0
 --- !u!1 &1498275313463498
 GameObject:
   m_ObjectHideFlags: 0
@@ -429,6 +461,7 @@ GameObject:
   - component: {fileID: 33296778404438352}
   - component: {fileID: 23470953130387544}
   - component: {fileID: 64707064634443690}
+  - component: {fileID: 7457661142817318441}
   m_Layer: 0
   m_Name: FrontPlane
   m_TagString: Untagged
@@ -509,3 +542,21 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 14
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &7457661142817318441
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1733790695741064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c08517e04830d6d44a13c5ea5f574181, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  active: 1
+  unhighlightOnDisable: 1
+  thickness: 1
+  customOutlineModels: []
+  customOutlineModelPaths: []
+  enableSubmeshHighlight: 0

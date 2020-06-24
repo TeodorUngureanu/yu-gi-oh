@@ -13,22 +13,30 @@ public class DiskScript : MonoBehaviour {
 
     public void HighlightMonster(int index)
     {
-        monstersOnDisk[index].GetComponent<DiskCardScript>().SetHighlightable(true);
+        DiskCardScript script = monstersOnDisk[index].GetComponent<DiskCardScript>();
+        script.SetHighlightable(true);
+        script.SetVRHighlightable(true);
     }
 
     public void UnhighlightMonster(int index)
     {
-        monstersOnDisk[index].GetComponent<DiskCardScript>().SetHighlightable(false);
+        DiskCardScript script = monstersOnDisk[index].GetComponent<DiskCardScript>();
+        script.SetHighlightable(false);
+        script.SetVRHighlightable(false);
     }
 
     public void HighlightSpell(int index)
     {
-        spellsOnDisk[index].GetComponent<DiskCardScript>().SetHighlightable(true);
+        DiskCardScript script = spellsOnDisk[index].GetComponent<DiskCardScript>();
+        script.SetHighlightable(true);
+        script.SetVRHighlightable(true);
     }
 
     public void UnhighlightSpell(int index)
     {
-        spellsOnDisk[index].GetComponent<DiskCardScript>().SetHighlightable(false);
+        DiskCardScript script = spellsOnDisk[index].GetComponent<DiskCardScript>();
+        script.SetHighlightable(false);
+        script.SetVRHighlightable(false);
     }
 
     public void SetMonster(int index, Enums.CardFace face, Monster cardInfo)

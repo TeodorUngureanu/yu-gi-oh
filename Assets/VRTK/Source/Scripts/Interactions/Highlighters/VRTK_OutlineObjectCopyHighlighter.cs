@@ -79,6 +79,11 @@ namespace VRTK.Highlighters
         /// <param name="duration">Not used.</param>
         public override void Highlight(Color? color, float duration = 0f)
         {
+            if(!active)
+            {
+                return;
+            }
+
             if (highlightModels != null && highlightModels.Length > 0 && stencilOutline != null)
             {
                 stencilOutline.SetFloat("_Thickness", thickness);

@@ -3,16 +3,19 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using VRTK;
+using VRTK.Highlighters;
 
 public class Deck : InteractibleElementScript {
     private List<Card> mainDeck = new List<Card>();
-    private bool isDrawPhase = false;
+    private bool isDrawPhase;
 
     protected override void Awake()
     {
         base.Awake();
         Debug.Log("Deck object awaken");
         objRenderer = GetComponent<Renderer>();
+        SetIsDrawPhase(false);
     }
 
     public void LoadDeck(int deckKey)
@@ -24,8 +27,6 @@ public class Deck : InteractibleElementScript {
             {
                 foreach (KeyValuePair<int, Constants.CardInfo> _card in _dictionary)
                 {
-                    // Debug.Log(string.Format("ID_Deck = {0}, ID_Card = {1}, Card_Type = {2}, Card_Order = {3}", deckKey, _card.Key, _card.Value.Card_Type, _card.Value.Card_Order));
-
                     // Monster
                     if (_card.Value.Card_Type == 1)
                     {
@@ -88,6 +89,7 @@ public class Deck : InteractibleElementScript {
     public void SetIsDrawPhase(bool drawPhase)
     {
         isDrawPhase = drawPhase;
+        gameObject.GetComponent<VRTK_OutlineObjectCopyHighlighter>().active = drawPhase;
     }
 
     void OnMouseEnter()

@@ -6,7 +6,6 @@ namespace VRTK
     using UnityEngine.EventSystems;
     using System.Collections;
     using System.Reflection;
-    using System;
 
     /// <summary>
     /// Denotes a Unity World UI Canvas can be interacted with a UIPointer script.
@@ -32,9 +31,10 @@ namespace VRTK
         protected BoxCollider canvasBoxCollider;
         protected Rigidbody canvasRigidBody;
         protected Coroutine draggablePanelCreation;
-        private bool canDrawCard;
         protected const string CANVAS_DRAGGABLE_PANEL = "VRTK_UICANVAS_DRAGGABLE_PANEL";
         protected const string ACTIVATOR_FRONT_TRIGGER_GAMEOBJECT = "VRTK_UICANVAS_ACTIVATOR_FRONT_TRIGGER";
+
+        private bool canDrawCard, canPlayHandCard, canUseDiskCard;
 
         protected virtual void OnEnable()
         {
@@ -56,7 +56,30 @@ namespace VRTK
             if (Input.GetMouseButtonDown(0) && canDrawCard)
             {
                 GameManager.Get().DrawCard();
+                
                 canDrawCard = false;
+            }
+
+            if (canPlayHandCard)
+            {
+                if(Input.GetMouseButtonDown(0))
+                {
+                    gameObject.GetComponent<HandCardScript>().HandleClick(true);
+                    canPlayHandCard = false;
+                }
+                if(Input.GetMouseButtonDown(1))
+                {
+                    gameObject.GetComponent<HandCardScript>().HandleClick(false);
+                }
+            }
+
+            if(canUseDiskCard)
+            {
+                if(Input.GetMouseButtonDown(0))
+                {
+                    gameObject.GetComponent<DiskCardScript>().HandleClick();
+                    canUseDiskCard = false;
+                }
             }
         }
 
@@ -68,20 +91,61 @@ namespace VRTK
             //{
             //    pointerCheck.collisionClick = clickOnPointerCollision;
             //}
-            if(gameObject.name == "DeckPlaceholder")
+            switch(gameObject.name)
             {
-                canDrawCard = true;
+                case "DeckPlaceholder":
+                    if(GameManager.Get().GetTurnPhase() == Turn.Phase.Draw)
+                    {
+                        canDrawCard = true;
+                    }
+                    break;
+                case "HandCard(Clone)":
+                    HandCardScript script = gameObject.GetComponent<HandCardScript>();
+                    script.OnPointerEnter();
+                    if (script.IsHighlightable())
+                    {
+                        canPlayHandCard = true;
+                    }
+                    break;
+                case "Card1":
+                case "Card2":
+                case "Card3":
+                case "Card4":
+                case "Card5":
+                    DiskCardScript diskScript = gameObject.GetComponent<DiskCardScript>();
+                    diskScript.OnMouseEnter();
+                    if(diskScript.IsHighlightable())
+                    {
+                        canUseDiskCard = true;
+                    }
+                    break;
             }
         }
 
         protected virtual void OnTriggerExit(Collider collider)
         {
-            VRTK_UIPointer pointerCheck = collider.GetComponentInParent<VRTK_UIPointer>();
-            if (pointerCheck != null)
+            //VRTK_UIPointer pointerCheck = collider.GetComponentInParent<VRTK_UIPointer>();
+            //if (pointerCheck != null)
+            //{
+            //    pointerCheck.collisionClick = false;
+            //}
+            switch (gameObject.name)
             {
-                pointerCheck.collisionClick = false;
+                case "DeckPlaceholder":
+                    canDrawCard = false;
+                    break;
+                case "HandCard(Clone)":
+                    gameObject.GetComponent<HandCardScript>().OnPointerExit();
+                    canPlayHandCard = false;
+                    break;
+                case "Card1":
+                case "Card2":
+                case "Card3":
+                case "Card4":
+                case "Card5":
+                    canUseDiskCard = false;
+                    break;
             }
-            canDrawCard = false;
         }
 
         protected virtual void SetupCanvas()
