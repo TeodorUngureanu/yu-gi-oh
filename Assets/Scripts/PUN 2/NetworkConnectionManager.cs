@@ -68,18 +68,28 @@ public class NetworkConnectionManager : MonoBehaviourPunCallbacks
 
     public override void OnDisconnected(DisconnectCause cause)
     {
-        disconnectedScreen.SetActive(true);
+        if (disconnectedScreen)
+        {
+            disconnectedScreen.SetActive(true);
+        }
+
         Debug.Log(cause);
     }
 
     public override void OnJoinedLobby()
     {
-        if (disconnectedScreen.activeSelf)
+        if (disconnectedScreen)
         {
-            disconnectedScreen.SetActive(false);
+            if (disconnectedScreen.activeSelf)
+            {
+                disconnectedScreen.SetActive(false);
+            }
         }
 
-        connectedScreen.SetActive(true);
+        if (connectedScreen)
+        {
+            connectedScreen.SetActive(true);
+        }
     }
 
     public void OnClick_JoinRoom()
@@ -107,7 +117,11 @@ public class NetworkConnectionManager : MonoBehaviourPunCallbacks
             waitingLobby.SetActive(true);
 
             playerName = PhotonNetwork.NickName;
-            enemyName = PhotonNetwork.PlayerListOthers[0].NickName;
+
+            if (PhotonNetwork.PlayerListOthers.Length > 0)
+            {
+                enemyName = PhotonNetwork.PlayerListOthers[0].NickName;
+            }
         }
         else
         {
@@ -115,7 +129,11 @@ public class NetworkConnectionManager : MonoBehaviourPunCallbacks
             photonView.RPC("ChatMessage", RpcTarget.All, "Start_Game");
 
             playerName = PhotonNetwork.NickName;
-            enemyName = PhotonNetwork.PlayerListOthers[0].NickName;
+
+            if (PhotonNetwork.PlayerListOthers.Length > 0)
+            {
+                enemyName = PhotonNetwork.PlayerListOthers[0].NickName;
+            }
         }
     }
     void OnPhotonPlayerConnected()
@@ -140,7 +158,11 @@ public class NetworkConnectionManager : MonoBehaviourPunCallbacks
         if (message == "Start_Game")
         {
             playerName = PhotonNetwork.NickName;
-            enemyName = PhotonNetwork.PlayerListOthers[0].NickName;
+
+            if (PhotonNetwork.PlayerListOthers.Length > 0)
+            {
+                enemyName = PhotonNetwork.PlayerListOthers[0].NickName;
+            }
 
             PhotonNetwork.LoadLevel("scene");
         }

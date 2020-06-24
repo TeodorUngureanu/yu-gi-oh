@@ -15,10 +15,19 @@ public class FieldScript : MonoBehaviour {
     private List<GameObject> tributeCircleInstances;
     private GameObject attackSwordInstance;
 
+    private AudioSource EffectSoundFX;
+
     private void Awake()
     {
         tributeCircleInstances = new List<GameObject>();
         attackableMonsters = new List<int>();
+
+        EffectSoundFX = GetComponent<AudioSource>();
+
+        if (PlayerPrefs.HasKey("SoundFX"))
+        {
+            EffectSoundFX.volume = PlayerPrefs.GetFloat("SoundFX");
+        }
 
         //TODO: delete this if not needed anymore - testing purpose only
         //MockDataForTesting();
@@ -186,6 +195,8 @@ public class FieldScript : MonoBehaviour {
         float totalDuration = particleSystem.main.duration + particleSystem.main.startLifetimeMultiplier;
         Destroy(summonEffect, totalDuration);
         particleSystem.Play();
+        EffectSoundFX.Play();
+
     }
 
     public void AddTributeCircle(bool isEnemy, int index)

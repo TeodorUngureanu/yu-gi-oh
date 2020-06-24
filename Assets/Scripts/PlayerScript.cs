@@ -185,7 +185,7 @@ public class PlayerScript : MonoBehaviour {
                 //after cards are discarded, send a message to the enemy to start their turn
                 GameManager.Get().SendInformation(Constants.END_TURN, 0, new List<MessageParameter>());
 
-                //OnPhaseTrigger();
+                OnPhaseTrigger();
             }
         }
     }

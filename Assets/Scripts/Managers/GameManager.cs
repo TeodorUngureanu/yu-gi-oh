@@ -36,6 +36,8 @@ public class GameManager : MonoBehaviourPunCallbacks {
     private Actions actionsToBeDone;
     private List<Message> actionBacklog;
 
+    public AudioSource MainSceneAmbientalMusic;
+
     public static GameManager Get()
     {
         return instance;
@@ -50,6 +52,11 @@ public class GameManager : MonoBehaviourPunCallbacks {
             fieldScript = field.GetComponent<FieldScript>();
             actionBacklog = new List<Message>();
             actionsToBeDone = null;
+
+            if (PlayerPrefs.HasKey("AmbientSound"))
+            {
+                MainSceneAmbientalMusic.volume = PlayerPrefs.GetFloat("AmbientSound");
+            }
         }
         else
         {
