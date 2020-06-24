@@ -49,6 +49,7 @@ public class PlayerScript : MonoBehaviour {
     
     void Start()
     {
+        ModifyLifePoints(0);
         int defaultDeck = 1;
 
         if (PlayerPrefs.HasKey("Default_Deck"))
@@ -145,6 +146,10 @@ public class PlayerScript : MonoBehaviour {
                 DrawCard();
             }
             hasDrawnHand = true;
+            if(isMyTurn)
+            {
+                UIManager.Get().ChangePhaseOnInfoPanel(turn.getCurrentPhase().ToString(), false);
+            }
         }
 
         //used only at the beginning, maybe it can be moved
@@ -154,12 +159,12 @@ public class PlayerScript : MonoBehaviour {
         }
 
         if (turn.getCurrentPhase() == Turn.Phase.Hold && hasDrawnHand && isMyTurn)
-        //if (turn.getCurrentPhase() == Turn.Phase.Hold && hasDrawnHand)
         {
             //TODO: apply any needed effects or restrictions, then proceed to draw phase
             canPlayMonster = true;
 
-            OnPhaseTrigger();
+            paused = true;
+            StartCoroutine(SkipPhaseCoroutine());
         }
 
         if (turn.isMainPhase() || turn.getCurrentPhase() == Turn.Phase.Battle)
@@ -180,7 +185,7 @@ public class PlayerScript : MonoBehaviour {
                 //after cards are discarded, send a message to the enemy to start their turn
                 GameManager.Get().SendInformation(Constants.END_TURN, 0, new List<MessageParameter>());
 
-                OnPhaseTrigger();
+                //OnPhaseTrigger();
             }
         }
     }
@@ -209,11 +214,13 @@ public class PlayerScript : MonoBehaviour {
         {
             deckScript.SetIsDrawPhase(true);
             turnCount++;
-
-            //get value for canOpponentActivateCards from the opponent (if so wait)
         }
 
-        HighlightPlayerCards();
+        if(turn.getCurrentPhase() == Turn.Phase.Battle && !IsAnyMonsterBattleReady())
+        {
+            paused = true;
+            StartCoroutine(SkipPhaseCoroutine());
+        }
 
         if (turn.getCurrentPhase() == Turn.Phase.End)
         {
@@ -226,6 +233,13 @@ public class PlayerScript : MonoBehaviour {
             }
         }
         HighlightPlayerCards();
+    }
+
+    private IEnumerator SkipPhaseCoroutine()
+    {
+        yield return new WaitForSeconds(0.75f);
+        paused = false;
+        OnPhaseTrigger();
     }
 
     public void AskForQuickActivation(bool asking)
@@ -391,15 +405,27 @@ public class PlayerScript : MonoBehaviour {
         }
     }
 
+    private bool IsAnyMonsterBattleReady()
+    {
+        for (int index = 0; index < monstersOnDisk.Count; index++)
+        {
+            if (monstersOnDisk[index] != null && diskScript.SwitchAttackModeForIndex(index, true)
+                && diskScript.GetPositionForIndex(index) == Enums.CardPosition.Atk)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void ProcessBattleReadyMonsters(bool highlight)
     {
         for (int index = 0; index < monstersOnDisk.Count; index++)
         {
-            Card crtCard = monstersOnDisk[index];
-            if (crtCard != null)
+            if (monstersOnDisk[index] != null)
             {
                 bool canAttackThisTurn = diskScript.SwitchAttackModeForIndex(index, highlight);
-                if (canAttackThisTurn && highlight)
+                if (canAttackThisTurn && highlight && diskScript.GetPositionForIndex(index) == Enums.CardPosition.Atk)
                 {
                     if (diskScript.GetPositionForIndex(index) == Enums.CardPosition.Atk)
                     {
