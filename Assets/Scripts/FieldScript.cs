@@ -69,6 +69,8 @@ public class FieldScript : MonoBehaviour {
 
         SetMonsterCardRotation(crtMonster, face);
         ApplyTexture(crtMonster, cardNumber, Enums.CardType.Monster);
+
+        PlayAndDestroyEffect(crtMonster.transform, ParticleEffectManager.Get().GetSummonEffect());
     }
 
     private void SetMonsterCardRotation(GameObject crtMonster, Enums.CardFace face)
@@ -102,6 +104,7 @@ public class FieldScript : MonoBehaviour {
         crtMonster.SetActive(true);
 
         ApplyTexture(crtMonster, cardNumber, Enums.CardType.Monster);
+        PlayAndDestroyEffect(crtMonster.transform, ParticleEffectManager.Get().GetSummonEffect());
     }
 
     public void FlipMonster(int index, bool isEnemy)
@@ -129,6 +132,7 @@ public class FieldScript : MonoBehaviour {
 
         SetSpellCardRotation(crtSpell, face);
         ApplyTexture(crtSpell, cardInfo.GetCardNumber(), (Enums.CardType)Enum.Parse(typeof(Enums.CardType), cardInfo.GetSpellType().ToString()));
+        PlayAndDestroyEffect(crtSpell.transform, ParticleEffectManager.Get().GetSummonEffect());
     }
 
     private void SetSpellCardRotation(GameObject crtSpell, Enums.CardFace face)
@@ -168,6 +172,20 @@ public class FieldScript : MonoBehaviour {
             GameObject frontImagePlane = parent.transform.Find("FrontPlane").gameObject;
             frontImagePlane.GetComponent<Renderer>().material.mainTexture = texture;
         }
+    }
+
+   private void PlayAndDestroyEffect(Transform cardTransform, GameObject effectPrefab)
+    {
+        GameObject summonEffect = Instantiate(
+            effectPrefab,
+            cardTransform.position + new Vector3(),
+            Quaternion.identity,
+            cardTransform);
+        ParticleSystem particleSystem = summonEffect.GetComponentInChildren<ParticleSystem>();
+
+        float totalDuration = particleSystem.main.duration + particleSystem.main.startLifetimeMultiplier;
+        Destroy(summonEffect, totalDuration);
+        particleSystem.Play();
     }
 
     public void AddTributeCircle(bool isEnemy, int index)
@@ -250,6 +268,7 @@ public class FieldScript : MonoBehaviour {
             ApplyTexture(crtMonster, cardInfo.GetCardNumber(), Enums.CardType.Monster);
         }
         attackableMonsters.Add(index);
+        PlayAndDestroyEffect(crtMonster.transform, ParticleEffectManager.Get().GetEnemySummonEffect());
     }
 
     public void SetEnemyCardInfo(int index, Card cardInfo)
@@ -272,6 +291,7 @@ public class FieldScript : MonoBehaviour {
         {
             ApplyTexture(crtSpell, cardInfo.GetCardNumber(), Enums.CardType.Spell);
         }
+        PlayAndDestroyEffect(crtSpell.transform, ParticleEffectManager.Get().GetEnemySummonEffect());
     }
 
     public void SwitchMonsterPosition(bool isEnemy, int index, Enums.CardFace oldFace, Enums.CardPosition newPosition)
