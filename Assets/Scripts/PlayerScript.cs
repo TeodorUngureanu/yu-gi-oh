@@ -194,6 +194,10 @@ public class PlayerScript : MonoBehaviour {
     {
         if (turn.getCurrentPhase() == Turn.Phase.Hold)
         {
+            if (!isMyTurn)
+            {
+                return;
+            }
             RefreshStuffWhenTurnStarts();
         }
 

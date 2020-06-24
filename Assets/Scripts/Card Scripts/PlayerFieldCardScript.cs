@@ -35,13 +35,13 @@ public class PlayerFieldCardScript : MonoBehaviour
         isBeingSummoned = true;
     }
 
-    void OnMouseEnter()
+    public void OnMouseEnter()
     {
         UIManager.Get().ShowInformation(cardInfo.GetCardNumber(),
             cardInfo.IsMonster() ? Enums.CardType.Monster : Enums.CardType.Spell);
     }
 
-    void OnMouseExit()
+    public void OnMouseExit()
     {
         UIManager.Get().HideInformation();
     }

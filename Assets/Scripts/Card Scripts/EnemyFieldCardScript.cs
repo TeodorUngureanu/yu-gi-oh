@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using VRTK.Highlighters;
 
 public class EnemyFieldCardScript : InteractibleAbstractCard
 {
@@ -75,7 +76,12 @@ public class EnemyFieldCardScript : InteractibleAbstractCard
         cardInfo = vCardInfo;
     }
 
-    void OnMouseEnter()
+    public void SetVRHighlightable(bool highlightable)
+    {
+        gameObject.GetComponentInChildren<VRTK_OutlineObjectCopyHighlighter>().active = highlightable;
+    }
+
+    public void OnPointerEnter()
     {
         string cardNumber = null;
         Enums.CardType cardType = Enums.CardType.Monster;
@@ -88,22 +94,22 @@ public class EnemyFieldCardScript : InteractibleAbstractCard
         UIManager.Get().ShowInformation(cardNumber, cardType);
         if (highlightable)
         {
-            HighlightObject();
+            //HighlightObject();
             canvas.enabled = true;
         }
     }
 
-    void OnMouseExit()
+    public void OnPointerExit()
     {
         UIManager.Get().HideInformation();
         if (highlightable)
         {
-            UnhighlightObject();
+            //UnhighlightObject();
             canvas.enabled = false;
         }
     }
 
-    void OnMouseOver()
+    void OnPointerOver()
     {
         if (highlightable && Input.GetMouseButtonDown(0))
         {

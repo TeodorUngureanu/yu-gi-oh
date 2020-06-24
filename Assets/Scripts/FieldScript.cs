@@ -353,7 +353,9 @@ public class FieldScript : MonoBehaviour {
     {
         for(int i = 0; i < attackableMonsters.Count; i++)
         {
-            enemyMonsterField[attackableMonsters[i]].GetComponent<EnemyFieldCardScript>().SetHighlightable(value);
+            EnemyFieldCardScript script = enemyMonsterField[attackableMonsters[i]].GetComponent<EnemyFieldCardScript>();
+            script.SetHighlightable(value);
+            script.SetVRHighlightable(value);
         }
     }
 
@@ -399,19 +401,22 @@ public class FieldScript : MonoBehaviour {
         for (int index = 0; index < enemyMonsterField.Count; index++)
         {
             Monster monsterInfo = (Monster) GetEnemyCardInfo(index, true);
+            EnemyFieldCardScript script = enemyMonsterField[index].GetComponent<EnemyFieldCardScript>();
 
-            if(monsterInfo != null
+            if (monsterInfo != null
                 && (attribute == Constants.DUMMY_INEXISTENT_ID || attribute == monsterInfo.GetAttribute())
                 && (type == Constants.DUMMY_INEXISTENT_ID || type == monsterInfo.GetMonsterType())
                 && (superiorAtkLimit == 0 || monsterInfo.GetAttackPoints() <= superiorAtkLimit)
                 && highlight)
             {
-                enemyMonsterField[index].GetComponent<EnemyFieldCardScript>().SetHighlightable(true);
+                script.SetHighlightable(true);
+                script.SetVRHighlightable(true);
             }
 
             if(!highlight)
             {
-                enemyMonsterField[index].GetComponent<EnemyFieldCardScript>().SetHighlightable(false);
+                script.SetHighlightable(false);
+                script.SetVRHighlightable(false);
             }
         }
     }

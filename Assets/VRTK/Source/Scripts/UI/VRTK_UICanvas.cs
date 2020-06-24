@@ -34,7 +34,7 @@ namespace VRTK
         protected const string CANVAS_DRAGGABLE_PANEL = "VRTK_UICANVAS_DRAGGABLE_PANEL";
         protected const string ACTIVATOR_FRONT_TRIGGER_GAMEOBJECT = "VRTK_UICANVAS_ACTIVATOR_FRONT_TRIGGER";
 
-        private bool canDrawCard, canPlayHandCard, canUseDiskCard;
+        private bool canDrawCard, canPlayHandCard, canUseDiskCard, canSelectEnemyCard;
 
         protected virtual void OnEnable()
         {
@@ -73,15 +73,17 @@ namespace VRTK
                 }
             }
 
-            if(canUseDiskCard)
+            if(canUseDiskCard && Input.GetMouseButtonDown(0))
             {
-                if(Input.GetMouseButtonDown(0))
-                {
-                    gameObject.GetComponent<DiskCardScript>().HandleClick();
-                    canUseDiskCard = false;
-                }
+                gameObject.GetComponent<DiskCardScript>().HandleClick();
+                canUseDiskCard = false;
             }
-        }
+
+            if(canSelectEnemyCard)
+            {
+
+            }
+         }
 
         protected virtual void OnTriggerEnter(Collider collider)
         {
@@ -119,6 +121,25 @@ namespace VRTK
                         canUseDiskCard = true;
                     }
                     break;
+                case "FieldCard1":
+                case "FieldCard2":
+                case "FieldCard3":
+                case "FieldCard4":
+                case "FieldCard5":
+                    gameObject.GetComponent<PlayerFieldCardScript>().OnMouseEnter();
+                    break;
+                case "EnemyFieldCard1":
+                case "EnemyFieldCard2":
+                case "EnemyFieldCard3":
+                case "EnemyFieldCard4":
+                case "EnemyFieldCard5":
+                    EnemyFieldCardScript fieldScript = gameObject.GetComponent<EnemyFieldCardScript>();
+                    fieldScript.OnPointerEnter();
+                    if(fieldScript.IsHighlightable())
+                    {
+                        canSelectEnemyCard = true;
+                    }
+                    break;
             }
         }
 
@@ -144,6 +165,21 @@ namespace VRTK
                 case "Card4":
                 case "Card5":
                     canUseDiskCard = false;
+                    break;
+                case "FieldCard1":
+                case "FieldCard2":
+                case "FieldCard3":
+                case "FieldCard4":
+                case "FieldCard5":
+                    gameObject.GetComponent<PlayerFieldCardScript>().OnMouseExit();
+                    break;
+                case "EnemyFieldCard1":
+                case "EnemyFieldCard2":
+                case "EnemyFieldCard3":
+                case "EnemyFieldCard4":
+                case "EnemyFieldCard5":
+                    gameObject.GetComponent<EnemyFieldCardScript>().OnPointerExit();
+                    canSelectEnemyCard = false;
                     break;
             }
         }

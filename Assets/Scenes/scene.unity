@@ -1769,7 +1769,7 @@ PrefabInstance:
     - target: {fileID: 5400324823314114830, guid: 443d103e7b8f6204ab6d276b35471191,
         type: 3}
       propertyPath: m_Name
-      value: FieldCard5
+      value: EnemyFieldCard5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 443d103e7b8f6204ab6d276b35471191, type: 3}
@@ -2870,7 +2870,7 @@ PrefabInstance:
     - target: {fileID: 5400324823314114830, guid: 443d103e7b8f6204ab6d276b35471191,
         type: 3}
       propertyPath: m_Name
-      value: FieldCard3
+      value: EnemyFieldCard3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 443d103e7b8f6204ab6d276b35471191, type: 3}
@@ -4350,7 +4350,7 @@ PrefabInstance:
     - target: {fileID: 5400324823314114830, guid: 443d103e7b8f6204ab6d276b35471191,
         type: 3}
       propertyPath: m_Name
-      value: FieldCard2
+      value: EnemyFieldCard2
       objectReference: {fileID: 0}
     - target: {fileID: 5327099906378229236, guid: 443d103e7b8f6204ab6d276b35471191,
         type: 3}
@@ -6791,7 +6791,7 @@ PrefabInstance:
     - target: {fileID: 5400324823314114830, guid: 443d103e7b8f6204ab6d276b35471191,
         type: 3}
       propertyPath: m_Name
-      value: FieldCard4
+      value: EnemyFieldCard4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 443d103e7b8f6204ab6d276b35471191, type: 3}
@@ -12917,7 +12917,7 @@ PrefabInstance:
     - target: {fileID: 5400324823314114830, guid: 443d103e7b8f6204ab6d276b35471191,
         type: 3}
       propertyPath: m_Name
-      value: FieldCard2
+      value: EnemyFieldCard2
       objectReference: {fileID: 0}
     - target: {fileID: 5400324823314114830, guid: 443d103e7b8f6204ab6d276b35471191,
         type: 3}
@@ -14038,7 +14038,7 @@ PrefabInstance:
     - target: {fileID: 5400324823314114830, guid: 443d103e7b8f6204ab6d276b35471191,
         type: 3}
       propertyPath: m_Name
-      value: FieldCard3
+      value: EnemyFieldCard3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 443d103e7b8f6204ab6d276b35471191, type: 3}
@@ -16395,7 +16395,7 @@ PrefabInstance:
     - target: {fileID: 5400324823314114830, guid: 443d103e7b8f6204ab6d276b35471191,
         type: 3}
       propertyPath: m_Name
-      value: FieldCard1
+      value: EnemyFieldCard1
       objectReference: {fileID: 0}
     - target: {fileID: 5327099906378229236, guid: 443d103e7b8f6204ab6d276b35471191,
         type: 3}
@@ -16977,7 +16977,7 @@ PrefabInstance:
     - target: {fileID: 5400324823314114830, guid: 443d103e7b8f6204ab6d276b35471191,
         type: 3}
       propertyPath: m_Name
-      value: FieldCard4
+      value: EnemyFieldCard4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 443d103e7b8f6204ab6d276b35471191, type: 3}
@@ -17414,7 +17414,7 @@ PrefabInstance:
     - target: {fileID: 5400324823314114830, guid: 443d103e7b8f6204ab6d276b35471191,
         type: 3}
       propertyPath: m_Name
-      value: FieldCard5
+      value: EnemyFieldCard5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 443d103e7b8f6204ab6d276b35471191, type: 3}
@@ -19434,7 +19434,7 @@ PrefabInstance:
     - target: {fileID: 5400324823314114830, guid: 443d103e7b8f6204ab6d276b35471191,
         type: 3}
       propertyPath: m_Name
-      value: FieldCard1
+      value: EnemyFieldCard1
       objectReference: {fileID: 0}
     - target: {fileID: 5400324823314114830, guid: 443d103e7b8f6204ab6d276b35471191,
         type: 3}
