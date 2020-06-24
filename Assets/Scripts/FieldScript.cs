@@ -442,13 +442,15 @@ public class FieldScript : MonoBehaviour {
         {
             script = enemyMonsterField[index].GetComponent<EnemyFieldCardScript>();
             script.SetEnemySelection(false);
-            script.UnhighlightObject();
+            //script.UnhighlightObject();
+            script.SetVRHighlightable(false);
         }
         for (int index = 0; index < enemySpellField.Count; index++)
         {
             script = enemySpellField[index].GetComponent<EnemyFieldCardScript>();
             script.SetEnemySelection(false);
-            script.UnhighlightObject();
+            //script.UnhighlightObject();
+            script.SetVRHighlightable(false);
         }
     }
 }

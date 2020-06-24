@@ -92,7 +92,7 @@ public class Deck : InteractibleElementScript {
         gameObject.GetComponent<VRTK_OutlineObjectCopyHighlighter>().active = drawPhase;
     }
 
-    void OnMouseEnter()
+    void OnPointerEnter()
     {
         if (isDrawPhase)
         {
@@ -100,7 +100,7 @@ public class Deck : InteractibleElementScript {
         }
     }
 
-    void OnMouseExit()
+    void OnPointerExit()
     {
         if (isDrawPhase)
         {
@@ -108,7 +108,7 @@ public class Deck : InteractibleElementScript {
         }
     }
 
-    void OnMouseDown()
+    void OnPointerDown()
     {
         if(isDrawPhase)
         {
@@ -119,6 +119,6 @@ public class Deck : InteractibleElementScript {
     public override void InteractWithElement()
     {
         GameManager.Get().DrawCard();
-        UnhighlightObject();
+        //UnhighlightObject();
     }
 }

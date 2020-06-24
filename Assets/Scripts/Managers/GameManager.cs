@@ -1047,11 +1047,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
         {
             playerScript.DeselectDiskCards();
             fieldScript.DeselectAllFieldCards();
-            // TODO: also deselect the deck/graveyard cards (if any) - maybe these should be stored
-            // and here we can check if there is any card selected
-
-            // Set Unhighlightable
-
+            
             GraveyardButton.onClick.Invoke();
 
             List<Utils.InstantiatedGraveyardDeck> PlayerGraveyard = GraveyardCanvas.Get().GetPlayerGraveyard();
@@ -1122,6 +1118,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
                         fieldScript.DestroyFieldMonsters(true, tributeIndices);
                     }
                     fieldScript.SetEnemyMonster(cardIndex, cardInfo, face);
+                    UIManager.Get().SetHandSizeOnInfoPanel((--enemyHand).ToString(), true);
                 }
 
                 if (action == Constants.FLIPPING_TEXT && ((Monster)cardInfo).IsFlippable())
@@ -1137,6 +1134,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
                 Enums.CardFace face = (action == Constants.ACTIVATING_TEXT) ? Enums.CardFace.Up : Enums.CardFace.Down;
 
                 fieldScript.SetEnemySpell(cardIndex, cardInfo, face);
+                UIManager.Get().SetHandSizeOnInfoPanel((--enemyHand).ToString(), true);
 
                 /*if(action == Constants.ACTIVATING_TEXT)
                 {

@@ -36,36 +36,20 @@ namespace VRTK
 
         private bool canDrawCard, canPlayHandCard, canUseDiskCard, canSelectEnemyCard;
 
-        protected virtual void OnEnable()
-        {
-            SetupCanvas();
-        }
-
-        protected virtual void OnDisable()
-        {
-            RemoveCanvas();
-        }
-
-        protected virtual void OnDestroy()
-        {
-            RemoveCanvas();
-        }
-
         private void Update()
         {
             if (Input.GetMouseButtonDown(0) && canDrawCard)
             {
-                GameManager.Get().DrawCard();
-                
                 canDrawCard = false;
+                GameManager.Get().DrawCard();
             }
 
             if (canPlayHandCard)
             {
                 if(Input.GetMouseButtonDown(0))
                 {
-                    gameObject.GetComponent<HandCardScript>().HandleClick(true);
                     canPlayHandCard = false;
+                    gameObject.GetComponent<HandCardScript>().HandleClick(true);
                 }
                 if(Input.GetMouseButtonDown(1))
                 {
@@ -75,24 +59,19 @@ namespace VRTK
 
             if(canUseDiskCard && Input.GetMouseButtonDown(0))
             {
-                gameObject.GetComponent<DiskCardScript>().HandleClick();
                 canUseDiskCard = false;
+                gameObject.GetComponent<DiskCardScript>().HandleClick();
             }
 
-            if(canSelectEnemyCard)
+            if(canSelectEnemyCard && Input.GetMouseButtonDown(0))
             {
-
+                canSelectEnemyCard = false;
+                gameObject.GetComponent<EnemyFieldCardScript>().HandleClick();
             }
          }
 
         protected virtual void OnTriggerEnter(Collider collider)
         {
-            //VRTK_PlayerObject colliderCheck = collider.GetComponentInParent<VRTK_PlayerObject>();
-            //VRTK_UIPointer pointerCheck = collider.GetComponentInParent<VRTK_UIPointer>();
-            //if (pointerCheck != null && colliderCheck != null && colliderCheck.objectType == VRTK_PlayerObject.ObjectTypes.Collider)
-            //{
-            //    pointerCheck.collisionClick = clickOnPointerCollision;
-            //}
             switch(gameObject.name)
             {
                 case "DeckPlaceholder":
@@ -115,7 +94,7 @@ namespace VRTK
                 case "Card4":
                 case "Card5":
                     DiskCardScript diskScript = gameObject.GetComponent<DiskCardScript>();
-                    diskScript.OnMouseEnter();
+                    diskScript.OnPointerEnter();
                     if(diskScript.IsHighlightable())
                     {
                         canUseDiskCard = true;
@@ -145,11 +124,6 @@ namespace VRTK
 
         protected virtual void OnTriggerExit(Collider collider)
         {
-            //VRTK_UIPointer pointerCheck = collider.GetComponentInParent<VRTK_UIPointer>();
-            //if (pointerCheck != null)
-            //{
-            //    pointerCheck.collisionClick = false;
-            //}
             switch (gameObject.name)
             {
                 case "DeckPlaceholder":

@@ -113,9 +113,14 @@ public class EnemyFieldCardScript : InteractibleAbstractCard
     {
         if (highlightable && Input.GetMouseButtonDown(0))
         {
-            canvas.enabled = false;
-            InteractWithElement();
+            HandleClick();
         }
+    }
+
+    public void HandleClick()
+    {
+        canvas.enabled = false;
+        InteractWithElement();
     }
 
     public override void ChangeText()
@@ -126,7 +131,8 @@ public class EnemyFieldCardScript : InteractibleAbstractCard
     public override void InteractWithElement()
     {
         highlightable = false;
-        UnhighlightObject();
+        //UnhighlightObject();
+        SetVRHighlightable(false);
         GameManager.Get().AttackTarget(cardIndex, position, face);
     }
 }

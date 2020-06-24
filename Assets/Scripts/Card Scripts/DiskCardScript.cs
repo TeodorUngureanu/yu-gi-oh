@@ -54,7 +54,8 @@ public class DiskCardScript : InteractibleAbstractCard {
             }
             if(face == Enums.CardFace.Up || cardType == Enums.CardType.Trap)
             {
-                UnhighlightObject();
+                //UnhighlightObject();
+                SetVRHighlightable(false);
                 highlightable = false;
             }
         }
@@ -175,27 +176,27 @@ public class DiskCardScript : InteractibleAbstractCard {
         }
     }
 
-    public void OnMouseEnter()
+    public void OnPointerEnter()
     {
         UIManager.Get().ShowInformation(cardInfo.GetCardNumber(), cardInfo.IsMonster() ? Enums.CardType.Monster : Enums.CardType.Spell);
         if (highlightable)
         {
-            HighlightObject();
+            //HighlightObject();
             canvas.enabled = true;
         }
     }
 
-    public void OnMouseExit()
+    public void OnPointerExit()
     {
         UIManager.Get().HideInformation();
         if (highlightable)
         {
-            UnhighlightObject();
+            //UnhighlightObject();
             canvas.enabled = false;
         }
     }
 
-    void OnMouseOver()
+    void OnPointerOver()
     {
         if (highlightable && Input.GetMouseButtonDown(0))
         {
@@ -263,7 +264,8 @@ public class DiskCardScript : InteractibleAbstractCard {
 
         TweakCardTransform(coefficient);
 
-        UnhighlightObject();
+        //UnhighlightObject();
+        SetVRHighlightable(false);
         highlightable = false;
     }
 
@@ -274,7 +276,8 @@ public class DiskCardScript : InteractibleAbstractCard {
             if(selectionMode)
             {
                 SwitchSelectionMode(false);
-                UnhighlightObject();
+                //UnhighlightObject();
+                SetVRHighlightable(false);
                 highlightable = false;
                 GameManager.Get().SelectMonster(cardIndex);
                 return;
@@ -290,7 +293,8 @@ public class DiskCardScript : InteractibleAbstractCard {
             if(GameManager.Get().IsPlayerSacrificing())
             {
                 GameManager.Get().AddTribute(false, cardIndex);
-                UnhighlightObject();
+                //UnhighlightObject();
+                SetVRHighlightable(false);
                 highlightable = false;
                 return;
             }
@@ -313,7 +317,8 @@ public class DiskCardScript : InteractibleAbstractCard {
         }
         else
         {
-            UnhighlightObject();
+            //UnhighlightObject();
+            SetVRHighlightable(false);
             highlightable = false;
             SetFace(Enums.CardFace.Up);
             RotateCard(false);
@@ -346,7 +351,8 @@ public class DiskCardScript : InteractibleAbstractCard {
         SetBattlingMonster(false);
 
         //after attack, unhighlight it
-        UnhighlightObject();
+        //UnhighlightObject();
+        SetVRHighlightable(false);
         highlightable = false;
     }
 

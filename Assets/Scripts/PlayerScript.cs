@@ -194,10 +194,6 @@ public class PlayerScript : MonoBehaviour {
     {
         if (turn.getCurrentPhase() == Turn.Phase.Hold)
         {
-            if (!isMyTurn)
-            {
-                return;
-            }
             RefreshStuffWhenTurnStarts();
         }
 
@@ -228,6 +224,10 @@ public class PlayerScript : MonoBehaviour {
 
         if (turn.getCurrentPhase() == Turn.Phase.End)
         {
+            if (!isMyTurn)
+            {
+                return;
+            }
             UnhighlightEverything();
 
             if (handScript.GetNoOfCards() > Constants.MAX_HAND_SIZE)
@@ -560,7 +560,6 @@ public class PlayerScript : MonoBehaviour {
 
     public void DrawCard()
     {
-        //TODO: add animation
         handScript.AddCard(deckScript.DrawCard());
         UIManager.Get().SetHandSizeOnInfoPanel(handScript.GetNoOfCards().ToString(), false);
 
