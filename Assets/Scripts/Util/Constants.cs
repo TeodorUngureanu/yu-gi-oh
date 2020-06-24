@@ -20,7 +20,7 @@ public static class Constants
 
     public const int INITIAL_HAND_SIZE = 5;
     public const int MAX_HAND_SIZE = 6;
-    public const int STARTING_LIFE_POINTS = 8000;
+    public const int STARTING_LIFE_POINTS = 2000;
 
     public const string PLAYER = "FromPlayer";
     public const string ENEMY = "FromEnemy";

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,11 +9,47 @@ public class HandCardScript : InteractibleAbstractCard
 
     private Enums.CardFace summoningFace;
     private Card cardInfo;
+    private float originalY, maxYmovement = 0.15f;
+    private bool isMovingUp = false, isMovingDown = false;
 
     protected override void Awake()
     {
         base.Awake();
         objRenderer = GetComponent<Renderer>();
+        originalY = transform.position.y;
+    }
+
+    protected override void Update()
+    {
+        base.Update();
+        if(isMovingUp)
+        {
+            float currentY = transform.position.y;
+            if(currentY >= originalY + maxYmovement)
+            {
+                Vector3 defaultPos = transform.position;
+                defaultPos.y = originalY + maxYmovement;
+                transform.position = defaultPos;
+
+                isMovingUp = false;
+                return;
+            }
+            transform.Translate(Vector3.up * Time.deltaTime, Camera.main.transform);
+        } else
+        if (isMovingDown)
+        {
+            float currentY = transform.position.y;
+            if (currentY <= originalY)
+            {
+                Vector3 defaultPos = transform.position;
+                defaultPos.y = originalY;
+                transform.position = defaultPos;
+
+                isMovingDown = false;
+                return;
+            }
+            transform.Translate(Vector3.down * Time.deltaTime, Camera.main.transform);
+        }
     }
 
     public void SetCardIndex(int vCardIndex)
@@ -110,6 +144,7 @@ public class HandCardScript : InteractibleAbstractCard
 
     void OnMouseEnter()
     {
+        isMovingUp = true;
         UIManager.Get().ShowInformation(cardInfo.GetCardNumber(), cardInfo.IsMonster() ? Enums.CardType.Monster : Enums.CardType.Spell);
         if (highlightable)
         {
@@ -120,6 +155,7 @@ public class HandCardScript : InteractibleAbstractCard
 
     void OnMouseExit()
     {
+        isMovingDown = true;
         UIManager.Get().HideInformation();
         if (highlightable)
         {

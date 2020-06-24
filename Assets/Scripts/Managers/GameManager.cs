@@ -572,6 +572,9 @@ public class GameManager : MonoBehaviourPunCallbacks {
             if(!isEnemy)
             {
                 AfterAttack();
+            } else
+            {
+                fieldScript.DestroySword();
             }
         }
     }

@@ -889,7 +889,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.5882353, g: 0.8000001, b: 0.76470596, a: 1}
+  m_Color: {r: 0.105882354, g: 0.7372549, b: 0.6313726, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -909,7 +909,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 8000
+  m_Text: 2000
 --- !u!222 &207712990
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1047,7 +1047,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.61960787, g: 0.8980392, b: 0.85490197, a: 1}
+  m_Color: {r: 0.105882354, g: 0.7372549, b: 0.6313726, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -1685,7 +1685,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.8980392, g: 0.6512054, b: 0.61960787, a: 1}
+  m_Color: {r: 0.7529412, g: 0.23529412, b: 0.16470589, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -2067,7 +2067,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.61960787, g: 0.8980392, b: 0.85490197, a: 1}
+  m_Color: {r: 0.105882354, g: 0.7372549, b: 0.6313726, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -2653,7 +2653,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.86274517, g: 0.627451, b: 0.59607846, a: 1}
+  m_Color: {r: 0.7529412, g: 0.23529412, b: 0.16470589, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -2673,7 +2673,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 8000
+  m_Text: 2000
 --- !u!222 &492109144
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5279,7 +5279,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.8980393, g: 0.6509804, b: 0.61960787, a: 1}
+  m_Color: {r: 0.7529412, g: 0.23529412, b: 0.16470589, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -7395,6 +7395,7 @@ GameObject:
   - component: {fileID: 1360528751}
   - component: {fileID: 1360528753}
   - component: {fileID: 1360528754}
+  - component: {fileID: 1360528755}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -7468,6 +7469,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7e70f025767e134d9c6780cfe7ce039, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1360528755
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1360528750}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cc8b34d40ff14043941ede829224e7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  summonEffectPrefab: {fileID: 2122802673281369569, guid: 7a0be636ab571b84e8fdaeadbce195ba,
+    type: 3}
+  summonEnemyEffectPrefab: {fileID: 2122802673281369569, guid: 5843cea1fb349ae4683b158284782fe2,
+    type: 3}
 --- !u!4 &1396417868 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400032, guid: 33bcb979ee46e794eb5f20f147d607d6,
@@ -7524,7 +7541,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.8980393, g: 0.6509804, b: 0.61960787, a: 1}
+  m_Color: {r: 0.7529412, g: 0.23529412, b: 0.16470589, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -7872,7 +7889,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!81 &1480818862
 AudioListener:
   m_ObjectHideFlags: 0
@@ -8031,7 +8048,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.8980393, g: 0.6509804, b: 0.61960787, a: 1}
+  m_Color: {r: 0.7529412, g: 0.23529412, b: 0.16470589, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -9861,7 +9878,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!81 &1767782434
 AudioListener:
   m_ObjectHideFlags: 0
@@ -11046,7 +11063,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.61960787, g: 0.8980392, b: 0.85490197, a: 1}
+  m_Color: {r: 0.105882354, g: 0.7372549, b: 0.6313726, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -12159,7 +12176,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.61960787, g: 0.8980392, b: 0.85490197, a: 1}
+  m_Color: {r: 0.105882354, g: 0.7372549, b: 0.6313726, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
