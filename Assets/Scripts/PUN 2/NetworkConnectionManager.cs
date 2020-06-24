@@ -14,9 +14,38 @@ public class NetworkConnectionManager : MonoBehaviourPunCallbacks
     public InputField createRoomTF;
     public InputField joinRoomTF;
 
+    private string playerName;
+    private string enemyName;
+
+    private static NetworkConnectionManager instance;
+
+    public static NetworkConnectionManager Get()
+    {
+        return instance;
+    }
+
     private void Awake()
     {
-        OnClick_ConnectBtn();
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(this.gameObject);
+            OnClick_ConnectBtn();
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    public string GetPlayerName()
+    {
+        return playerName;
+    }
+
+    public string GetEnemyName()
+    {
+        return enemyName;
     }
 
     public void OnClick_ConnectBtn()
@@ -76,11 +105,17 @@ public class NetworkConnectionManager : MonoBehaviourPunCallbacks
         {
             connectedScreen.SetActive(false);
             waitingLobby.SetActive(true);
+
+            playerName = PhotonNetwork.NickName;
+            enemyName = PhotonNetwork.PlayerListOthers[0].NickName;
         }
         else
         {
             PhotonView photonView = PhotonView.Get(this);
             photonView.RPC("ChatMessage", RpcTarget.All, "Start_Game");
+
+            playerName = PhotonNetwork.NickName;
+            enemyName = PhotonNetwork.PlayerListOthers[0].NickName;
         }
     }
     void OnPhotonPlayerConnected()
@@ -104,6 +139,9 @@ public class NetworkConnectionManager : MonoBehaviourPunCallbacks
     {
         if (message == "Start_Game")
         {
+            playerName = PhotonNetwork.NickName;
+            enemyName = PhotonNetwork.PlayerListOthers[0].NickName;
+
             PhotonNetwork.LoadLevel("scene");
         }
     }

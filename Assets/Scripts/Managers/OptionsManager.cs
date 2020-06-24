@@ -48,7 +48,6 @@ public class OptionsManager : MonoBehaviour
 
     public void SavePlayerPrefs()
     {
-        Debug.Log(PlayerName);
         PlayerPrefs.SetString("PlayerName", PlayerName.text);
         PlayerPrefs.SetFloat("SoundFX", SoundFX.value);
         PlayerPrefs.SetFloat("Music", Music.value);

@@ -40,7 +40,8 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        PlayerName.text = PlayerPrefs.GetString("PlayerName");
+        PlayerName.text = NetworkConnectionManager.Get().GetPlayerName();
+        EnemyName.text = NetworkConnectionManager.Get().GetEnemyName();
     }
 
     public void HideInformation()

@@ -11,16 +11,37 @@ public class MainMenuManager : MonoBehaviour
     public Button Options;
     public Button Exit;
 
+    private static MainMenuManager instance;
+
+    private AudioSource MainMenuMusic;
+
     private Image ImgMultiplayer;
     private Image ImgDeckConstruction;
     private Image ImgOptions;
     private Image ImgExit;
 
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+
+            MainMenuMusic = GetComponent<AudioSource>();
+
+            if (PlayerPrefs.HasKey("Music"))
+            {
+                MainMenuMusic.volume = PlayerPrefs.GetFloat("Music");
+            }
+        }
+        else
+        {
+            DestroyObject(this.gameObject);
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        DontDestroyOnLoad(this.gameObject);
-
         ImgMultiplayer = Multiplayer.GetComponent<Image>();
         ImgDeckConstruction = DeckConstruction.GetComponent<Image>();
         ImgOptions = Options.GetComponent<Image>();
