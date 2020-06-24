@@ -40,6 +40,7 @@ public class DeckConstructionCanvas : MonoBehaviour
 
                     crtCard.transform.localScale = new Vector3(19.60209f, 31.73939f, 8.988595f);
 
+                    crtCard.transform.position = new Vector3(crtCard.transform.position.x + 0.001f, crtCard.transform.position.y, crtCard.transform.position.z);
 
                     if ((i * DeckMaxWidth + j) < monsterCardsCount)
                     {
