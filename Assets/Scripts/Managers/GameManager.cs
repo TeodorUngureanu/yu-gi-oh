@@ -417,6 +417,16 @@ public class GameManager : MonoBehaviourPunCallbacks {
             // Monster Reborn
             TriggerMonsterSelection(1, 0, 0, Constants.BOTH, Constants.GRAVEYARD, 0);
         }
+        if(cardNumber == "84257639")
+        {
+            if(isEnemyAction)
+            {
+                DecreaseLifePoints(-1000, true);
+            } else
+            {
+                BaseMethodsManager.Get().ModifyPlayerLifePoints(1000);
+            }
+        }
 
         if (!cardInfo.IsContinuous())
         {
@@ -1026,8 +1036,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
             position = (Enums.CardPosition)Enum.Parse(typeof(Enums.CardPosition), positionString);
 
             fieldScript.SetEnemyMonster(cardIndex, Config.Get().GetCardInfoByNumber(cardNumber, true), Enums.CardFace.Up);
-            fieldScript.SwitchEnemyMonsterPosition(cardIndex, cardNumber, Enums.CardFace.Down, (position == Enums.CardPosition.Atk ? Enums.CardPosition.Def : Enums.CardPosition.Atk));
-
             playerEnemyConstant = Utils.SwitchOwner(playerEnemyConstant);
 
             if (playerEnemyConstant == Constants.PLAYER)
@@ -1038,6 +1046,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
             {
                 PopCardFromEnemyGraveyard(graveyardIndex);
             }
+            StartCoroutine(CloseGraveyardCoroutine());
 
             return;
         }
@@ -1059,9 +1068,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
             selectionOwner = null;
             selectionCardType = null;
             selectedCards.Clear();
-
-            // Close la graveyard
-            StartCoroutine(CloseGraveyardCoroutine());
         }
 
         if (action == Constants.ATK_CHANGE_TEXT || action == Constants.DEF_CHANGE_TEXT)
@@ -1144,12 +1150,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
         }
 
         AskForQuickActivation();
-
-        if (action == Constants.DESELECT)
-        {
-            // Close la graveyard
-            // StartCoroutine(CloseGraveyardCoroutine());
-        }
     }
 
     private IEnumerator CloseGraveyardCoroutine()
@@ -1384,6 +1384,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
         actionBacklog.Add(message);
         actionsToBeDone = SetMonsterFromGraveyardAction + actionsToBeDone;
 
+        StartCoroutine(CloseGraveyardCoroutine());
         SendInformation(Constants.SELECTION_TEXT, 0, parameters);
     }
 }

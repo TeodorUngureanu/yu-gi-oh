@@ -13,7 +13,7 @@ public class PlayerScript : MonoBehaviour {
     private int turnCount;
     private bool isReadyForDuel, hasDrawnHand;
     private bool canPlayMonster;
-    private bool isMyTurn = true; //only set for testing
+    private bool isMyTurn = false; //only set for testing
     private bool hasDuelEnded;
     private bool askingForQuickActivation, askingForEffectActivation;
     private bool paused = false;
@@ -333,7 +333,12 @@ public class PlayerScript : MonoBehaviour {
                 }
                 if(!crtCard.IsMonster() && spellsOnDisk.IndexOf(null) != -1)
                 {
-                    handScript.SetCardHighlightable(index);
+                    if(crtCard.GetCardNumber() != "83764718" || 
+                        (GameManager.Get().GetGraveyard(Constants.PLAYER).Count > 0 ||
+                        GameManager.Get().GetGraveyard(Constants.ENEMY).Count > 0))
+                    {
+                        handScript.SetCardHighlightable(index);
+                    }
                 }
             } else
             {
@@ -377,7 +382,12 @@ public class PlayerScript : MonoBehaviour {
                     if ((diskScript.GetTypeForIndex(index) == Enums.CardType.Spell || crtCard.GetTurnPlayed() != turnCount)
                             && !diskScript.IsSpellActivated(index))
                     {
-                        diskScript.HighlightSpell(index);
+                        if (crtCard.GetCardNumber() != "83764718" ||
+                        (GameManager.Get().GetGraveyard(Constants.PLAYER).Count > 0 ||
+                        GameManager.Get().GetGraveyard(Constants.ENEMY).Count > 0))
+                        {
+                            diskScript.HighlightSpell(index);
+                        }
                     }
                 }
                 else
