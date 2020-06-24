@@ -36,5 +36,6 @@ MonoBehaviour:
   - RespawnSpaceship
   - SendSerializedMessage
   - ReceiveSerializedMessage
+  - ChatMessage
   DisableAutoOpenWizard: 1
   ShowSettings: 1

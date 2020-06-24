@@ -9,6 +9,7 @@ public class NetworkConnectionManager : MonoBehaviourPunCallbacks
 {
     public GameObject connectedScreen;
     public GameObject disconnectedScreen;
+    public GameObject waitingLobby;
 
     public InputField createRoomTF;
     public InputField joinRoomTF;
@@ -20,9 +21,12 @@ public class NetworkConnectionManager : MonoBehaviourPunCallbacks
 
     public void OnClick_ConnectBtn()
     {
+        string playerName = PlayerPrefs.GetString("PlayerName");
+
         PhotonNetwork.OfflineMode = false;
-        PhotonNetwork.NickName = "PlayerName";
+        PhotonNetwork.NickName = "" + playerName;
         PhotonNetwork.GameVersion = "v1";
+        PhotonNetwork.AutomaticallySyncScene = true;
 
         PhotonNetwork.ConnectUsingSettings();
     }
@@ -68,11 +72,40 @@ public class NetworkConnectionManager : MonoBehaviourPunCallbacks
             + " - " 
             + PhotonNetwork.CurrentRoom.PlayerCount);
 
-        PhotonNetwork.LoadLevel("scene");
+        if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
+        {
+            connectedScreen.SetActive(false);
+            waitingLobby.SetActive(true);
+        }
+        else
+        {
+            PhotonView photonView = PhotonView.Get(this);
+            photonView.RPC("ChatMessage", RpcTarget.All, "Start_Game");
+        }
+    }
+    void OnPhotonPlayerConnected()
+    {
+        Debug.Log("OnPhotonPlayerConnected " + PhotonNetwork.CountOfPlayers);
+    }
+
+    public void CancelConnectionAndReturnToMainMenu()
+    {
+        PhotonNetwork.Disconnect();
+        PhotonNetwork.LoadLevel("mainMenu");
     }
 
     public override void OnJoinRoomFailed(short returnCode, string message)
     {
         Debug.Log("Room Joined Failed " + returnCode + ", Message " + message);
     }
+
+    [PunRPC]
+    void ChatMessage(string message)
+    {
+        if (message == "Start_Game")
+        {
+            PhotonNetwork.LoadLevel("scene");
+        }
+    }
+
 }
