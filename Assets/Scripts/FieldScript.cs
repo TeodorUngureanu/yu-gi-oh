@@ -264,7 +264,7 @@ public class FieldScript : MonoBehaviour {
             else
             {
                 spellField[fieldIndices[index]].SetActive(false);
-                spellField[fieldIndices[index]].transform.localEulerAngles = new Vector3(0, 90, 0);
+                spellField[fieldIndices[index]].transform.localEulerAngles = new Vector3(0, 0, 0);
             }
         }
         UIManager.Get().HideInformation();

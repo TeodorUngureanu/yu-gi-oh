@@ -777,6 +777,7 @@ public class PlayerScript : MonoBehaviour {
     {
         lifePoints += points;
         UIManager.Get().UpdateLPOnDisk(lifePoints);
+        UIManager.Get().UpdatePointsOnInfoPanel(lifePoints.ToString(), false);
         return lifePoints;
     }
     
