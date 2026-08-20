@@ -1,4 +1,4 @@
-# YuGiHoHoHo
+# YU-GI-OH! VR
 
 A Unity implementation of the *Yu-Gi-Oh! Trading Card Game*, featuring real-time multiplayer duels and a virtual reality game mode.
 
@@ -51,3 +51,18 @@ The VR mode is built on VRTK and expects a compatible headset/controller setup (
 ## License
 
 This is an educational/dissertation project. No license has been specified — all rights reserved unless stated otherwise.
+
+### Demo
+Un spirit malefic capturează anotimpurile, cauzează haos, transformă lumea într-un deșert. Vulpea vrea să le salveze, începe prin a traversa deșertul, luptă la sfârșit cu spiritul rău, îl învinge, acesta se retrage. Apoi intră pe teritoriul fiecărui anotimp (acestea au fost corupte, trebuie învinse, după care i se va alătura în party; fiecare anotimp va avea una sau mai multe abilități, la switch între vulpe și un anotimp se schimbă nuanțele background-ului pentru a reprezenta acel anotimp. La final party-ul e compus din vulpe și cele 4 anotimpuri, care trebuie să învingă spiritul rău (acesta a absorbit între timp o parte din puterile anotimpurilor și este mai greu de învins).
+
+<img width="240" height="135" alt="MainMenu" src="https://github.com/user-attachments/assets/bab915e8-6835-4599-a2bf-c3c306860784" />
+<img width="240" height="135" alt="Networking" src="https://github.com/user-attachments/assets/86fc9ad1-db7a-437d-8e8c-6380fa667d94" />
+<img width="240" height="160" alt="deck" src="https://github.com/user-attachments/assets/f6835ad3-89a9-4ed8-bd08-53e97c38a910" />
+<img width="240" height="135" alt="Scene" src="https://github.com/user-attachments/assets/4bef0c86-deee-4d76-b25e-8759a8b28583" />
+<img width="240" height="110" alt="player" src="https://github.com/user-attachments/assets/5611b92e-373b-4134-a5bf-6269c6fdc5c8" />
+<img width="240" height="110" alt="enemy" src="https://github.com/user-attachments/assets/c31b1c77-231e-4c22-b543-36487d81cab7" />
+<img width="240" height="135" alt="Graveyard" src="https://github.com/user-attachments/assets/5a3e99a4-96a4-4181-90fa-bf243d6cca7b" />
+
+Video
+
+[<img src="https://img.youtube.com/vi/4rrq2kjN1H8/0.jpg" width="240">](https://youtu.be/4rrq2kjN1H8)
