@@ -20,11 +20,11 @@ Originally built as part of a dissertation project, it recreates the core duel l
 - **Data:** SQLite (card database)
 - **Language:** C#
 
-### Playing a multiplayer duel
+## Playing a multiplayer duel
 
 The game uses Photon PUN 2 for networking. To test multiplayer locally, make sure a valid Photon App ID is configured in the PUN 2 setup wizard, then launch two instances of the game (e.g. via two Editor/build instances) and join the same room from the lobby.
 
-### Playing in VR
+## Playing in VR
 
 The VR mode is built on VRTK and expects a compatible headset/controller setup (e.g. SteamVR-supported hardware). Launch the VR scene with your headset connected to duel using motion controllers.
 
@@ -42,7 +42,7 @@ The VR mode is built on VRTK and expects a compatible headset/controller setup (
 
 This is an educational/dissertation project. No license has been specified — all rights reserved unless stated otherwise.
 
-### Demo
+## Demo
 An evil spirit captures the Seasons, causing chaos and turning the world into a desert. The Fox sets out to save them, first crossing the desert and facing the evil spirit in a final battle — defeating it and forcing it to retreat. The Fox then enters each Season's territory; each one has been corrupted and must be defeated before joining the party. Each Season has one or more unique abilities, and switching between the Fox and a Season shifts the background's color palette to reflect that Season. By the end, the party is made up of the Fox and all four Seasons, who must face the evil spirit once more — having absorbed part of the Seasons' powers in the meantime, it is now far harder to defeat.
 
 <img width="240" height="135" alt="MainMenu" src="https://github.com/user-attachments/assets/bab915e8-6835-4599-a2bf-c3c306860784" />
