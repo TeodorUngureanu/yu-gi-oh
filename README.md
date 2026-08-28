@@ -20,16 +20,6 @@ Originally built as part of a dissertation project, it recreates the core duel l
 - **Data:** SQLite (card database)
 - **Language:** C#
 
-## Getting started
-
-1. Install [Unity Hub](https://unity.com/download) and Unity Editor version **2018.4.5f1**.
-2. Clone the repository:
-   ```
-   git clone https://github.com/TeodorUngureanu/yu-gi-oh.git
-   ```
-3. Open the project folder in Unity Hub / the Unity Editor.
-4. Open the main menu scene from `Assets/Scripts/Scenes` (or the scene configured in Build Settings) and press Play.
-
 ### Playing a multiplayer duel
 
 The game uses Photon PUN 2 for networking. To test multiplayer locally, make sure a valid Photon App ID is configured in the PUN 2 setup wizard, then launch two instances of the game (e.g. via two Editor/build instances) and join the same room from the lobby.
@@ -53,7 +43,7 @@ The VR mode is built on VRTK and expects a compatible headset/controller setup (
 This is an educational/dissertation project. No license has been specified — all rights reserved unless stated otherwise.
 
 ### Demo
-Un spirit malefic capturează anotimpurile, cauzează haos, transformă lumea într-un deșert. Vulpea vrea să le salveze, începe prin a traversa deșertul, luptă la sfârșit cu spiritul rău, îl învinge, acesta se retrage. Apoi intră pe teritoriul fiecărui anotimp (acestea au fost corupte, trebuie învinse, după care i se va alătura în party; fiecare anotimp va avea una sau mai multe abilități, la switch între vulpe și un anotimp se schimbă nuanțele background-ului pentru a reprezenta acel anotimp. La final party-ul e compus din vulpe și cele 4 anotimpuri, care trebuie să învingă spiritul rău (acesta a absorbit între timp o parte din puterile anotimpurilor și este mai greu de învins).
+An evil spirit captures the Seasons, causing chaos and turning the world into a desert. The Fox sets out to save them, first crossing the desert and facing the evil spirit in a final battle — defeating it and forcing it to retreat. The Fox then enters each Season's territory; each one has been corrupted and must be defeated before joining the party. Each Season has one or more unique abilities, and switching between the Fox and a Season shifts the background's color palette to reflect that Season. By the end, the party is made up of the Fox and all four Seasons, who must face the evil spirit once more — having absorbed part of the Seasons' powers in the meantime, it is now far harder to defeat.
 
 <img width="240" height="135" alt="MainMenu" src="https://github.com/user-attachments/assets/bab915e8-6835-4599-a2bf-c3c306860784" />
 <img width="240" height="135" alt="Networking" src="https://github.com/user-attachments/assets/86fc9ad1-db7a-437d-8e8c-6380fa667d94" />
