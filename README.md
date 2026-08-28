@@ -42,17 +42,16 @@ The VR mode is built on VRTK and expects a compatible headset/controller setup (
 
 This is an educational/dissertation project. No license has been specified — all rights reserved unless stated otherwise.
 
+## Design
+
+<img width="480" height="270" alt="MainMenu" src="https://github.com/user-attachments/assets/bab915e8-6835-4599-a2bf-c3c306860784" />
+<img width="480" height="270" alt="Networking" src="https://github.com/user-attachments/assets/86fc9ad1-db7a-437d-8e8c-6380fa667d94" />
+<img width="480" height="320" alt="deck" src="https://github.com/user-attachments/assets/f6835ad3-89a9-4ed8-bd08-53e97c38a910" />
+<img width="480" height="270" alt="Scene" src="https://github.com/user-attachments/assets/4bef0c86-deee-4d76-b25e-8759a8b28583" />
+<img width="480" height="220" alt="player" src="https://github.com/user-attachments/assets/5611b92e-373b-4134-a5bf-6269c6fdc5c8" />
+<img width="480" height="220" alt="enemy" src="https://github.com/user-attachments/assets/c31b1c77-231e-4c22-b543-36487d81cab7" />
+<img width="480" height="270" alt="Graveyard" src="https://github.com/user-attachments/assets/5a3e99a4-96a4-4181-90fa-bf243d6cca7b" />
+
 ## Demo
-An evil spirit captures the Seasons, causing chaos and turning the world into a desert. The Fox sets out to save them, first crossing the desert and facing the evil spirit in a final battle — defeating it and forcing it to retreat. The Fox then enters each Season's territory; each one has been corrupted and must be defeated before joining the party. Each Season has one or more unique abilities, and switching between the Fox and a Season shifts the background's color palette to reflect that Season. By the end, the party is made up of the Fox and all four Seasons, who must face the evil spirit once more — having absorbed part of the Seasons' powers in the meantime, it is now far harder to defeat.
 
-<img width="240" height="135" alt="MainMenu" src="https://github.com/user-attachments/assets/bab915e8-6835-4599-a2bf-c3c306860784" />
-<img width="240" height="135" alt="Networking" src="https://github.com/user-attachments/assets/86fc9ad1-db7a-437d-8e8c-6380fa667d94" />
-<img width="240" height="160" alt="deck" src="https://github.com/user-attachments/assets/f6835ad3-89a9-4ed8-bd08-53e97c38a910" />
-<img width="240" height="135" alt="Scene" src="https://github.com/user-attachments/assets/4bef0c86-deee-4d76-b25e-8759a8b28583" />
-<img width="240" height="110" alt="player" src="https://github.com/user-attachments/assets/5611b92e-373b-4134-a5bf-6269c6fdc5c8" />
-<img width="240" height="110" alt="enemy" src="https://github.com/user-attachments/assets/c31b1c77-231e-4c22-b543-36487d81cab7" />
-<img width="240" height="135" alt="Graveyard" src="https://github.com/user-attachments/assets/5a3e99a4-96a4-4181-90fa-bf243d6cca7b" />
-
-Video
-
-[<img src="https://img.youtube.com/vi/4rrq2kjN1H8/0.jpg" width="240">](https://youtu.be/4rrq2kjN1H8)
+[<img src="https://img.youtube.com/vi/4rrq2kjN1H8/0.jpg" width="480">](https://youtu.be/4rrq2kjN1H8)
